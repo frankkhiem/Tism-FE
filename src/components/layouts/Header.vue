@@ -80,7 +80,12 @@
           <span class="home-link-img"></span>
         </div>
       </router-link>
-      <div class="top-nav-right">
+      <div 
+        class="top-nav-right" 
+        :style="{
+          height: '42px'
+        }"
+      >
         <router-link to="/" class="top-nav-links">
           <sui-icon
             bordered
@@ -136,7 +141,7 @@
             }"
           ></sui-icon>
         </router-link>
-        <div class="dropdown-menu">
+        <div class="dropdown-menu-account">
           <p
             :style="{
               borderRadius: '50%',
@@ -278,7 +283,7 @@ export default {
   width: 18px;
 }
 
-.dropdown-menu {
+.dropdown-menu-account {
   cursor: pointer;
 }
 

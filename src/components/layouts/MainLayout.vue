@@ -5,8 +5,9 @@
       <router-view></router-view>
     </section>
     <div class="footer">
-      <h3>Footer</h3>
+      <h3>chan trang</h3>
     </div>
+    <Footer></Footer>
   </div>
 </template>
 
@@ -14,8 +15,14 @@
 import { mapGetters, mapMutations } from "vuex";
 import axios from "axios";
 import Header from "./Header.vue";
+import Footer from "./Footer.vue";
 
 export default {
+  components: { 
+    Header,
+    Footer
+  },
+
   computed: {
     ...mapGetters({
       isAuth: "userAuthenticated",
@@ -53,7 +60,6 @@ export default {
       this.$router.push({ name: "Login" });
     },
   },
-  components: { Header },
 };
 </script>
 
@@ -63,7 +69,8 @@ div.footer {
 
   h3 {
     font-size: 22px;
-    margin-left: 3rem;
+    width: fit-content;
+    margin: 0 auto;
   }
 }
 </style>
