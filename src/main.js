@@ -2,6 +2,9 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
+import SeUIVue from 'semantic-ui-vue'
+import 'semantic-ui-css/semantic.min.css';
+import './assets/css/general.css';
 // import GAuth from 'vue-google-oauth2'
 
 Vue.config.productionTip = false
@@ -13,6 +16,7 @@ Vue.config.productionTip = false
 //   prompt: 'consent'
 // }
 // Vue.use(GAuth, gauthOption)
+Vue.use(SeUIVue)
 
 new Vue({
   router,
