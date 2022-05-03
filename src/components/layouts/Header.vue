@@ -159,9 +159,15 @@
             </sui-icon>
           </p>
           <div class="menu-options" v-show="show_dropdown_menu == true">
-            <div class="option" v-for="option in options" :key="option.id">
-              <i aria-hidden="true" class="icon" :class="option.icon"></i
-              ><span class="text">{{ option.text }}</span>
+            <div class="option" v-for="(option, index) in options" :key="index">
+              <div v-if="index !== options.length - 1">
+                <i aria-hidden="true" class="icon" :class="option.icon"></i>
+                <span class="text">{{ option.text }}</span>
+              </div>
+              <div v-else @click="logout">
+                <i aria-hidden="true" class="icon" :class="option.icon"></i>
+                <span class="text">{{ option.text }}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -192,6 +198,12 @@ export default {
       ],
     };
   },
+
+  methods: {
+    logout() {
+      this.$emit('logout')
+    }
+  }
 };
 </script>
 
@@ -309,13 +321,16 @@ export default {
   margin: 0;
   text-align: left;
   font-size: 1em !important;
-  padding: 11px 16px !important;
   background: 0 0 !important;
   color: rgba(0, 0, 0, 0.87) !important;
   text-transform: none !important;
   font-weight: 400 !important;
   box-shadow: none !important;
   transition: none !important;
+}
+
+.menu-options > .option > div {
+  padding: 11px 16px !important;
 }
 
 .menu-options > .option:hover {

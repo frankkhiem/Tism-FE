@@ -1,10 +1,10 @@
 <template>
   <div class="app-main">
-    <Header></Header>
+    <Header v-on:logout="logout"></Header>
     <section id="app-content">
       <router-view></router-view>
     </section>
-    <div>
+    <div class="footer">
       <h3>Footer</h3>
     </div>
   </div>
@@ -34,6 +34,7 @@ export default {
     ...mapMutations({
       logoutUser: "logoutUser",
     }),
+
     async logout() {
       try {
         const accessToken = localStorage.getItem("accessToken");
@@ -56,4 +57,13 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style lang="scss" scoped>
+div.footer {
+  margin-top: 2rem;
+
+  h3 {
+    font-size: 22px;
+    margin-left: 3rem;
+  }
+}
+</style>
