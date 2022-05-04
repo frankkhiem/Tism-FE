@@ -4,9 +4,7 @@
     <section id="app-content">
       <router-view></router-view>
     </section>
-    <div class="footer">
-      <h3>chan trang</h3>
-    </div>
+    <router-link to="/contacts">Danh ba</router-link>
     <Footer></Footer>
   </div>
 </template>
@@ -64,13 +62,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-div.footer {
-  margin-top: 2rem;
 
-  h3 {
-    font-size: 22px;
-    width: fit-content;
-    margin: 0 auto;
-  }
-}
 </style>

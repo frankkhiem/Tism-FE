@@ -5,7 +5,9 @@ const state = {
 }
 
 const getters = {
-  
+  outlookContacts: (state) => {
+    return state.outlookContacts
+  }
 }
 
 const mutations = {
@@ -46,6 +48,23 @@ const actions = {
       console.log(error.response.data)
     }
   },
+
+  outlookUnlink: async ({ dispatch }) => {
+    const accessToken = localStorage.getItem('accessToken')
+
+    try {
+      const response = await axios.get(`${process.env.VUE_APP_ZATO_ESB_MODULE_HOST}/outlook/unlink`, {
+        params: {
+          accessToken
+        }
+      })
+
+      if( response.data.success ) dispatch('getOutlookContacts')
+    } catch(error) {
+      // statements
+      console.log(error.response.data);
+    }
+  }
 }
 
 export default {

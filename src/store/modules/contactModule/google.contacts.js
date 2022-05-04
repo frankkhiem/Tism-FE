@@ -5,7 +5,9 @@ const state = {
 }
 
 const getters = {
-  
+  googleContacts: (state) => {
+    return state.googleContacts
+  }
 }
 
 const mutations = {
