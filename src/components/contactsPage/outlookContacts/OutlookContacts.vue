@@ -16,7 +16,7 @@
       <div @click="accountLinking" class="account-link-btn">
         <img class="tism-logo" src="@/assets/img/IconPage.png" alt="Logo Tism">
         <i class="fa-solid fa-link"></i>
-        <img class="outlook-logo" src="https://img.icons8.com/color/48/000000/ms-outlook.png" alt="Logo Outlook">
+        <img class="outlook-logo" src="https://seeklogo.com/images/O/outlook-logo-7117D18788-seeklogo.com.png" alt="Logo Outlook">
       </div>
     </div>
     <div v-if="!loading && outlook.linked">
@@ -111,7 +111,7 @@ export default {
     },
 
     async unlink() {
-      if( confirm('Bạn muốn hủy kết nối') ) {
+      if( confirm('Bạn muốn hủy kết nối Outlook') ) {
         this.loading = true
         await this.outlookUnlink()
         this.loading = false
@@ -121,7 +121,7 @@ export default {
     },
 
     async accountLinking() {
-      console.log('dang lien ket tai khoan outlook')
+      console.log('Dang lien ket tai khoan Outlook')
       let url = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=e63fb652-b80d-439f-a487-87dc8ea3bd7b&response_type=code&redirect_uri=http://localhost:8080/outlook/get-auth-code&scope=User.Read User.ReadWrite Contacts.Read Contacts.ReadWrite offline_access&response_mode=query`
       window.location.href = url
     }
@@ -141,7 +141,7 @@ export default {
 
 <style lang="scss" scoped>
 .contacts-page__outlook {
-  width: 50%;
+  width: 675px;
   margin: 0 auto;
 
   .contacts-count {
@@ -214,8 +214,8 @@ export default {
       }
 
       img.tism-logo {
-        width: 30px;
-        height: 30px;
+        width: 40px;
+        height: 40px;
       }
 
       img.outlook-logo {

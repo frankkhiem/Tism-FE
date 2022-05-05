@@ -9,6 +9,7 @@
           v-for="(contact, index) in groupContacts" 
           :key="index"
           :contact="contact"
+          :checked-names="checkedNames"
         >          
         </ContactItem>
       </div>
@@ -28,7 +29,8 @@ export default {
     contacts: {
       type: Object,
       required: true
-    }
+    },
+    checkedNames: Array
   }
 }
 </script>

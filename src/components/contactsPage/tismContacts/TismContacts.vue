@@ -1,36 +1,37 @@
 <template>
-  <div class="contacts-page__google">
+  <div class="contacts-page__tism">
     <ContactsTitle 
-      :email="google.account"
-      @google-refresh="googleRefresh"
-      @google-sync="googleSync"
-    ></ContactsTitle>
+      :checked-names="checkedNames"
+      @create-contact="createContact"
+      @tism-refresh="tismRefresh"
+      @tism-sync="tismSync"
+    >
+    </ContactsTitle>
     <div v-if="loading" class="loading-page">
       <img src="@/assets/img/Dual Ring-1s-200px.gif" alt="">
     </div>
-    <div v-if="!loading && !google.linked" class="account-link">
-      <div class="account-link__intro">
-        <h5>Bạn chưa liên kết <strong>Tism</strong> với tài khoản <strong>Google</strong> của mình</h5>
-        <p>Nếu muốn đồng bộ danh bạ của bạn với Google, hãy kết nối ngay bây giờ!</p>
-      </div>
-      <div @click="accountLinking" class="account-link-btn">
-        <img class="tism-logo" src="@/assets/img/IconPage.png" alt="Logo Tism">
-        <i class="fa-solid fa-link"></i>
-        <img class="google-logo" src="https://img.icons8.com/external-justicon-lineal-color-justicon/48/000000/external-google-social-media-justicon-lineal-color-justicon.png" alt="Logo Google">
-      </div>
-    </div>
-    <div v-if="!loading && google.linked">
+    <div v-else>
       <ContactsSearch @search-contacts="search"></ContactsSearch>
-      <div class="contacts-count">
-        Có {{ contactsCount }} liên hệ
-      </div>
-      <ListHeader></ListHeader>
-      <ListContacts :contacts="listContacts"></ListContacts>
-      <div class="unlink">
-        <div class="unlink-btn" @click="unlink">
-          <i class="fa-solid fa-link-slash"></i>
-          Hủy liên kết Google
-        </div>
+      <ContactsInfo 
+        :contacts-count="contactsCount"
+        :contacts-sync-at="tism.syncAt"
+      >
+      </ContactsInfo>
+      <ListHeader 
+        @check-all-change="checkAll"
+        :checked-all="checkedAll"
+        :contacts-count="contactsCount"
+      ></ListHeader>
+      <ListContacts
+        :contacts="listContacts"
+        :checked-names="checkedNames"
+      ></ListContacts>
+      <div 
+        v-if="contactsCount === 0" 
+        class="empty-contacts"
+        @click="createContact"
+      >
+        Danh bạ trống, hãy tạo mới!
       </div>
     </div>
   </div>
@@ -40,6 +41,7 @@
 import { mapGetters, mapActions } from 'vuex'
 import ContactsTitle from './ContactsTitle'
 import ContactsSearch from './ContactsSearch'
+import ContactsInfo from './ContactsInfo'
 import ListHeader from './ListHeader'
 import ListContacts from './ListContacts'
 
@@ -47,33 +49,36 @@ export default {
   components: {
     ContactsTitle,
     ContactsSearch,
+    ContactsInfo,
     ListHeader,
     ListContacts
   },
 
   computed: {
     ...mapGetters({
-      google: 'googleContacts',
-    }),
+      tism: 'tismContacts',
+    })
   },
 
   data() {
     return {
       listContacts: {},
       contactsCount: 0,
-      loading: false
+      loading: false,
+      checkedNames: [],
+      checkedAll: false
     }
   },
 
   methods: {
     ...mapActions({
-      refreshGoogleContacts: 'refreshGoogleContacts',
-      googleUnlink: 'googleUnlink'
+      refreshTismContacts: 'getSyncContacts',
+      syncTismContacts: 'syncContacts'
     }),
 
     search(keyword) {
       // console.log(keyword)
-      const contacts = this.google.contacts.filter((contact) => {
+      const contacts = this.tism.contacts.filter((contact) => {
         if( contact.phoneName.toLowerCase().includes(keyword.toLowerCase()) ) return true
         for (let i = 0; i < contact.phoneNumbers.length; i++) {
           if( contact.phoneNumbers[i].replace(/\s/g, '').includes(keyword.replace(/\s/g, '')) ) return true
@@ -86,8 +91,7 @@ export default {
 
     sortContacts(contacts) {
       this.listContacts = {}
-      this.contactsCount = 0
-      if( !this.google.linked || this.google.linked === undefined ) return
+      this.contactsCount = 0,
       contacts.forEach((contact) => {
         this.contactsCount++
         const firstLetter = contact.phoneName[0].toUpperCase()
@@ -100,54 +104,64 @@ export default {
       })
     },
 
-    async googleRefresh() {
+    async tismRefresh() {
       this.loading = true
-      await this.refreshGoogleContacts()
+      await this.refreshTismContacts()
       this.loading = false
     },
 
-    googleSync() {
-      console.log('dong bo nguoc google')
+    async tismSync() {
+      this.loading = true
+      await this.syncTismContacts()
+      this.loading = false
     },
 
-    async unlink() {
-      if( confirm('Bạn muốn hủy kết nối Google') ) {
-        this.loading = true
-        await this.googleUnlink()
-        this.loading = false
-      } else {
-        console.log('Không hủy')
+    async createContact() {
+      console.log('Tao moi')
+    },
+
+    checkAll(checked) {
+      this.checkedNames = []
+      if( checked ) {
+        for( let groupContacts in this.listContacts ) {
+          for( let contact of this.listContacts[groupContacts] ) {
+            this.checkedNames.push(contact.phoneName)
+          }
+        }
       }
-    },
-
-    async accountLinking() {
-      console.log('Dang lien ket tai khoan Google')
-      let url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=301608552892-g7inqpodo0dkvlvkmnaqrmpgf8oi695d.apps.googleusercontent.com&scope=https://www.googleapis.com/auth/contacts https://www.googleapis.com/auth/contacts.readonly https://www.googleapis.com/auth/userinfo.email&redirect_uri=http://localhost:8080/google/get-auth-code&response_type=code&access_type=offline&prompt=select_account`
-      window.location.href = url
     }
   },
 
   created() {
-    this.sortContacts(this.google.contacts)
+    if( this.tism.contacts ) {
+      this.sortContacts(this.tism.contacts)
+    }
   },
 
   watch: {
-    google(newValue) {
+    tism(newValue) {
       this.sortContacts(newValue.contacts)
+    },
+
+    listContacts() {
+      this.checkAll(false)
+    },
+
+    checkedNames(newValue) {
+      if( newValue.length === this.contactsCount && this.contactsCount !== 0 ) {
+        this.checkedAll = true
+      } else {
+        this.checkedAll = false
+      }
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.contacts-page__google {
-  width: 675px;
+.contacts-page__tism {
+  width: 810px;
   margin: 0 auto;
-
-  .contacts-count {
-    margin-top: 1rem;
-    margin-left: 1rem;
-  }
 
   .loading-page {
     text-align: center;
@@ -218,7 +232,7 @@ export default {
         height: 40px;
       }
 
-      img.google-logo {
+      img.tism-logo {
         width: 40px;
         height: 40px;
       }
@@ -226,6 +240,18 @@ export default {
       i {
         margin: 0 .5rem 0 .7rem;
       }
+    }
+  }
+
+  .empty-contacts {
+    margin-top: 4rem;
+    font-size: 18px;
+    text-align: center;
+    color: #28afb7;
+    cursor: pointer;
+
+    &:hover {
+      color: #1965a9;
     }
   }
 }

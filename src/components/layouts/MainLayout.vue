@@ -57,6 +57,7 @@ export default {
       this.logoutUser();
       this.$router.push({ name: "Login" });
     },
+
   },
 };
 </script>

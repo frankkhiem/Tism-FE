@@ -6,7 +6,7 @@
     </div>
     <div v-else class="google__account--unlinked">
       <b-icon icon="exclamation-octagon-fill" variant="warning"></b-icon> 
-      <span>Bạn chưa liên kết với tài khoản Google</span>
+      <span>Chưa có kết nối Google</span>
     </div>
     <div class="google__btns">
       <div 

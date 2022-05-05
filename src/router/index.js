@@ -35,7 +35,7 @@ const routes = [
           {
             path: '',
             name: 'Contacts',
-            component: () => import('../components/contactsPage/contactsType/TismContacts'),
+            component: () => import('../components/contactsPage/tismContacts/TismContacts'),
           },
           {
             path: 'google-contacts',

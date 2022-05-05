@@ -48,6 +48,23 @@ const actions = {
       console.log(error.response.data)
     }
   },
+
+  googleUnlink: async ({ dispatch }) => {
+    const accessToken = localStorage.getItem('accessToken')
+
+    try {
+      const response = await axios.get(`${process.env.VUE_APP_ZATO_ESB_MODULE_HOST}/google/unlink`, {
+        params: {
+          accessToken
+        }
+      })
+
+      if( response.data.success ) dispatch('getGoogleContacts')
+    } catch(error) {
+      // statements
+      console.log(error.response.data);
+    }
+  }
 }
 
 export default {
