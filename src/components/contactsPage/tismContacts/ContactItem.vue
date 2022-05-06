@@ -33,7 +33,12 @@
       <i v-if="contact.phoneNumbers.length > 1" class="fa-solid fa-caret-down show-more"></i>
     </div>
     <div class="contact__actions" :style="{ fontSize: '1.5rem' }">
-      <div class="edit-btn" @mouseenter="hoverEdit = true" @mouseleave="hoverEdit = false">
+      <div 
+        class="edit-btn" 
+        @mouseenter="hoverEdit = true" 
+        @mouseleave="hoverEdit = false"
+        @click.stop="updateContact"
+      >
         <b-icon 
           v-if="hoverEdit"
           icon="pen-fill" 
@@ -117,6 +122,10 @@ export default {
       deleteContact: 'deleteContact'
     }),
 
+    updateContact() {
+      this.$emit('update-contact')
+    },
+
     deleteAContact() {
       this.$confirm(
         {
@@ -177,6 +186,7 @@ export default {
       display: flex;
       align-items: baseline;
       position: relative;
+      width: 150px;
 
       .show-less {
         position: absolute;

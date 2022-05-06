@@ -119,10 +119,10 @@ export default {
     }
 
     .create-btn {
-      background-color: #248398;
+      background-color: #137c94;
 
       &:hover {
-        background-color: #167084;
+        background-color: #095e71;
       }
     }
 

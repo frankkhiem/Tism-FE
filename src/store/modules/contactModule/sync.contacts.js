@@ -51,6 +51,47 @@ const actions = {
     }
   },
 
+  createContact: async ({ dispatch }, { phoneName, phoneNumbers }) => {
+    const accessToken = localStorage.getItem('accessToken')
+
+    try {
+      const response = await axios.post(`${process.env.VUE_APP_ZATO_ESB_MODULE_HOST}/contact`, {
+        accessToken,
+        phoneName,
+        phoneNumbers
+      })
+
+      if( response.data.success ) {
+        await dispatch('getSyncContacts')
+      }
+      return response.data
+    } catch(error) {
+      // statements
+      console.log(error.response.data);
+    }
+  },
+
+  updateContact: async ({ dispatch }, { oldPhoneName, newPhoneName, phoneNumbers }) => {
+    const accessToken = localStorage.getItem('accessToken')
+
+    try {
+      const response = await axios.put(`${process.env.VUE_APP_ZATO_ESB_MODULE_HOST}/contact`, {
+        accessToken,
+        oldPhoneName,
+        newPhoneName,
+        phoneNumbers
+      })
+
+      if( response.data.success ) {
+        await dispatch('getSyncContacts')
+      }
+      return response.data
+    } catch(error) {
+      // statements
+      console.log(error.response.data);
+    }
+  },
+
   deleteContact: async ({ dispatch }, phoneName) => {
     const accessToken = localStorage.getItem('accessToken')
 
@@ -58,7 +99,7 @@ const actions = {
       await axios.delete(`${process.env.VUE_APP_ZATO_ESB_MODULE_HOST}/contact`, {
         params: {
           accessToken,
-          phoneName: phoneName
+          phoneName
         }
       })
 

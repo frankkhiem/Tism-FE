@@ -10,6 +10,7 @@
           :key="index"
           :contact="contact"
           :checked-names="checkedNames"
+          @update-contact="$emit('update-contact', contact)"
         >          
         </ContactItem>
       </div>

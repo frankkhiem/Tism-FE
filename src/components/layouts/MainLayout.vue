@@ -4,7 +4,6 @@
     <section id="app-content">
       <router-view></router-view>
     </section>
-    <router-link to="/contacts">Danh ba</router-link>
     <Footer></Footer>
   </div>
 </template>
@@ -63,5 +62,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+#app-content {
+  min-height: calc(100vh - 58px - 80px - 4rem);
+}
 </style>

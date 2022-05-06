@@ -25,6 +25,7 @@
       <ListContacts
         :contacts="listContacts"
         :checked-names="checkedNames"
+        @update-contact="updateContact"
       ></ListContacts>
       <div 
         v-if="contactsCount === 0" 
@@ -44,6 +45,7 @@ import ContactsSearch from './ContactsSearch'
 import ContactsInfo from './ContactsInfo'
 import ListHeader from './ListHeader'
 import ListContacts from './ListContacts'
+import UpsertContact from './UpsertContact'
 
 export default {
   components: {
@@ -116,8 +118,37 @@ export default {
       this.loading = false
     },
 
-    async createContact() {
-      console.log('Tao moi')
+    createContact() {
+      this.$modal.show( 
+        UpsertContact,
+        {
+          isUpdate: false
+        },
+        {
+          draggable: true,
+          // resizable: true,
+          adaptive: true,
+          width: 460,
+          height: 'auto'
+        }
+      )
+    },
+
+    updateContact(contact) {
+      this.$modal.show( 
+        UpsertContact,
+        {
+          isUpdate: true,
+          currentContact: contact
+        },
+        {
+          draggable: true,
+          // resizable: true,
+          adaptive: true,
+          width: 460,
+          height: 'auto'
+        }
+      )
     },
 
     checkAll(checked) {

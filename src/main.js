@@ -18,6 +18,9 @@ import VueConfirmDialog from 'vue-confirm-dialog'
 Vue.use(VueConfirmDialog)
 Vue.component('vue-confirm-dialog', VueConfirmDialog.default)
 
+import VModal from 'vue-js-modal'
+Vue.use(VModal)
+
 Vue.config.productionTip = false
 
 new Vue({

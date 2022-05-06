@@ -68,6 +68,7 @@ export default {
   methods: {
     ...mapActions({
       refreshOutlookContacts: 'refreshOutlookContacts',
+      syncOutlookContacts: 'syncReverseOutlookContacts',
       outlookUnlink: 'outlookUnlink'
     }),
 
@@ -101,23 +102,41 @@ export default {
     },
 
     async outlookRefresh() {
-      this.loading = true
-      await this.refreshOutlookContacts()
-      this.loading = false
+      try {
+        this.loading = true
+        await this.refreshOutlookContacts()
+        this.loading = false
+      } catch(error) {
+        console.log(error);
+      }
     },
 
-    outlookSync() {
-      console.log('dong bo nguoc outlook')
+    async outlookSync() {
+      try {
+        this.loading = true
+        await this.syncOutlookContacts()
+        this.loading = false
+      } catch(error) {
+        console.log(error);
+      }
     },
 
     async unlink() {
-      if( confirm('Bạn muốn hủy kết nối Outlook') ) {
-        this.loading = true
-        await this.outlookUnlink()
-        this.loading = false
-      } else {
-        console.log('Không hủy')
-      }
+      this.$confirm({
+        title: `Hủy liên kết với Outlook`,
+        message: `Bạn muốn thực hiện điều này?`,
+        button: {
+          no: 'Không',
+          yes: 'Thực hiện'
+        },
+        callback: async confirm => {
+          if (confirm) {
+            this.loading = true
+            await this.outlookUnlink()
+            this.loading = false
+          }
+        }
+      })
     },
 
     async accountLinking() {

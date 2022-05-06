@@ -68,6 +68,7 @@ export default {
   methods: {
     ...mapActions({
       refreshGoogleContacts: 'refreshGoogleContacts',
+      syncGoogleContacts: 'syncReverseGoogleContacts',
       googleUnlink: 'googleUnlink'
     }),
 
@@ -101,23 +102,53 @@ export default {
     },
 
     async googleRefresh() {
-      this.loading = true
-      await this.refreshGoogleContacts()
-      this.loading = false
+      try {
+        this.loading = true
+        await this.refreshGoogleContacts()
+        this.loading = false
+      } catch(error) {
+        console.log(error)
+      }
     },
 
-    googleSync() {
-      console.log('dong bo nguoc google')
+    async googleSync() {
+      try {
+        this.loading = true
+        await this.syncGoogleContacts()
+        this.loading = false
+        this.$confirm(
+        {
+          title: 'Thông báo',
+          message: 'Danh bạ Google của bạn sẽ mất một khoảng thời gian để được làm mới, vui lòng đợi!',
+          button: {
+            yes: 'OK',
+          }
+        })
+        setTimeout(() => {
+          // console.log('lam moi google nay')
+          this.refreshGoogleContacts()
+        }, 15000)
+      } catch(error) {
+        console.log(error)
+      }
     },
 
     async unlink() {
-      if( confirm('Bạn muốn hủy kết nối Google') ) {
-        this.loading = true
-        await this.googleUnlink()
-        this.loading = false
-      } else {
-        console.log('Không hủy')
-      }
+      this.$confirm({
+        title: `Hủy liên kết với Google`,
+        message: `Bạn muốn thực hiện điều này?`,
+        button: {
+          no: 'Không',
+          yes: 'Thực hiện'
+        },
+        callback: async confirm => {
+          if (confirm) {
+            this.loading = true
+            await this.googleUnlink()
+            this.loading = false
+          }
+        }
+      })
     },
 
     async accountLinking() {
