@@ -4,9 +4,6 @@
     <section id="app-content">
       <router-view></router-view>
     </section>
-    <div class="footer">
-      <h3>chan trang</h3>
-    </div>
     <Footer></Footer>
   </div>
 </template>
@@ -59,18 +56,13 @@ export default {
       this.logoutUser();
       this.$router.push({ name: "Login" });
     },
+
   },
 };
 </script>
 
 <style lang="scss" scoped>
-div.footer {
-  margin-top: 2rem;
-
-  h3 {
-    font-size: 22px;
-    width: fit-content;
-    margin: 0 auto;
-  }
+#app-content {
+  min-height: calc(100vh - 58px - 80px - 4rem);
 }
 </style>

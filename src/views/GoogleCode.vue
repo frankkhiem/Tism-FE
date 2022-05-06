@@ -6,9 +6,9 @@
 <script>
 export default {
 	created() {
-		console.log(this.$route.query);
+		// console.log(this.$route.query);
 		this.$router.replace({ 
-			name: 'Contacts', 
+			name: 'GoogleContacts', 
 			query: { 
 				type: 'linkingGoogle',
 				data: this.$route.query

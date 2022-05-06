@@ -50,7 +50,7 @@
   margin: 0; 
 }
 .footer {
-  margin-top: 40px;
+  margin-top: 4rem;
 }
 .top-footer {
   height: 20px;

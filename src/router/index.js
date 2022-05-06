@@ -30,8 +30,24 @@ const routes = [
       },
       {
         path: 'contacts',
-        name: 'Contacts',
-        component: () => import(/* webpackChunkName: "about" */ '../views/Contacts.vue')
+        component: () => import(/* webpackChunkName: "about" */ '../views/Contacts.vue'),
+        children: [
+          {
+            path: '',
+            name: 'Contacts',
+            component: () => import('../components/contactsPage/tismContacts/TismContacts'),
+          },
+          {
+            path: 'google-contacts',
+            name: 'GoogleContacts',
+            component: () => import('../components/contactsPage/googleContacts/GoogleContacts'),
+          },
+          {
+            path: 'outlook-contacts',
+            name: 'OutlookContacts',
+            component: () => import('../components/contactsPage/outlookContacts/OutlookContacts'),
+          },
+        ]
       },
       // {
       //   path: 'profile',
