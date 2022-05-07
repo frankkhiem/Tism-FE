@@ -63,6 +63,6 @@ export default {
 
 <style lang="scss" scoped>
 #app-content {
-  min-height: calc(100vh - 58px - 80px - 4rem);
+  min-height: calc(100vh - 58px - 80px - 1rem);
 }
 </style>

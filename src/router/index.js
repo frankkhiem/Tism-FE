@@ -76,11 +76,11 @@ const routes = [
   //   name: 'Zalo Code',
   //   component: () => import('../views/ZaloCode')
   // },
-  // {
-  //   path: '/*',
-  //   name: 'Not Found',
-  //   component: () => import('../views/NotFoundPage')
-  // },
+  {
+    path: '/*',
+    name: 'Not Found',
+    component: () => import('../views/NotFound')
+  },
 ]
 
 const router = new VueRouter({

@@ -48,7 +48,7 @@
             }"
           ></sui-icon>
         </router-link>
-        <router-link to="/" class="top-nav-links">
+        <router-link to="/contacts" class="top-nav-links">
           <sui-icon
             bordered
             fitted
