@@ -2,7 +2,7 @@
   <div class="app-main">
     <Header v-on:logout="logout"></Header>
     <section id="app-content">
-      <router-view class="router-view"></router-view>
+      <router-view></router-view>
     </section>
     <Footer></Footer>
   </div>
@@ -63,6 +63,6 @@ export default {
 
 <style lang="scss" scoped>
 #app-content {
-  min-height: calc(100vh - 58px - 80px - 1rem);
+  min-height: calc(100vh - 58px - 80px - 0rem);
 }
 </style>
