@@ -14,19 +14,6 @@
       </div>
     </div>
     <div class="col-12 col-lg-6 home-card">
-      <div class="card-container" @click="$router.push('/friends')">
-        <div class="card__image">
-          <img src="@/assets/img/friend-connections.jpg" alt="">
-        </div>
-        <div class="card__title">
-          Bạn bè và kết nối toàn cầu
-        </div>
-        <div class="card__description">
-          Tìm kiếm, kết bạn và trò chuyện với nhau qua hệ thống nhắn tin thời gian thực được chúng tôi cung cấp.
-        </div>
-      </div>
-    </div>
-    <div class="col-12 col-lg-6 home-card">
       <div class="card-container" @click="$router.push('/contacts')">
         <div class="card__image">
           <img src="@/assets/img/task.png" alt="">
@@ -36,6 +23,19 @@
         </div>
         <div class="card__description">
           Kết nối với Google và Outlook của bạn. Tism sẽ đồng bộ tất cả liên hệ giúp cho bạn luôn sẵn sàng liên lạc mọi lúc, mọi nơi.
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-lg-6 home-card">
+      <div class="card-container" @click="$router.push('/friends')">
+        <div class="card__image">
+          <img src="@/assets/img/friend-connections.jpg" alt="">
+        </div>
+        <div class="card__title">
+          Bạn bè và kết nối toàn cầu
+        </div>
+        <div class="card__description">
+          Tìm kiếm, kết bạn và trò chuyện với nhau qua hệ thống nhắn tin thời gian thực được chúng tôi cung cấp.
         </div>
       </div>
     </div>

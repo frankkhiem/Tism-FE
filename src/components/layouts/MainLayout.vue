@@ -2,7 +2,7 @@
   <div class="app-main">
     <Header v-on:logout="logout"></Header>
     <section id="app-content">
-      <router-view></router-view>
+      <router-view class="router-view"></router-view>
     </section>
     <Footer></Footer>
   </div>
