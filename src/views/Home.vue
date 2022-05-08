@@ -72,6 +72,7 @@ export default {
   }
 
   .card-container {
+    z-index: 1000;
     width: 80%;
     height: 100%;
     margin: 0 auto;

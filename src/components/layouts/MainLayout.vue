@@ -1,7 +1,8 @@
 <template>
   <div class="app-main">
-    <Header v-on:logout="logout"></Header>
+    <Header v-on:logout="logout" :userFullName="userProfile.fullname"></Header>
     <section id="app-content">
+      <LeftSideBar></LeftSideBar>
       <router-view></router-view>
     </section>
     <Footer></Footer>
@@ -13,11 +14,13 @@ import { mapGetters, mapMutations } from "vuex";
 import axios from "axios";
 import Header from "./Header.vue";
 import Footer from "./Footer.vue";
+import LeftSideBar from "./LeftSideBar.vue";
 
 export default {
   components: { 
     Header,
-    Footer
+    Footer,
+    LeftSideBar
   },
 
   computed: {

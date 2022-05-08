@@ -42,6 +42,7 @@ export default {
 
     async handleAfterAuth() {
       let query = this.$route.query;
+      console.log(query);
       if( query.type === 'linkingOutlook' ) {
         if( query.data && query.data.code ) {
           try {

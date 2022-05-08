@@ -154,6 +154,7 @@
             <sui-icon
               name="user"
               size="large"
+              v-show="!userFullName"
               :style="{
                 display: 'flex',
                 justifyContent: 'center',
@@ -162,7 +163,9 @@
               }"
             >
             </sui-icon>
+            <span class="user-name" v-show="userFullName">{{ userFullName.split(' ').map(elem => elem[0]).join('').slice(0, 2) }}</span>
           </p>
+          <div class="dot online"></div>
           <div class="menu-options" v-show="show_dropdown_menu == true">
             <div class="option" v-for="(option, index) in options" :key="index">
               <div v-if="index !== options.length - 1">
@@ -202,6 +205,10 @@ export default {
         },
       ],
     };
+  },
+
+  props: {
+    userFullName: String
   },
 
   methods: {
@@ -285,12 +292,13 @@ export default {
 
 .dropdown-menu-account {
   cursor: pointer;
+  position: relative;
 }
 
 .menu-options {
   position: absolute;
-  top: 70px;
-  right: 10px;
+  top: 60px;
+  right: 5px;
   background: #fff;
   font-size: 1em;
   text-shadow: none;
@@ -301,6 +309,7 @@ export default {
   transition: opacity 0.1s ease;
   z-index: 11;
   will-change: transform, opacity;
+  width: 120px
 }
 
 .menu-options::after {
@@ -341,5 +350,29 @@ export default {
 .menu-options > .option:hover {
   background: rgba(0, 0, 0, 0.05) !important;
   color: rgba(0, 0, 0, 0.95) !important;
+}
+
+.user-name {
+  text-transform: uppercase;
+}
+
+.dot {
+    height: 12px;
+    width: 12px;
+    border-radius: 100%;
+    position: absolute;
+    top: 32px;
+    right: 1px;
+    display: none;
+}
+
+.dot.online {
+  background: #31a24c;
+  display: block;
+}
+
+.dot.busy {
+  background: #ed4646;
+  display: block;
 }
 </style>
