@@ -1,8 +1,9 @@
 import User from './userModule'
 import Contact from './contactModule';
-// import Notification from './notification.module';
+import Friend from './friendModule';
 
 export const modules = {
   User,
-  Contact
+  Contact,
+  Friend
 }

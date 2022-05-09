@@ -56,8 +56,24 @@ const routes = [
       },
       {
         path: 'friends',
-        name: 'Friends',
-        component: () => import('../views/Friends')
+        component: () => import('../views/Friends'),
+        children: [
+          {
+            path: '',
+            name: 'ListFriends',
+            component: () => import('../components/friendsPage/listFriends/ListFriends'),
+          },
+          {
+            path: 'invitations',
+            name: 'InvitationsFriends',
+            component: () => import('../components/friendsPage/listFriends/ListFriends'),
+          },
+          {
+            path: 'find',
+            name: 'FindFriends',
+            component: () => import('../components/friendsPage/listFriends/ListFriends'),
+          },
+        ]
       },
       // {
       //   path: 'home-test',
