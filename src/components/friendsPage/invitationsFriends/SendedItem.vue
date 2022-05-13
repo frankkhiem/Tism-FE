@@ -12,26 +12,22 @@
         {{ friend.mutualFriends }} bạn chung
       </div>
       <div class="history">
-        Trở thành bạn từ: {{ friend.history }}
+        Gửi từ: {{ friend.createdAt }}
       </div>
     </div>
     <div class="btns">
       <div class="friend-btn" @click="showUnFriend">
         <b-icon icon="person-check-fill"></b-icon>
-        Bạn bè
+        Đã gửi lời mời
         <div 
           v-if="unFriendBtn"
           v-click-outside-element="hideUnFriend"
           class="unfriend-btn"
-          @click="unfriend"
+          @click="cancelInvitation"
         >
-          <b-icon icon="person-dash-fill" class="unfriend-icon"></b-icon>
-          Hủy kết bạn
+          <b-icon icon="person-x-fill" class="unfriend-icon"></b-icon>
+          Hủy lời mời
         </div>
-      </div>
-      <div class="chat-btn" @click="toChat">
-        <b-icon icon="chat-quote-fill"></b-icon>
-        Nhắn tin
       </div>
     </div>
   </div>
@@ -52,13 +48,9 @@ export default {
   },
 
   methods: {
-    ...mapActions({
-      unFriend: 'unFriend'
+    ...mapActions({ 
+      cancelInvitationFriend: 'cancelInvitationFriend'
     }),
-
-    toChat() {
-      this.$router.push(`/chat/${this.friend.chatRoomId}`)
-    },
 
     toProfile() {
       this.$router.push(`/person/${this.friend.id}/info`)
@@ -80,24 +72,20 @@ export default {
       }, 1)
     },
 
-    unfriend() {
+    cancelInvitation() {
       this.hideUnFriend()
       this.$confirm(
         {
-          title: `Hủy kết bạn với '${this.friend.name}'`,
-          message: `Bạn có chắc muốn xóa ${this.friend.name} khỏi danh sách bạn bè không?`,
+          title: `Hủy lời mời kết bạn với '${this.friend.name}'`,
+          message: `Bạn có chắc muốn hủy lời mời kết bạn với ${this.friend.name} không?`,
           button: {
             no: 'Hủy bỏ',
             yes: 'Xác nhận'
           },
           callback: async confirm => {
             if (confirm) {
-              try {
-                await this.unFriend(this.friend.id)
-                this.$emit('refresh-friends')
-              } catch(error) {
-                console.log(error);
-              }
+              await this.cancelInvitationFriend(this.friend.id)
+              this.$emit('refresh-invitations')
             }
           }
         }
@@ -222,7 +210,7 @@ export default {
         height: 32px;
         line-height: 32px;
         width: 140px;
-        transform: translate(-18%, -155%);
+        transform: translate(-3%, -155%);
         color: #2c3e50;;
         text-align: center;
         box-shadow: 0 3px 10px 3px rgba(0, 0, 0, 0.2);
@@ -238,10 +226,10 @@ export default {
           content: "";
           bottom: 0;
           left: 50%;
-          transform: translate(-50%, 95%);
+          transform: translate(-50%, 99%);
           border: 10px solid transparent;
           border-top: 10px solid #fff;
-          filter: drop-shadow(0px 4px 2px rgba(0, 0, 0, 0.1));
+          filter: drop-shadow(0px 2px 2px rgba(0, 0, 0, 0.1));
         }
 
         &:hover {

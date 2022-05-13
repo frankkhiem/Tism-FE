@@ -66,14 +66,35 @@ const routes = [
           {
             path: 'invitations',
             name: 'InvitationsFriends',
-            component: () => import('../components/friendsPage/listFriends/ListFriends'),
+            component: () => import('../components/friendsPage/invitationsFriends/InvitationsFriends'),
           },
           {
             path: 'find',
             name: 'FindFriends',
-            component: () => import('../components/friendsPage/listFriends/ListFriends'),
+            component: () => import('../components/friendsPage/findFriends/FindFriends'),
           },
         ]
+      },
+      {
+        path: 'person',
+        component: () => import('../views/PersonProfile'),
+        children: [
+          {
+            path: ':personId/info',
+            name: 'PersonInfo',
+            component: () => import('../components/personPage/PersonInfo'),
+          },
+          {
+            path: ':personId/mutual-friends',
+            name: 'MutualFriends',
+            component: () => import('../components/personPage/MutualFriends'),
+          },
+        ]
+      },
+      {
+        path: 'chat/:chatRoomId',
+        name: 'FriendChat',
+        component: () => import('../views/FriendChat')
       },
       // {
       //   path: 'home-test',

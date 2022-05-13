@@ -16,19 +16,6 @@
       </div>
     </div>
     <div class="btns">
-      <div class="friend-btn" @click="showUnFriend">
-        <b-icon icon="person-check-fill"></b-icon>
-        Bạn bè
-        <div 
-          v-if="unFriendBtn"
-          v-click-outside-element="hideUnFriend"
-          class="unfriend-btn"
-          @click="unfriend"
-        >
-          <b-icon icon="person-dash-fill" class="unfriend-icon"></b-icon>
-          Hủy kết bạn
-        </div>
-      </div>
       <div class="chat-btn" @click="toChat">
         <b-icon icon="chat-quote-fill"></b-icon>
         Nhắn tin
@@ -45,15 +32,22 @@ export default {
     friend: Object
   },
 
+  computed: {
+    
+  },
+
   data() {
     return {
-      unFriendBtn: false
+      
     }
   },
 
   methods: {
-    ...mapActions({
-      unFriend: 'unFriend'
+    ...mapActions({    
+      // sendInvitationFriend: 'sendInvitationFriend',
+      // cancelInvitationFriend: 'cancelInvitationFriend',
+      // declineInvitationFriend: 'declineInvitationFriend',
+      // acceptInvitationFriend: 'acceptInvitationFriend'
     }),
 
     toChat() {
@@ -66,44 +60,8 @@ export default {
 
     toMutualFriends() {
       this.$router.push(`/person/${this.friend.id}/mutual-friends`)
-    },
-
-    showUnFriend() {
-      setTimeout(() => {
-        this.unFriendBtn = true
-      }, 0)
-    },
-
-    hideUnFriend() {
-      setTimeout(() => {
-        this.unFriendBtn = false
-      }, 1)
-    },
-
-    unfriend() {
-      this.hideUnFriend()
-      this.$confirm(
-        {
-          title: `Hủy kết bạn với '${this.friend.name}'`,
-          message: `Bạn có chắc muốn xóa ${this.friend.name} khỏi danh sách bạn bè không?`,
-          button: {
-            no: 'Hủy bỏ',
-            yes: 'Xác nhận'
-          },
-          callback: async confirm => {
-            if (confirm) {
-              try {
-                await this.unFriend(this.friend.id)
-                this.$emit('refresh-friends')
-              } catch(error) {
-                console.log(error);
-              }
-            }
-          }
-        }
-      )
     }
-  }
+  },
 }
 </script>
 
@@ -112,8 +70,8 @@ export default {
   display: flex;
   align-items: center;
   height: 120px;
-  width: 70%;
-  margin: 0 auto 12px;
+  width: 65%;
+  margin: 0 auto 20px;
   border-radius: 6px;
   border: 1px solid #ddd;
   box-shadow: 0px 1px 2px 0px rgba(9, 30, 66, .2);
@@ -204,55 +162,6 @@ export default {
       border-radius: 6px;
       margin-left: .6rem;
       cursor: pointer;
-    }
-
-    .friend-btn {
-      position: relative;
-      background-color: #1b74e4;
-      color: #fff;
-
-      &:hover {
-        background-color: #1557e5;
-      }
-
-      .unfriend-btn {
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 32px;
-        line-height: 32px;
-        width: 140px;
-        transform: translate(-18%, -155%);
-        color: #2c3e50;;
-        text-align: center;
-        box-shadow: 0 3px 10px 3px rgba(0, 0, 0, 0.2);
-        border-radius: 6px;
-        background-color: #fff;
-
-        .unfriend-icon {
-          margin-right: 5px;
-        }
-
-        &::after {
-          position: absolute;
-          content: "";
-          bottom: 0;
-          left: 50%;
-          transform: translate(-50%, 95%);
-          border: 10px solid transparent;
-          border-top: 10px solid #fff;
-          filter: drop-shadow(0px 4px 2px rgba(0, 0, 0, 0.1));
-        }
-
-        &:hover {
-          color: #fff;
-          background-color: #ed5f0b;
-
-          &::after {
-            border-top: 10px solid #ed5f0b;
-          }
-        }
-      }
     }
 
     .chat-btn {

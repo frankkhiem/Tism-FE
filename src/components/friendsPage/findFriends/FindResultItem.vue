@@ -12,26 +12,41 @@
         {{ friend.mutualFriends }} bạn chung
       </div>
       <div class="history">
-        Trở thành bạn từ: {{ friend.history }}
+        {{ friendStatus }}
       </div>
     </div>
     <div class="btns">
-      <div class="friend-btn" @click="showUnFriend">
-        <b-icon icon="person-check-fill"></b-icon>
-        Bạn bè
-        <div 
-          v-if="unFriendBtn"
-          v-click-outside-element="hideUnFriend"
-          class="unfriend-btn"
-          @click="unfriend"
-        >
-          <b-icon icon="person-dash-fill" class="unfriend-icon"></b-icon>
-          Hủy kết bạn
-        </div>
-      </div>
-      <div class="chat-btn" @click="toChat">
+      <div v-if="status === 'friend'" class="chat-btn" @click="toChat">
         <b-icon icon="chat-quote-fill"></b-icon>
         Nhắn tin
+      </div>
+      <div v-if="status === 'stranger'" class="chat-btn" @click="addFriend">
+        <b-icon icon="person-plus-fill"></b-icon>
+        Thêm bạn bè
+      </div>
+      <div
+        v-if="status === 'invitation received'" 
+        class="friend-btn"
+        @click="acceptInvitation"
+      >
+        <!-- <b-icon icon="person-check-fill"></b-icon> -->
+        Chấp nhận
+      </div>
+      <div 
+        v-if="status === 'invitation received'" 
+        class="chat-btn" 
+        @click="declineInvitation"
+      >
+        <!-- <b-icon icon="person-x-fill"></b-icon> -->
+        Từ chối
+      </div>
+      <div 
+        v-if="status === 'invitation sended'" 
+        class="chat-btn" 
+        @click="cancelInvitation"
+      >
+        <b-icon icon="person-x-fill"></b-icon>
+        Hủy lời mời
       </div>
     </div>
   </div>
@@ -45,15 +60,28 @@ export default {
     friend: Object
   },
 
+  computed: {
+    friendStatus: function() {
+      if( this.status === 'friend' ) return 'Bạn bè'
+      if( this.status === 'invitation received' ) return 'Đã nhận được yêu cầu kết bạn'
+      if( this.status === 'invitation sended' ) return 'Đã gửi lời mời'
+      return 'Người lạ'
+    }
+  },
+
   data() {
     return {
-      unFriendBtn: false
+      unFriendBtn: false,
+      status: ''
     }
   },
 
   methods: {
-    ...mapActions({
-      unFriend: 'unFriend'
+    ...mapActions({    
+      sendInvitationFriend: 'sendInvitationFriend',
+      cancelInvitationFriend: 'cancelInvitationFriend',
+      declineInvitationFriend: 'declineInvitationFriend',
+      acceptInvitationFriend: 'acceptInvitationFriend'
     }),
 
     toChat() {
@@ -68,41 +96,43 @@ export default {
       this.$router.push(`/person/${this.friend.id}/mutual-friends`)
     },
 
-    showUnFriend() {
-      setTimeout(() => {
-        this.unFriendBtn = true
-      }, 0)
+    async addFriend() {
+      this.status = 'invitation sended'
+      await this.sendInvitationFriend(this.friend.id)
     },
 
-    hideUnFriend() {
-      setTimeout(() => {
-        this.unFriendBtn = false
-      }, 1)
+    async acceptInvitation() {
+      this.status = 'friend'
+      await this.acceptInvitationFriend(this.friend.id)
     },
 
-    unfriend() {
-      this.hideUnFriend()
+    async declineInvitation() {
+      this.status = 'stranger'
+      await this.declineInvitationFriend(this.friend.id)
+    },
+
+    cancelInvitation() {
       this.$confirm(
         {
-          title: `Hủy kết bạn với '${this.friend.name}'`,
-          message: `Bạn có chắc muốn xóa ${this.friend.name} khỏi danh sách bạn bè không?`,
+          title: `Hủy lời mời kết bạn với '${this.friend.name}'`,
+          message: `Bạn có chắc muốn thực hiện điều này không?`,
           button: {
             no: 'Hủy bỏ',
             yes: 'Xác nhận'
           },
           callback: async confirm => {
             if (confirm) {
-              try {
-                await this.unFriend(this.friend.id)
-                this.$emit('refresh-friends')
-              } catch(error) {
-                console.log(error);
-              }
+              this.status = 'stranger'
+              await this.cancelInvitationFriend(this.friend.id)
             }
           }
         }
       )
     }
+  },
+
+  created() {
+    this.status = this.friend.friendship
   }
 }
 </script>
@@ -238,10 +268,10 @@ export default {
           content: "";
           bottom: 0;
           left: 50%;
-          transform: translate(-50%, 95%);
+          transform: translate(-50%, 99%);
           border: 10px solid transparent;
           border-top: 10px solid #fff;
-          filter: drop-shadow(0px 4px 2px rgba(0, 0, 0, 0.1));
+          filter: drop-shadow(0px 2px 2px rgba(0, 0, 0, 0.1));
         }
 
         &:hover {

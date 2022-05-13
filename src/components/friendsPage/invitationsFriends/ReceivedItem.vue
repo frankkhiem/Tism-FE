@@ -12,26 +12,17 @@
         {{ friend.mutualFriends }} bạn chung
       </div>
       <div class="history">
-        Trở thành bạn từ: {{ friend.history }}
+        Nhận được từ: {{ friend.createdAt }}
       </div>
     </div>
     <div class="btns">
-      <div class="friend-btn" @click="showUnFriend">
-        <b-icon icon="person-check-fill"></b-icon>
-        Bạn bè
-        <div 
-          v-if="unFriendBtn"
-          v-click-outside-element="hideUnFriend"
-          class="unfriend-btn"
-          @click="unfriend"
-        >
-          <b-icon icon="person-dash-fill" class="unfriend-icon"></b-icon>
-          Hủy kết bạn
-        </div>
+      <div class="resolve-btn" @click="acceptInvitation">
+        <!-- <b-icon icon="person-plus-fill"></b-icon> -->
+        Chấp nhận
       </div>
-      <div class="chat-btn" @click="toChat">
-        <b-icon icon="chat-quote-fill"></b-icon>
-        Nhắn tin
+      <div class="reject-btn" @click="declineInvitation">
+        <!-- <b-icon icon="person-dash-fill"></b-icon> -->
+        Từ chối
       </div>
     </div>
   </div>
@@ -53,12 +44,9 @@ export default {
 
   methods: {
     ...mapActions({
-      unFriend: 'unFriend'
+      declineInvitationFriend: 'declineInvitationFriend',
+      acceptInvitationFriend: 'acceptInvitationFriend'
     }),
-
-    toChat() {
-      this.$router.push(`/chat/${this.friend.chatRoomId}`)
-    },
 
     toProfile() {
       this.$router.push(`/person/${this.friend.id}/info`)
@@ -68,40 +56,14 @@ export default {
       this.$router.push(`/person/${this.friend.id}/mutual-friends`)
     },
 
-    showUnFriend() {
-      setTimeout(() => {
-        this.unFriendBtn = true
-      }, 0)
+    async acceptInvitation() {
+      await this.acceptInvitationFriend(this.friend.id)
+      this.$emit('refresh-invitations')
     },
 
-    hideUnFriend() {
-      setTimeout(() => {
-        this.unFriendBtn = false
-      }, 1)
-    },
-
-    unfriend() {
-      this.hideUnFriend()
-      this.$confirm(
-        {
-          title: `Hủy kết bạn với '${this.friend.name}'`,
-          message: `Bạn có chắc muốn xóa ${this.friend.name} khỏi danh sách bạn bè không?`,
-          button: {
-            no: 'Hủy bỏ',
-            yes: 'Xác nhận'
-          },
-          callback: async confirm => {
-            if (confirm) {
-              try {
-                await this.unFriend(this.friend.id)
-                this.$emit('refresh-friends')
-              } catch(error) {
-                console.log(error);
-              }
-            }
-          }
-        }
-      )
+    async declineInvitation() {
+      await this.declineInvitationFriend(this.friend.id)
+      this.$emit('refresh-invitations')
     }
   }
 }
@@ -206,7 +168,7 @@ export default {
       cursor: pointer;
     }
 
-    .friend-btn {
+    .resolve-btn {
       position: relative;
       background-color: #1b74e4;
       color: #fff;
@@ -214,48 +176,9 @@ export default {
       &:hover {
         background-color: #1557e5;
       }
-
-      .unfriend-btn {
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 32px;
-        line-height: 32px;
-        width: 140px;
-        transform: translate(-18%, -155%);
-        color: #2c3e50;;
-        text-align: center;
-        box-shadow: 0 3px 10px 3px rgba(0, 0, 0, 0.2);
-        border-radius: 6px;
-        background-color: #fff;
-
-        .unfriend-icon {
-          margin-right: 5px;
-        }
-
-        &::after {
-          position: absolute;
-          content: "";
-          bottom: 0;
-          left: 50%;
-          transform: translate(-50%, 95%);
-          border: 10px solid transparent;
-          border-top: 10px solid #fff;
-          filter: drop-shadow(0px 4px 2px rgba(0, 0, 0, 0.1));
-        }
-
-        &:hover {
-          color: #fff;
-          background-color: #ed5f0b;
-
-          &::after {
-            border-top: 10px solid #ed5f0b;
-          }
-        }
-      }
     }
 
-    .chat-btn {
+    .reject-btn {
       background-color: #e4e6eb;
 
       &:hover {

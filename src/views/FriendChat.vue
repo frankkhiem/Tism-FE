@@ -1,7 +1,7 @@
 <template>
 	<div>
-		ho so ca nhan
-	</div>	
+		chat voi ban be
+	</div>
 </template>
 
 <script>

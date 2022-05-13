@@ -45,11 +45,11 @@ export default {
 
 	methods: {
 		toChat() {
-			this.$router.push(`/chat/${this.friend.name}`)
+			this.$router.push(`/chat/${this.friend.chatRoomId}`)
 		},
 
 		toProfile() {
-			this.$router.push(`/person/info/${this.friend.name}`)
+			this.$router.push(`/person/${this.friend.id}/info`)
 		},
 
 		showMore() {
@@ -85,8 +85,8 @@ export default {
 
 		.img-avatar {
 			img {
-				width: 100%;
-				height: 100%;
+				width: 45px;
+				height: 45px;
 				border-radius: 50%;
 				object-fit: cover;
 			}
