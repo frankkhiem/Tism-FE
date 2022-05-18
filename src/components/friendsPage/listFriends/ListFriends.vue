@@ -78,6 +78,7 @@ export default {
 			}
 			try {
 				this.loading = true;
+				await new Promise(resolve => setTimeout(resolve, 300))
 				await this.searchCurrentFriends(keyword)
 				this.loading = false;
 			} catch(error) {

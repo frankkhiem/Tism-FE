@@ -51,8 +51,19 @@ const routes = [
       },
       {
         path: 'profile',
-        name: 'Profile',
-        component: () => import('../views/Profile')
+        component: () => import('../views/Profile'),
+        children: [
+          {
+            path: '',
+            name: 'Profile',
+            component: () => import('../components/profilePage/UserInfo'),
+          },
+          {
+            path: 'edit',
+            name: 'EditProfile',
+            component: () => import('../components/profilePage/EditProfile'),
+          },
+        ]
       },
       {
         path: 'friends',
@@ -90,6 +101,11 @@ const routes = [
             component: () => import('../components/personPage/MutualFriends'),
           },
         ]
+      },
+      {
+        path: 'chat',
+        name: 'FriendChatDefault',
+        component: () => import('../views/FriendChat')
       },
       {
         path: 'chat/:chatRoomId',

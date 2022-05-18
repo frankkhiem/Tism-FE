@@ -13,9 +13,12 @@
     "core-js": "^3.6.5",
     "semantic-ui-css": "^2.4.1",
     "semantic-ui-vue": "^0.11.0",
+    "socket.io-client": "^4.5.0",
+    "timeago.js": "^4.0.2",
     "vue": "^2.6.11",
     "vue-click-outside-element": "^1.0.15",
     "vue-confirm-dialog": "^1.0.2",
+    "vue-emoji-picker": "^1.0.3",
     "vue-js-modal": "^2.0.1",
     "vue-router": "^3.5.3",
     "vuex": "^3.6.2"

@@ -149,7 +149,7 @@
               width: '42px',
               userSelect: 'none',
             }"
-            @click="show_dropdown_menu = !show_dropdown_menu"
+            @click="showDropdownMenu"
           >
             <sui-icon
               name="user"
@@ -163,9 +163,17 @@
             >
             </sui-icon>
           </p>
-          <div class="menu-options" v-show="show_dropdown_menu == true">
+          <div 
+            class="menu-options" 
+            v-if="show_dropdown_menu == true"
+            v-click-outside-element="hideDropdownMenu"
+          >
             <div class="option" v-for="(option, index) in options" :key="index">
-              <div v-if="index !== options.length - 1">
+              <div v-if="index === 0" @click="toProfile">
+                <i aria-hidden="true" class="icon" :class="option.icon"></i>
+                <span class="text">{{ option.text }}</span>
+              </div>
+              <div v-else-if="index !== options.length - 1">
                 <i aria-hidden="true" class="icon" :class="option.icon"></i>
                 <span class="text">{{ option.text }}</span>
               </div>
@@ -205,8 +213,25 @@ export default {
   },
 
   methods: {
+    showDropdownMenu() {
+      setTimeout(() => {
+        this.show_dropdown_menu = true
+      }, 0)
+    },
+
+    hideDropdownMenu() {
+      setTimeout(() => {
+        this.show_dropdown_menu = false
+      }, 1)
+    },
+
     logout() {
       this.$emit('logout')
+    },
+
+    toProfile() {
+      this.show_dropdown_menu = false
+      if( this.$route.name !== 'Profile' ) this.$router.push({ name: 'Profile' })
     }
   }
 };

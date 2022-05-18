@@ -25,7 +25,7 @@ export default {
 
   async created() {
     await this.fetchUserProfile()
-    await this.getListFriends()
+    // await this.getListFriends()
   },
 }
 </script>

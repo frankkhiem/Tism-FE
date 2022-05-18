@@ -9,10 +9,11 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from "vuex";
-import axios from "axios";
-import Header from "./Header.vue";
-import Footer from "./Footer.vue";
+import { mapGetters, mapMutations, mapActions } from "vuex";
+import axios from "axios"
+import Header from "./Header.vue"
+import Footer from "./Footer.vue"
+import socket from "@/helpers/socketClient"
 
 export default {
   components: { 
@@ -39,6 +40,10 @@ export default {
       logoutUser: "logoutUser",
     }),
 
+    ...mapActions({
+      getListFriends: 'getListFriends'
+    }),
+
     async logout() {
       try {
         const accessToken = localStorage.getItem("accessToken");
@@ -56,8 +61,26 @@ export default {
       this.logoutUser();
       this.$router.push({ name: "Login" });
     },
-
   },
+
+  async created() {
+    await this.getListFriends()
+    if( this.isAuth ) {
+      socket.auth = {
+        userId: this.userProfile.userId
+      }
+      socket.connect()
+    }
+
+    socket.on("connect_error", (error) => {
+      console.error('Connect to socket server fail: '+ error.message)
+    });
+  },
+
+  destroyed() {
+    socket.off("connect_error")
+    socket.disconnect()
+  }
 };
 </script>
 
