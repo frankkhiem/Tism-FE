@@ -1,5 +1,5 @@
 <template>
-  <div class="messenger">
+  <div class="messenger" @click="seen">
     <div v-if="!messages || messages.length === 0" class="no-messages">
       Chưa có tin nhắn trong cuộc trò chuyện!
     </div>
@@ -104,7 +104,8 @@ export default {
 
   methods: {
     ...mapActions({
-      sendTextMessage: 'sendTextMessage'
+      sendTextMessage: 'sendTextMessage',
+      seenConversation: 'seenConversation'
     }),
 
     resizeInput(e) {
@@ -146,15 +147,22 @@ export default {
       })
       this.scrollToBottom()
       document.querySelector('textarea.chat-input').style.height = '36px'
+    },
+
+    seen() {
+      this.seenConversation(this.$route.params.chatRoomId)
     }
   },
 
   created() {
     socket.on('new-message', (message) => {
-      this.messages.push(message)
-      setTimeout(() => {
-        this.scrollToBottom()
-      }, 100)
+      // console.log(message.friendship === this.$route.params.chatRoomId)
+      if( message.friendship === this.$route.params.chatRoomId ) {
+        this.messages.push(message)
+        setTimeout(() => {
+          this.scrollToBottom()
+        }, 100)
+      }
     })
   },
 
@@ -162,10 +170,6 @@ export default {
     setTimeout(() => {
       this.scrollToBottom()
     }, 100)
-  },
-
-  destroyed() {
-    socket.off("new-message")
   },
 
   watch: {

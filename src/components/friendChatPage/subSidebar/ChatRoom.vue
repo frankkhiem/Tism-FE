@@ -19,6 +19,8 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
+
 export default {
   props: {
     conversation: {
@@ -42,7 +44,12 @@ export default {
   },
 
   methods: {
+    ...mapActions({
+      seenConversation: 'seenConversation'
+    }),
+
     selectConversation() {
+      this.seenConversation(this.conversation.conversationId)
       if( this.conversation.conversationId === this.$route.params.chatRoomId ) return
       this.$router.push({
         name: 'FriendChat',

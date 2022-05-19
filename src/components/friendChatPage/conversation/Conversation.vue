@@ -1,9 +1,9 @@
 <template>
 	<div class="conversation">
-		<Header 
+		<ChatHeader 
 			:conversation="conversationSelected"
 			@toggle-info="showInfo = ! showInfo"
-		></Header>
+		></ChatHeader>
 		<Info 
 			v-if="showInfo"
 			:conversation="conversationSelected"
@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import Header from './Header'
+import ChatHeader from './Header'
 import Messenger from './Messenger'
 import Info from './Info'
 
@@ -25,7 +25,7 @@ import { mapGetters, mapActions } from 'vuex'
 
 export default {
 	components: {
-		Header,
+		ChatHeader,
 		Messenger,
 		Info
 	},
@@ -49,7 +49,7 @@ export default {
 
 		async refreshConversation() {
 			await this.getConversation(this.$route.params.chatRoomId)
-		}
+		},
 	},
 
 	created() {

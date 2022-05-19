@@ -1,11 +1,11 @@
 <template>
-	<div id="friend-chat-page">
-		<SubSidebar></SubSidebar>
-		<Conversation v-if="inConversation"></Conversation>
-		<div v-else class="out-conversation">
-			Hãy chọn cuộc trò chuyện của bạn!
-		</div>
-	</div>
+  <div id="friend-chat-page">
+    <SubSidebar></SubSidebar>
+    <Conversation v-if="inConversation"></Conversation>
+    <div v-else class="out-conversation">
+      Hãy chọn cuộc trò chuyện của bạn!
+    </div>
+  </div>
 </template>
 
 <script>
@@ -13,66 +13,91 @@ import SubSidebar from '@/components/friendChatPage/subSidebar/SubSidebar'
 import Conversation from '@/components/friendChatPage/conversation/Conversation'
 
 import { mapActions } from 'vuex'
+import socket from '@/helpers/socketClient'
 
 export default {
-	components: {
-		SubSidebar,
-		Conversation
-	},
+  components: {
+    SubSidebar,
+    Conversation
+  },
 
-	computed: {
-		inConversation() {
-			if( this.$route.params.chatRoomId ) {
-				return true
-			}
-			return false
-		}
-	},
+  computed: {
+    inConversation() {
+      if( this.$route.params.chatRoomId ) {
+        return true
+      }
+      return false
+    }
+  },
 
-	methods: {
-		...mapActions({
-			getListConversations: 'getListConversations'
-		})
-	},
+  methods: {
+    ...mapActions({
+      getListConversations: 'getListConversations',
+      receiveNewMessage: 'receiveNewMessage',
+      playMessageSound: 'playMessageSound'
+    })
+  },
 
-	async created() {
-		// console.log('chattttt')
-		try {
-			await this.getListConversations()
-		} catch(error) {
-			console.log(error);
-		}
-	}
+  async created() {
+    // console.log('chattttt')
+    try {
+      await this.getListConversations()
+    } catch(error) {
+      console.log(error);
+    }
+  },
+
+  mounted() {
+    socket.on('new-message', (message) => {
+      const newMessage = {
+        type: message.type,
+        content: message.content
+      }
+      const lastUpdated = message.createdAt
+      const conversationId = message.friendship
+
+      this.playMessageSound()
+      this.receiveNewMessage({
+        conversationId,
+        newMessage,
+        lastUpdated
+      })
+    })
+  },
+
+  destroyed() {
+    socket.off("new-message")
+  }
 }
 </script>
 
 <style lang="scss" scoped>
 #friend-chat-page {
-	display: flex;
-	min-height: inherit;
+  display: flex;
+  min-height: inherit;
   height: calc(100vh - 58px - 80px - 0rem);
 
-	.sub-sidebar {
-		height: inherit;
-		flex-basis: 340px;
-		border-right: 1px solid #dfdfdf;
-		box-shadow: 2px 0px 6px -3px rgba(9, 30, 66, .2);
-	}
+  .sub-sidebar {
+    height: inherit;
+    flex-basis: 340px;
+    border-right: 1px solid #dfdfdf;
+    box-shadow: 2px 0px 6px -3px rgba(9, 30, 66, .2);
+  }
 
-	.conversation {
-		flex-grow: 1;
-		height: inherit;
-	}
+  .conversation {
+    flex-grow: 1;
+    height: inherit;
+  }
 
-	.out-conversation {
-		height: inherit;
-		flex-grow: 1;
-		display: grid;
-		place-items: center;
-		text-align: center;
-		font-size: 36px;
-		font-weight: 700;
-		color: #c6c6c6;
-	}
+  .out-conversation {
+    height: inherit;
+    flex-grow: 1;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    font-size: 36px;
+    font-weight: 700;
+    color: #c6c6c6;
+  }
 }
 </style>

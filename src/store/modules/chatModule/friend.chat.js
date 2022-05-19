@@ -17,7 +17,10 @@ const getters = {
       }
     })
 
-    return conversations
+    return conversations.sort((item1, item2) => {
+      if( item1.lastUpdated > item2.lastUpdated  ) return -1;
+      else return 1;
+    })
   },
 
   conversationSelected: (state) => {
@@ -42,6 +45,26 @@ const mutations = {
 
   addSendedMessage: (state, message) => {
     state.conversation.messages.push(message)
+  },
+
+  updateSeenTagConversation: (state, { conversationId, seen }) => {
+    for (let conversation of state.listConversations) {
+      if( conversation.conversationId === conversationId ) {
+        conversation.isSeen = seen
+        break
+      }
+    }
+  },
+
+  receiveNewMessageToConversation: (state, { conversationId, message, lastUpdated }) => {
+    for (let conversation of state.listConversations) {
+      if( conversation.conversationId === conversationId ) {
+        conversation.isSeen = false
+        conversation.lastMessage = message
+        conversation.lastUpdated = lastUpdated
+        break
+      }
+    }
   }
 }
 
@@ -88,6 +111,32 @@ const actions = {
     } catch(error) {
       console.log(error.response.data);
     }
+  },
+
+  seenConversation: async ({ commit }, conversationId) => {
+    commit('updateSeenTagConversation', { conversationId, seen: true })
+    const accessToken = localStorage.getItem('accessToken')
+
+    try {
+      await axios.patch(`${process.env.VUE_APP_API_HOST}/conversations/${conversationId}/seen`, {}, {
+        headers: {"Authorization" : `Bearer ${accessToken}`}
+      })
+    } catch(error) {
+      console.log(error.response.data);
+    }
+  },
+
+  unSeenConversation: async ({ commit }, conversationId) => {
+    commit('updateSeenTagConversation', { conversationId, seen: false })
+    // const accessToken = localStorage.getItem('accessToken')
+  },
+
+  receiveNewMessage: ({ commit }, { conversationId, newMessage, lastUpdated }) => {
+    commit('receiveNewMessageToConversation', {
+      conversationId,
+      message: newMessage,
+      lastUpdated
+    })
   }
 }
 

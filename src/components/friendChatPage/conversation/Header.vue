@@ -1,6 +1,6 @@
 <template>
   <div class="conversation-header">
-    <div class="conversation-info">
+    <div class="conversation-info" @click="toProfile">
       <div class="avatar">
         <img v-if="conversation.friendAvatar" :src="conversation.friendAvatar" alt="">
         <div v-else class="avatar-text">
@@ -57,6 +57,15 @@ export default {
     toggleInfo() {
       this.showInfo = !this.showInfo
       this.$emit('toggle-info')
+    },
+
+    toProfile() {
+      this.$router.push({
+        name: 'PersonInfo',
+        params: {
+          personId: this.conversation.friendId
+        }
+      })
     }
   }
 }
