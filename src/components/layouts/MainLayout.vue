@@ -41,7 +41,8 @@ export default {
     }),
 
     ...mapActions({
-      getListFriends: 'getListFriends'
+      getListFriends: 'getListFriends',
+      playMessageSound: 'playMessageSound'
     }),
 
     async logout() {
@@ -75,10 +76,15 @@ export default {
     socket.on("connect_error", (error) => {
       console.error('Connect to socket server fail: '+ error.message)
     });
+
+    socket.on("new-message", () => {
+      this.playMessageSound()
+    });
   },
 
   destroyed() {
     socket.off("connect_error")
+    socket.off("new-message")
     socket.disconnect()
   }
 };

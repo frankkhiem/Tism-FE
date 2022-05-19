@@ -86,29 +86,11 @@
           height: '42px'
         }"
       >
-        <router-link to="/" class="top-nav-links">
+        <router-link to="/chat" class="top-nav-links">
           <sui-icon
             bordered
             fitted
-            name="plus"
-            inverted
-            color="blue"
-            :style="{
-              borderRadius: '2px',
-              height: '42px',
-              width: '42px',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginLeft: '4px',
-            }"
-          ></sui-icon>
-        </router-link>
-        <router-link to="/" class="top-nav-links">
-          <sui-icon
-            bordered
-            fitted
-            name="info"
+            name="facebook messenger"
             inverted
             color="blue"
             :style="{
@@ -127,6 +109,24 @@
             bordered
             fitted
             name="bell outline"
+            inverted
+            color="blue"
+            :style="{
+              borderRadius: '2px',
+              height: '42px',
+              width: '42px',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginLeft: '4px',
+            }"
+          ></sui-icon>
+        </router-link>
+        <router-link to="/" class="top-nav-links">
+          <sui-icon
+            bordered
+            fitted
+            name="info"
             inverted
             color="blue"
             :style="{

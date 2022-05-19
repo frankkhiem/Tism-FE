@@ -1,15 +1,20 @@
 <template>
 	<div class="conversation">
+		<div v-show="false" class="page-loading">
+			<img src="@/assets/img/Dual Ring-1s-200px.gif" alt="">
+		</div>
 		<ChatHeader 
+			v-show="!loading"
 			:conversation="conversationSelected"
 			@toggle-info="showInfo = ! showInfo"
 		></ChatHeader>
 		<Info 
-			v-if="showInfo"
+			v-show="!loading && showInfo"
 			:conversation="conversationSelected"
 		></Info>
-		<Messenger 
-			v-else
+		<Messenger
+			v-if="conversationSelected.messages"
+			v-show="!loading && !showInfo"
 			:messages="conversationSelected.messages"
 			:friendAvatar="conversationSelected.friendAvatar"
 		></Messenger>
@@ -38,6 +43,7 @@ export default {
 
 	data() {
 		return {
+			loading: false,
 			showInfo: false
 		}
 	},
@@ -48,7 +54,14 @@ export default {
 		}),
 
 		async refreshConversation() {
-			await this.getConversation(this.$route.params.chatRoomId)
+			try {
+				this.loading = true
+				await this.getConversation(this.$route.params.chatRoomId)
+				// await new Promise(resolve => setTimeout(resolve, 200))
+				this.loading = false
+			} catch(error) {
+				this.$router.replace({ name: 'Not Found' })
+			}
 		},
 	},
 
@@ -65,5 +78,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-	
+.page-loading {
+	height: 100%;
+	display: grid;
+	place-items: center;
+
+	img {
+		width: 60px;
+		height: 60px;
+	}
+}
 </style>

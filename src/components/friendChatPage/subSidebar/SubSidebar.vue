@@ -1,7 +1,7 @@
 <template>
 	<div class="sub-sidebar">
 		<div class="page-title">
-			<div class="title-name">
+			<div class="title-name" @click="toChatPage">
 				Chat
 			</div>
 			<div class="title-btns">
@@ -48,7 +48,11 @@ export default {
 	},
 
 	methods: {
-		
+		toChatPage() {
+			if( this.$route.name !== 'FriendChatDefault' ) {
+				this.$router.push({ name: 'FriendChatDefault' })
+			}
+		}
 	}
 }
 </script>
@@ -71,6 +75,7 @@ export default {
 		color: #252525;
 		font-weight: 700;
 		margin-left: 1rem;
+		cursor: pointer;
 	}
 
 	.title-btns {

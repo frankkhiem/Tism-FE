@@ -1,9 +1,9 @@
 <template>
   <div class="messenger" @click="seen">
-    <div v-if="!messages || messages.length === 0" class="no-messages">
+    <div v-show="messages.length === 0" class="no-messages">
       Chưa có tin nhắn trong cuộc trò chuyện!
     </div>
-    <div v-else class="messages">
+    <div v-show="messages.length > 0" class="messages">
       <MessageItem
         v-for="(mess, index) in messages"
         :key="index"
@@ -128,8 +128,11 @@ export default {
 
     scrollToBottom() {
       const listMessages = document.querySelector('.messages')
+      // console.log(listMessages)
       if( listMessages ) {
-        listMessages.scrollTop = listMessages.scrollHeight - listMessages.offsetHeight
+        setTimeout(() => {
+          listMessages.scrollTop = listMessages.scrollHeight - listMessages.offsetHeight
+        }, 0)
       }
     },
 
@@ -139,13 +142,12 @@ export default {
 
     async handleSendTextMessage() {
       if( this.message === '' ) return
-      const content = this.message
+      const content = this.message.trim()
       this.message = ''
       await this.sendTextMessage({
         conversationId: this.$route.params.chatRoomId, 
         content
       })
-      this.scrollToBottom()
       document.querySelector('textarea.chat-input').style.height = '36px'
     },
 
@@ -159,21 +161,18 @@ export default {
       // console.log(message.friendship === this.$route.params.chatRoomId)
       if( message.friendship === this.$route.params.chatRoomId ) {
         this.messages.push(message)
-        setTimeout(() => {
-          this.scrollToBottom()
-        }, 100)
       }
     })
   },
 
-  mounted() {
-    setTimeout(() => {
-      this.scrollToBottom()
-    }, 100)
+  async mounted() {
+    // await new Promise(resolve => setTimeout(resolve, 250))
+    this.scrollToBottom()
   },
 
   watch: {
     messages() {
+      // console.log('thay doi messages')
       this.scrollToBottom()
     }
   }
@@ -201,6 +200,7 @@ export default {
   flex-grow: 1;
   overflow-y: auto;
   padding: 1.5rem 0;
+  // scroll-behavior: smooth;
 }
 
 .chatbox {

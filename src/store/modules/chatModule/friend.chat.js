@@ -45,6 +45,16 @@ const mutations = {
 
   addSendedMessage: (state, message) => {
     state.conversation.messages.push(message)
+    for (let conversation of state.listConversations) {
+      if( conversation.conversationId === message.friendship ) {
+        conversation.lastMessage = {
+          type: message.type,
+          content: message.content
+        }
+        conversation.lastUpdated = message.createdAt
+        break
+      }
+    }
   },
 
   updateSeenTagConversation: (state, { conversationId, seen }) => {
@@ -93,11 +103,14 @@ const actions = {
 
       commit('updateConversationSelected', response.data.conversation)
     } catch(error) {
-      console.log(error.response.data);
+      console.log(error.response.data)
+      throw error
     }
   },
 
-  sendTextMessage: async ({ commit }, { conversationId, content })  => {
+  sendTextMessage: async ({ commit, dispatch }, { conversationId, content })  => {
+    dispatch('seenConversation', conversationId)
+
     const accessToken = localStorage.getItem('accessToken')
 
     try {

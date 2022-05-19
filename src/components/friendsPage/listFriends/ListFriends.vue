@@ -61,8 +61,8 @@ export default {
 		async refreshListFriends() {
 			try {
 				this.loading = true;
-				await new Promise(resolve => setTimeout(resolve, 500))
 				await this.getListFriends()
+				await new Promise(resolve => setTimeout(resolve, 300))
 				this.loading = false;
 			} catch(error) {
 				console.log(error);
@@ -78,8 +78,8 @@ export default {
 			}
 			try {
 				this.loading = true;
-				await new Promise(resolve => setTimeout(resolve, 300))
 				await this.searchCurrentFriends(keyword)
+				await new Promise(resolve => setTimeout(resolve, 300))
 				this.loading = false;
 			} catch(error) {
 				console.log(error)

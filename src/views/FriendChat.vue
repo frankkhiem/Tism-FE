@@ -1,5 +1,8 @@
 <template>
-  <div id="friend-chat-page">
+  <div v-if="loading" class="page-loading">
+    <img src="@/assets/img/Dual Ring-1s-200px.gif" alt="">
+  </div>
+  <div v-else id="friend-chat-page">
     <SubSidebar></SubSidebar>
     <Conversation v-if="inConversation"></Conversation>
     <div v-else class="out-conversation">
@@ -30,18 +33,25 @@ export default {
     }
   },
 
+  data() {
+    return {
+      loading: false
+    }
+  },
+
   methods: {
     ...mapActions({
       getListConversations: 'getListConversations',
-      receiveNewMessage: 'receiveNewMessage',
-      playMessageSound: 'playMessageSound'
+      receiveNewMessage: 'receiveNewMessage'
     })
   },
 
   async created() {
-    // console.log('chattttt')
     try {
+      this.loading = true
       await this.getListConversations()
+      await new Promise(resolve => setTimeout(resolve, 200))
+      this.loading = false
     } catch(error) {
       console.log(error);
     }
@@ -56,7 +66,6 @@ export default {
       const lastUpdated = message.createdAt
       const conversationId = message.friendship
 
-      this.playMessageSound()
       this.receiveNewMessage({
         conversationId,
         newMessage,
@@ -64,14 +73,22 @@ export default {
       })
     })
   },
-
-  destroyed() {
-    socket.off("new-message")
-  }
 }
 </script>
 
 <style lang="scss" scoped>
+.page-loading {
+  display: grid;
+  place-items: center;
+  min-height: inherit;
+  height: calc(100vh - 58px - 80px - 0rem);
+
+  img {
+    width: 100px;
+    height: 100px;
+  }
+}
+
 #friend-chat-page {
   display: flex;
   min-height: inherit;
