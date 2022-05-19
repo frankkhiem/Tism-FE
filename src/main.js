@@ -21,6 +21,9 @@ Vue.component('vue-confirm-dialog', VueConfirmDialog.default)
 import VModal from 'vue-js-modal'
 Vue.use(VModal)
 
+import VueClickOutsideElement from 'vue-click-outside-element'
+Vue.use(VueClickOutsideElement)
+
 Vue.config.productionTip = false
 
 import VueSidebarMenu from 'vue-sidebar-menu'

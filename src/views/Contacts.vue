@@ -100,6 +100,6 @@ export default {
 </script>
 <style lang="scss" scoped>
 .contacts-page {
-  margin-bottom: 4rem;
+  margin-bottom: 5rem;
 }
 </style>

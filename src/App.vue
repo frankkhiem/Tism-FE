@@ -19,11 +19,13 @@ export default {
   methods: {
     ...mapActions({
       fetchUserProfile: 'fetchUserProfile',
+      getListFriends: 'getListFriends'
     }),
   },
 
-  created() {
-    this.fetchUserProfile();
+  async created() {
+    await this.fetchUserProfile()
+    // await this.getListFriends()
   },
 }
 </script>
