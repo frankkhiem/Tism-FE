@@ -45,12 +45,20 @@ const mutations = {
 
   addSendedMessage: (state, message) => {
     state.conversation.messages.push(message)
+    let lastMessage = {}
+
+    if( message.type === 'image' ) {
+      lastMessage.content = 'Ảnh gửi lên.'
+    } else if( message.type === 'file' ) {
+      lastMessage.content = 'Tệp đính kèm.'
+    } else {
+      lastMessage.content = message.content
+    }
+    lastMessage.type = message.type
+
     for (let conversation of state.listConversations) {
       if( conversation.conversationId === message.friendship ) {
-        conversation.lastMessage = {
-          type: message.type,
-          content: message.content
-        }
+        conversation.lastMessage = lastMessage
         conversation.lastUpdated = message.createdAt
         break
       }
@@ -98,7 +106,7 @@ const actions = {
 
     try {
       const response = await axios.get(`${process.env.VUE_APP_API_HOST}/conversations/${conversationId}`, { 
-        headers: {"Authorization" : `Bearer ${accessToken}`}
+        headers: {"Authorization": `Bearer ${accessToken}`}
       })
 
       commit('updateConversationSelected', response.data.conversation)
@@ -118,6 +126,40 @@ const actions = {
         content
       }, {
         headers: {"Authorization" : `Bearer ${accessToken}`}
+      })
+
+      commit('addSendedMessage', response.data.message)
+    } catch(error) {
+      console.log(error.response.data);
+    }
+  },
+
+  sendImageMessage: async ({ commit }, { conversationId, formData })  => {
+    const accessToken = localStorage.getItem('accessToken')
+
+    try {
+      const response = await axios.post(`${process.env.VUE_APP_API_HOST}/conversations/${conversationId}/image-message`, formData, {
+        headers: {
+          "Authorization": `Bearer ${accessToken}`,
+          "Content-Type": "multipart/form-data"
+        }
+      })
+
+      commit('addSendedMessage', response.data.message)
+    } catch(error) {
+      console.log(error.response.data);
+    }
+  },
+
+  sendFileMessage: async ({ commit }, { conversationId, formData })  => {
+    const accessToken = localStorage.getItem('accessToken')
+    
+    try {
+      const response = await axios.post(`${process.env.VUE_APP_API_HOST}/conversations/${conversationId}/file-message`, formData, {
+        headers: {
+          "Authorization": `Bearer ${accessToken}`,
+          "Content-Type": "multipart/form-data"
+        }
       })
 
       commit('addSendedMessage', response.data.message)

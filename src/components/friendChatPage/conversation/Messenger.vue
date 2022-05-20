@@ -14,10 +14,23 @@
     </div>
     <div class="chatbox">
       <div class="send-options">
-        <div class="link-option">
+        <input 
+          type="file" 
+          ref="selectFile" 
+          style="display: none"
+          @input="handleSendFile"
+        >
+        <div class="link-option" @click="$refs.selectFile.click()">
           <i class="fa-solid fa-paperclip"></i>
         </div>
-        <div class="image-option">
+        <input 
+          type="file" 
+          ref="selectImage" 
+          accept="image/*" 
+          style="display: none"
+          @input="handleSendImage"
+        >
+        <div class="image-option" @click="$refs.selectImage.click()">
           <i class="fa-solid fa-image"></i>
         </div>
       </div>
@@ -105,6 +118,8 @@ export default {
   methods: {
     ...mapActions({
       sendTextMessage: 'sendTextMessage',
+      sendImageMessage: 'sendImageMessage',
+      sendFileMessage: 'sendFileMessage',
       seenConversation: 'seenConversation'
     }),
 
@@ -151,6 +166,36 @@ export default {
       document.querySelector('textarea.chat-input').style.height = '36px'
     },
 
+    async handleSendImage(e) {
+      let file = e.target.files[0]
+      if( !file ) return
+      let formData = new FormData()
+      formData.append('image-message', file)
+      await this.sendImageMessage({
+        conversationId: this.$route.params.chatRoomId,
+        formData
+      })
+    },
+
+    async handleSendFile(e) {
+      let file = e.target.files[0]
+      if( !file ) return
+      let formData = new FormData()
+      if( (/^image\/.+$/).test(file.type) ) {
+        formData.append('image-message', file)
+        await this.sendImageMessage({
+          conversationId: this.$route.params.chatRoomId,
+          formData
+        })
+      } else {
+        formData.append('file-message', file)
+        await this.sendFileMessage({
+          conversationId: this.$route.params.chatRoomId,
+          formData
+        })
+      }
+    },
+
     seen() {
       this.seenConversation(this.$route.params.chatRoomId)
     }
@@ -171,8 +216,9 @@ export default {
   },
 
   watch: {
-    messages() {
+    async messages() {
       // console.log('thay doi messages')
+      await new Promise(resolve => setTimeout(resolve, 300))
       this.scrollToBottom()
     }
   }
