@@ -86,29 +86,11 @@
           height: '42px'
         }"
       >
-        <router-link to="/" class="top-nav-links">
+        <router-link to="/chat" class="top-nav-links">
           <sui-icon
             bordered
             fitted
-            name="plus"
-            inverted
-            color="blue"
-            :style="{
-              borderRadius: '2px',
-              height: '42px',
-              width: '42px',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginLeft: '4px',
-            }"
-          ></sui-icon>
-        </router-link>
-        <router-link to="/" class="top-nav-links">
-          <sui-icon
-            bordered
-            fitted
-            name="info"
+            name="facebook messenger"
             inverted
             color="blue"
             :style="{
@@ -131,6 +113,24 @@
             color="blue"
             :style="{
               borderRadius: '2px',
+              height: '42px',
+              width: '42px',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginLeft: '4px',
+            }"
+          ></sui-icon>
+        </router-link>
+        <router-link to="/" class="top-nav-links">
+          <sui-icon
+            bordered
+            fitted
+            name="info"
+            inverted
+            color="blue"
+            :style="{
+              borderRadius: '2px',
               margin: '2px',
               height: '42px',
               width: '42px',
@@ -141,7 +141,7 @@
             }"
           ></sui-icon>
         </router-link>
-        <div class="dropdown-menu-account">
+        <div class="dropdown-menu-account"  @click="showDropdownMenu">
           <p
             :style="{
               borderRadius: '50%',
@@ -149,7 +149,6 @@
               width: '42px',
               userSelect: 'none',
             }"
-            @click="show_dropdown_menu = !show_dropdown_menu"
           >
             <sui-icon
               name="user"
@@ -163,12 +162,20 @@
               }"
             >
             </sui-icon>
-            <span class="user-name" v-show="userFullName">{{ userFullName.split(' ').map(elem => elem[0]).join('').slice(0, 2) }}</span>
+            <span class="user-name-icon" v-show="userFullName">{{ userFullName.split(' ').map(elem => elem[0]).join('').slice(0, 2) }}</span>
           </p>
-          <div class="dot online"></div>
-          <div class="menu-options" v-show="show_dropdown_menu == true">
+          <span class="user-name">{{ userFullName }}</span>
+          <div 
+            class="menu-options" 
+            v-if="show_dropdown_menu == true"
+            v-click-outside-element="hideDropdownMenu"
+          >
             <div class="option" v-for="(option, index) in options" :key="index">
-              <div v-if="index !== options.length - 1">
+              <div v-if="index === 0" @click="toProfile">
+                <i aria-hidden="true" class="icon" :class="option.icon"></i>
+                <span class="text">{{ option.text }}</span>
+              </div>
+              <div v-else-if="index !== options.length - 1">
                 <i aria-hidden="true" class="icon" :class="option.icon"></i>
                 <span class="text">{{ option.text }}</span>
               </div>
@@ -212,8 +219,25 @@ export default {
   },
 
   methods: {
+    showDropdownMenu() {
+      setTimeout(() => {
+        this.show_dropdown_menu = true
+      }, 0)
+    },
+
+    hideDropdownMenu() {
+      setTimeout(() => {
+        this.show_dropdown_menu = false
+      }, 1)
+    },
+
     logout() {
       this.$emit('logout')
+    },
+
+    toProfile() {
+      this.show_dropdown_menu = false
+      if( this.$route.name !== 'Profile' ) this.$router.push({ name: 'Profile' })
     }
   }
 };
@@ -293,12 +317,19 @@ export default {
 .dropdown-menu-account {
   cursor: pointer;
   position: relative;
+  left: 20px;
+
+}
+
+.dropdown-menu-account > p {
+  position: relative;
+  z-index: 2;
 }
 
 .menu-options {
   position: absolute;
   top: 60px;
-  right: 5px;
+  right: 30px;
   background: #fff;
   font-size: 1em;
   text-shadow: none;
@@ -352,8 +383,20 @@ export default {
   color: rgba(0, 0, 0, 0.95) !important;
 }
 
-.user-name {
+.user-name-icon {
   text-transform: uppercase;
+}
+
+.user-name {
+  padding: 12px 25px 12px 55px;
+  border-radius: 20px;
+  background: white;
+  position: relative;
+  right: 42px;
+}
+
+.user-name:hover {
+  background: #f4f5f7;
 }
 
 .dot {

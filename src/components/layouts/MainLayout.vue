@@ -10,11 +10,12 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from "vuex";
+import { mapGetters, mapMutations, mapActions } from "vuex";
 import axios from "axios";
 import Header from "./Header.vue";
 import Footer from "./Footer.vue";
 import LeftSideBar from "./LeftSideBar.vue";
+import socket from "@/helpers/socketClient"
 
 export default {
   data() {
@@ -48,6 +49,11 @@ export default {
       logoutUser: "logoutUser",
     }),
 
+    ...mapActions({
+      getListFriends: 'getListFriends',
+      playMessageSound: 'playMessageSound'
+    }),
+
     async logout() {
       try {
         const accessToken = localStorage.getItem("accessToken");
@@ -69,6 +75,30 @@ export default {
     toggleCollapse () {
       this.collapedContent = !this.collapedContent
     }
+  },
+
+  async created() {
+    await this.getListFriends()
+    if( this.isAuth ) {
+      socket.auth = {
+        userId: this.userProfile.userId
+      }
+      socket.connect()
+    }
+
+    socket.on("connect_error", (error) => {
+      console.error('Connect to socket server fail: '+ error.message)
+    });
+
+    socket.on("new-message", () => {
+      this.playMessageSound()
+    });
+  },
+
+  destroyed() {
+    socket.off("connect_error")
+    socket.off("new-message")
+    socket.disconnect()
   },
 };
 </script>

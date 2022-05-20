@@ -49,11 +49,69 @@ const routes = [
           },
         ]
       },
-      // {
-      //   path: 'profile',
-      //   name: 'Profile',
-      //   component: () => import('../views/Profile')
-      // },
+      {
+        path: 'profile',
+        component: () => import('../views/Profile'),
+        children: [
+          {
+            path: '',
+            name: 'Profile',
+            component: () => import('../components/profilePage/UserInfo'),
+          },
+          {
+            path: 'edit',
+            name: 'EditProfile',
+            component: () => import('../components/profilePage/EditProfile'),
+          },
+        ]
+      },
+      {
+        path: 'friends',
+        component: () => import('../views/Friends'),
+        children: [
+          {
+            path: '',
+            name: 'ListFriends',
+            component: () => import('../components/friendsPage/listFriends/ListFriends'),
+          },
+          {
+            path: 'invitations',
+            name: 'InvitationsFriends',
+            component: () => import('../components/friendsPage/invitationsFriends/InvitationsFriends'),
+          },
+          {
+            path: 'find',
+            name: 'FindFriends',
+            component: () => import('../components/friendsPage/findFriends/FindFriends'),
+          },
+        ]
+      },
+      {
+        path: 'person',
+        component: () => import('../views/PersonProfile'),
+        children: [
+          {
+            path: ':personId/info',
+            name: 'PersonInfo',
+            component: () => import('../components/personPage/PersonInfo'),
+          },
+          {
+            path: ':personId/mutual-friends',
+            name: 'MutualFriends',
+            component: () => import('../components/personPage/MutualFriends'),
+          },
+        ]
+      },
+      {
+        path: 'chat',
+        name: 'FriendChatDefault',
+        component: () => import('../views/FriendChat')
+      },
+      {
+        path: 'chat/:chatRoomId',
+        name: 'FriendChat',
+        component: () => import('../views/FriendChat')
+      },
       // {
       //   path: 'home-test',
       //   name: 'HomeTest',

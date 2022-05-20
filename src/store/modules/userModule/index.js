@@ -12,7 +12,13 @@ const getters = {
   },
 
   profile: (state) => {
-    return state.user
+    const firstName = state.user.fullname?.split(' ').pop()
+    const firstNameLetter = firstName?.slice(0, 1).toUpperCase()
+    return {
+      ...state.user,
+      firstName,
+      firstNameLetter
+    }
   }
 }
 

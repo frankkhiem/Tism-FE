@@ -49,6 +49,9 @@
   padding: 0;
   margin: 0; 
 }
+.footer {
+  margin-top: 0rem;
+}
 .top-footer {
   height: 20px;
   background-color: #ebeeee;
