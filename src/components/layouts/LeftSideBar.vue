@@ -1,11 +1,13 @@
 <template>
-  <sidebar-menu :menu="menu" :collapsed="true" width="200px"/>
+  <sidebar-menu :menu="menu" :collapsed="true" width="200px" @toggle-collapse="onToggleCollapse"/>
 </template>
 <script>
 export default {
    data() {
      return {
-       menu: [
+      collapsed: true,
+
+      menu: [
         {
           href: '/',
           title: 'Home',
@@ -34,15 +36,19 @@ export default {
       ]
      };
   },
+
+  methods: {
+    onToggleCollapse() {
+      this.$emit('toggle-collapse')
+    },
+  }
 };
 </script>
 <style>
 .v-sidebar-menu {
-  /* top: 58px;
-  bottom: 60px; */
-  position: absolute;
-  top: 58px;
   background-color: #026aa7;
+  top:58px;
+  bottom: 80px;
 }
 .v-sidebar-menu .vsm--link_level-1 .vsm--icon {
   background-color: transparent;
@@ -51,5 +57,9 @@ export default {
 .v-sidebar-menu .vsm--mobile-bg {
   background-color: #1a9de9;
   z-index: 0;
+}
+
+.v-sidebar-menu .vsm--list {
+  margin-top: 50px;
 }
 </style>

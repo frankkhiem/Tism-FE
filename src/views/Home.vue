@@ -62,10 +62,9 @@ export default {
   
 }
 </script>
-
 <style lang="scss" scoped>
 #home-page {
-  padding: 3rem 4rem 0;
+  padding: 3rem 0 0 4rem;
 
   .home-card {
     margin-bottom: 3rem;
