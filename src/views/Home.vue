@@ -64,7 +64,6 @@ export default {
   
 }
 </script>
-
 <style lang="scss" scoped>
 #home-page {
   padding: 3rem 4rem 0;

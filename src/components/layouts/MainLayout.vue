@@ -1,8 +1,8 @@
 <template>
   <div class="app-main">
     <Header v-on:logout="logout" :userFullName="userProfile.fullname"></Header>
-    <section id="app-content">
-      <LeftSideBar></LeftSideBar>
+    <section id="app-content" :class="{'collapedContent': collapedContent }">
+      <LeftSideBar v-on:toggle-collapse="toggleCollapse"></LeftSideBar>
       <router-view></router-view>
     </section>
     <Footer></Footer>
@@ -18,11 +18,17 @@ import LeftSideBar from "./LeftSideBar.vue";
 import socket from "@/helpers/socketClient"
 
 export default {
-  components: { 
+  data() {
+    return {
+      collapedContent: true
+    };
+  },
+
+  components: {
     Header,
     Footer,
-    LeftSideBar
-  },
+    LeftSideBar,
+},
 
   computed: {
     ...mapGetters({
@@ -65,6 +71,10 @@ export default {
       this.logoutUser();
       this.$router.push({ name: "Login" });
     },
+
+    toggleCollapse () {
+      this.collapedContent = !this.collapedContent
+    }
   },
 
   async created() {
@@ -89,12 +99,20 @@ export default {
     socket.off("connect_error")
     socket.off("new-message")
     socket.disconnect()
-  }
+  },
 };
 </script>
 
 <style lang="scss" scoped>
 #app-content {
-  min-height: calc(100vh - 58px - 80px - 0rem);
+  height: calc(100vh - 58px - 80px);
+  overflow-y: scroll;
+  overflow-x: hidden;
+  padding-left: 150px;
+  transition: 0.3s padding-left ease;
+}
+
+.collapedContent {
+  padding-left: 0px !important;
 }
 </style>

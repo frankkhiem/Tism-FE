@@ -141,7 +141,7 @@
             }"
           ></sui-icon>
         </router-link>
-        <div class="dropdown-menu-account">
+        <div class="dropdown-menu-account"  @click="showDropdownMenu">
           <p
             :style="{
               borderRadius: '50%',
@@ -149,7 +149,6 @@
               width: '42px',
               userSelect: 'none',
             }"
-            @click="showDropdownMenu"
           >
             <sui-icon
               name="user"
@@ -163,8 +162,9 @@
               }"
             >
             </sui-icon>
-            <span class="user-name" v-show="userFullName">{{ userFullName.split(' ').map(elem => elem[0]).join('').slice(0, 2) }}</span>
+            <span class="user-name-icon" v-show="userFullName">{{ userFullName.split(' ').map(elem => elem[0]).join('').slice(0, 2) }}</span>
           </p>
+          <span class="user-name">{{ userFullName }}</span>
           <div 
             class="menu-options" 
             v-if="show_dropdown_menu == true"
@@ -317,12 +317,19 @@ export default {
 .dropdown-menu-account {
   cursor: pointer;
   position: relative;
+  left: 20px;
+
+}
+
+.dropdown-menu-account > p {
+  position: relative;
+  z-index: 2;
 }
 
 .menu-options {
   position: absolute;
   top: 60px;
-  right: 5px;
+  right: 30px;
   background: #fff;
   font-size: 1em;
   text-shadow: none;
@@ -376,8 +383,20 @@ export default {
   color: rgba(0, 0, 0, 0.95) !important;
 }
 
-.user-name {
+.user-name-icon {
   text-transform: uppercase;
+}
+
+.user-name {
+  padding: 12px 25px 12px 55px;
+  border-radius: 20px;
+  background: white;
+  position: relative;
+  right: 42px;
+}
+
+.user-name:hover {
+  background: #f4f5f7;
 }
 
 .dot {
