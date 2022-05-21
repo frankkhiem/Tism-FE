@@ -1,6 +1,10 @@
 <template>
   <div class="app-main">
-    <Header v-on:logout="logout" :userFullName="userProfile.fullname"></Header>
+    <Header 
+      @logout="logout" 
+      :userFirstName="userProfile.firstName"
+      :userFirstNameLetter="userProfile.firstNameLetter"
+    ></Header>
     <section id="app-content" :class="{'collapedContent': collapedContent }">
       <LeftSideBar v-on:toggle-collapse="toggleCollapse"></LeftSideBar>
       <router-view></router-view>
@@ -51,6 +55,7 @@ export default {
 
     ...mapActions({
       getListFriends: 'getListFriends',
+      getListConversations: 'getListConversations',
       playMessageSound: 'playMessageSound'
     }),
 
@@ -93,11 +98,24 @@ export default {
     socket.on("new-message", () => {
       this.playMessageSound()
     });
+
+    socket.on("friend-online", async () => {
+      this.getListFriends()
+      this.getListConversations()
+    });
+
+    socket.on("friend-offline", async () => {
+      await new Promise(resolve => setTimeout(resolve, 5000))
+      this.getListFriends()
+      this.getListConversations()
+    });
   },
 
   destroyed() {
     socket.off("connect_error")
     socket.off("new-message")
+    socket.off("friend-online")
+    socket.off("friend-offline")
     socket.disconnect()
   },
 };
@@ -110,6 +128,7 @@ export default {
   overflow-x: hidden;
   padding-left: 150px;
   transition: 0.3s padding-left ease;
+  margin-left: 50px;
 }
 
 .collapedContent {

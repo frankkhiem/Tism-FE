@@ -1,9 +1,17 @@
 <template>
   <div class="messenger" @click="seen">
+    <div v-show="loadingMore" class="loading-more">
+      <img src="@/assets/img/Dual Ring-1s-200px.gif" alt="">
+    </div>
     <div v-show="messages.length === 0" class="no-messages">
       Chưa có tin nhắn trong cuộc trò chuyện!
     </div>
-    <div v-show="messages.length > 0" class="messages">
+    <div 
+      v-show="messages.length > 0" 
+      class="messages"
+      ref="listMessages"
+      @scroll.passive="checkScroll"
+    >
       <MessageItem
         v-for="(mess, index) in messages"
         :key="index"
@@ -11,6 +19,11 @@
         :friendAvatar="friendAvatar"
         :userId="user.userId"
       ></MessageItem>
+    </div>
+    <div v-show="showScrollToBottom" class="scroll-to-bottom">
+      <span class="scroll-btn" @click="scrollToBottom">
+        <i class="fa-solid fa-arrow-down"></i>
+      </span>
     </div>
     <div class="chatbox">
       <div class="send-options">
@@ -95,6 +108,7 @@ export default {
   },
 
   props: {
+    totalMessages: Number,
     messages: {
       type: Array
     },
@@ -111,7 +125,9 @@ export default {
 
   data() {
     return {
-      message: ''
+      message: '',
+      loadingMore: false,
+      showScrollToBottom: false
     }
   },
 
@@ -120,7 +136,8 @@ export default {
       sendTextMessage: 'sendTextMessage',
       sendImageMessage: 'sendImageMessage',
       sendFileMessage: 'sendFileMessage',
-      seenConversation: 'seenConversation'
+      seenConversation: 'seenConversation',
+      getOlderMessages: 'getOlderMessages'
     }),
 
     resizeInput(e) {
@@ -142,17 +159,42 @@ export default {
     },
 
     scrollToBottom() {
-      const listMessages = document.querySelector('.messages')
-      // console.log(listMessages)
-      if( listMessages ) {
-        setTimeout(() => {
-          listMessages.scrollTop = listMessages.scrollHeight - listMessages.offsetHeight
-        }, 0)
+      const messages = this.$refs.listMessages
+
+      setTimeout(() => {
+        messages.scrollTop = messages.scrollHeight /*- listMessages.offsetHeight*/
+      }, 0)
+    },
+
+    checkScroll() {
+      const messages = this.$refs.listMessages
+      let scrollRangeFromBottom = messages.scrollHeight - messages.offsetHeight - messages.scrollTop
+      if( scrollRangeFromBottom > 500 ) {
+        this.showScrollToBottom = true
+      } else {
+        this.showScrollToBottom = false
+      }
+
+      if( messages.scrollTop === 0 && this.messages.length < this.totalMessages ) {
+        this.handleLoadMoreMessages(scrollRangeFromBottom)
       }
     },
 
     insertEmoji(emoji) {
       this.message += emoji
+    },
+
+    async handleLoadMoreMessages(scrollRangeFromBottom) {
+      this.loadingMore = true
+      await new Promise(resolve => setTimeout(resolve, 200))
+      await this.getOlderMessages({
+        conversationId: this.$route.params.chatRoomId,
+        skip: this.messages.length,
+        take: 10
+      })
+      const messages = this.$refs.listMessages
+      messages.scrollTop = messages.scrollHeight - messages.offsetHeight - scrollRangeFromBottom
+      this.loadingMore = false
     },
 
     async handleSendTextMessage() {
@@ -216,10 +258,16 @@ export default {
   },
 
   watch: {
-    async messages() {
-      // console.log('thay doi messages')
-      await new Promise(resolve => setTimeout(resolve, 300))
-      this.scrollToBottom()
+    async messages(newValue, oldValue) {
+      if( newValue[newValue.length - 1]?._id != oldValue[oldValue.length - 1]?._id ) {
+        this.scrollToBottom()
+        this.showScrollToBottom = false
+        return
+      }
+      if( !this.showScrollToBottom ) {
+        await new Promise(resolve => setTimeout(resolve, 350))
+        this.scrollToBottom()
+      }      
     }
   }
 }
@@ -230,6 +278,19 @@ export default {
   height: calc(100% - 60px);
   display: flex;
   flex-direction: column;
+  position: relative;
+}
+
+.loading-more {
+  position: absolute;
+  top: 1rem;
+  width: 100%;
+  text-align: center;
+
+  img {
+    width: 40px;
+    height: 40px;
+  }
 }
 
 .no-messages {
@@ -247,6 +308,41 @@ export default {
   overflow-y: auto;
   padding: 1.5rem 0;
   // scroll-behavior: smooth;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+.scroll-to-bottom {
+  position: absolute;
+  bottom: 80px;
+  width: 100%;
+  text-align: center;
+  animation: slideUp .2s ease-out;
+
+  span.scroll-btn {
+    display: inline-block;
+    width: 36px;
+    height: 36px;
+    line-height: 36px;
+    color: #026aa7;
+    background-color: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 6px 2px rgba(0, 0, 0, 0.3);
+    transition: background-color .1s linear;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #e8e8e8;
+    }
+  }
 }
 
 .chatbox {

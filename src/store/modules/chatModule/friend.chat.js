@@ -65,6 +65,10 @@ const mutations = {
     }
   },
 
+  addOlderMessages: (state, messages) => {
+    state.conversation.messages.unshift(...messages)
+  },
+
   updateSeenTagConversation: (state, { conversationId, seen }) => {
     for (let conversation of state.listConversations) {
       if( conversation.conversationId === conversationId ) {
@@ -192,6 +196,23 @@ const actions = {
       message: newMessage,
       lastUpdated
     })
+  },
+
+  getOlderMessages: async ({ commit }, { conversationId, skip, take }) => {
+    const accessToken = localStorage.getItem('accessToken')
+
+    try {
+      const response = await axios.get(`${process.env.VUE_APP_API_HOST}/conversations/${conversationId}/messages`, {
+        headers: {"Authorization" : `Bearer ${accessToken}`},
+        params: {
+          skip,
+          take
+        }
+      })
+      commit('addOlderMessages', response.data.messages)
+    } catch(error) {
+      console.log(error.response.data);
+    }
   }
 }
 

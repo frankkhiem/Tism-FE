@@ -112,7 +112,7 @@ export default {
   display: flex;
   align-items: center;
   height: 120px;
-  width: 70%;
+  width: 75%;
   margin: 0 auto 12px;
   border-radius: 6px;
   border: 1px solid #ddd;

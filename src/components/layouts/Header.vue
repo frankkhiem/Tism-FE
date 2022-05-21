@@ -153,7 +153,7 @@
             <sui-icon
               name="user"
               size="large"
-              v-show="!userFullName"
+              v-show="!userFirstName"
               :style="{
                 display: 'flex',
                 justifyContent: 'center',
@@ -162,9 +162,9 @@
               }"
             >
             </sui-icon>
-            <span class="user-name-icon" v-show="userFullName">{{ userFullName.split(' ').map(elem => elem[0]).join('').slice(0, 2) }}</span>
+            <span class="user-name-icon" v-show="userFirstName">{{ userFirstNameLetter }}</span>
           </p>
-          <span class="user-name">{{ userFullName }}</span>
+          <span class="user-name">{{ userFirstName }}</span>
           <div 
             class="menu-options" 
             v-if="show_dropdown_menu == true"
@@ -215,7 +215,8 @@ export default {
   },
 
   props: {
-    userFullName: String
+    userFirstName: String,
+    userFirstNameLetter: String
   },
 
   methods: {

@@ -35,16 +35,17 @@
 				></a>
 			</div>
 		</div>
-		<div class="time-ago">
-			{{ timeago }}
-		</div>
+		<div class="time-ago" ref="timeAgo" :datetime="message.createdAt"></div>
 	</div>
 </template>
 
 <script>
 import ImageModal from './ImageModal'
 
-import { format } from 'timeago.js'
+import { format, render, register } from 'timeago.js'
+import vieLocaleFunc from '@/helpers/timeAgoVie'
+
+register('VN', vieLocaleFunc)
 
 export default {
 	props: {
@@ -89,6 +90,10 @@ export default {
 		downloadFile() {
 			this.$refs.fileUrlDownload.click()
 		}
+	},
+
+	mounted() {
+		render(this.$refs.timeAgo, 'VN')
 	}
 }
 </script>
