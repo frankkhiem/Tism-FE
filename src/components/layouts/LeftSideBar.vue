@@ -30,7 +30,7 @@ export default {
         },
          {
           href: 'about',
-          title: 'About We',
+          title: 'About Us',
           icon: 'fa-solid fa-circle-info'
         },
       ]

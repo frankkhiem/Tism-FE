@@ -36,9 +36,11 @@
   display: flex;
   align-items: center;
   min-height: inherit;
+  padding-top: 3rem;
 
   .tism-information {
     margin-left: 6rem;
+    flex-shrink: 1;
 
     .title {
       margin-bottom: .5rem;
@@ -95,6 +97,10 @@
         background-color: #026aa7;
       }
     }
+  }
+
+  .tism-image {
+    flex-shrink: 1;
   }
 }
 </style>

@@ -15,6 +15,7 @@
 		<Messenger
 			v-if="conversationSelected.messages"
 			v-show="!loading && !showInfo"
+			:totalMessages="conversationSelected.totalMessages"
 			:messages="conversationSelected.messages"
 			:friendAvatar="conversationSelected.friendAvatar"
 		></Messenger>

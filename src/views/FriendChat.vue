@@ -59,9 +59,15 @@ export default {
 
   mounted() {
     socket.on('new-message', (message) => {
-      const newMessage = {
+      let newMessage = {
         type: message.type,
-        content: message.content
+      }
+      if( message.type === 'image' ) {
+        newMessage.content = 'Ảnh gửi lên.'
+      } else if( message.type === 'file' ) {
+        newMessage.content = 'Tệp đính kèm.'
+      } else {
+        newMessage.content = message.content
       }
       const lastUpdated = message.createdAt
       const conversationId = message.friendship

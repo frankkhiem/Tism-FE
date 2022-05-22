@@ -11,7 +11,7 @@
         <div class="friend-name">
           {{ conversation.friendFullName }}
         </div>
-        <div v-if="conversation.friendStatus === 'online'" class="friend-status">
+        <div v-if="friendStatus === 'online'" class="friend-status">
           <span class="online-badge"></span>
           Online
         </div>
@@ -40,6 +40,8 @@
 </template>
 
 <script>
+import socket from '@/helpers/socketClient'
+
 export default {
   props: {
     conversation: {
@@ -49,7 +51,8 @@ export default {
 
   data() {
     return {
-      showInfo: false
+      showInfo: false,
+      friendStatus: 'offline'
     }
   },
 
@@ -67,6 +70,26 @@ export default {
         }
       })
     }
+  },
+
+  created() {
+    socket.on('friend-online', (data) => {
+      if( data.id === this.conversation.friendId ) {
+        this.friendStatus = 'online'
+      }
+    })
+
+    socket.on('friend-offline', (data) => {
+      if( data.id === this.conversation.friendId ) {
+        this.friendStatus = 'offline'
+      }
+    })
+  },
+
+  watch: {
+    conversation(newData) {
+      this.friendStatus = newData.friendStatus
+    },
   }
 }
 </script>
