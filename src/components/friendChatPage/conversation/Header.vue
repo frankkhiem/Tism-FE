@@ -52,7 +52,8 @@ export default {
   data() {
     return {
       showInfo: false,
-      friendStatus: 'offline'
+      friendStatus: 'offline',
+      realtimeOnline: false
     }
   },
 
@@ -76,12 +77,18 @@ export default {
     socket.on('friend-online', (data) => {
       if( data.id === this.conversation.friendId ) {
         this.friendStatus = 'online'
+        this.realtimeOnline = true
       }
     })
 
     socket.on('friend-offline', (data) => {
       if( data.id === this.conversation.friendId ) {
-        this.friendStatus = 'offline'
+        this.realtimeOnline = false
+        setTimeout(() => {
+          if( !this.realtimeOnline ) {
+            this.friendStatus = 'offline'
+          }
+        }, 5000)
       }
     })
   },
