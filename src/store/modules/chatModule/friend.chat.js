@@ -87,6 +87,17 @@ const mutations = {
         break
       }
     }
+  },
+
+  removeDeletedMessage: (state, deletedMessage) => {
+    if( state.conversation.conversationId !== deletedMessage.friendship ) return
+    for( let i = 0; i < state.conversation.messages.length; i++ ) {
+      let message = state.conversation.messages[i]
+      if( message._id === deletedMessage._id ) {
+        state.conversation.messages.splice(i, 1)
+        break
+      }
+    }
   }
 }
 
@@ -210,6 +221,21 @@ const actions = {
         }
       })
       commit('addOlderMessages', response.data.messages)
+    } catch(error) {
+      console.log(error.response.data);
+    }
+  },
+
+  deleteMessage: async ({ commit, dispatch }, { conversationId, messageId }) => {
+    const accessToken = localStorage.getItem('accessToken')
+
+    try {
+      const response = await axios.delete(`${process.env.VUE_APP_API_HOST}/conversations/${conversationId}/messages/${messageId}`, {
+        headers: {"Authorization" : `Bearer ${accessToken}`}
+      })
+
+      commit('removeDeletedMessage', response.data.deletedMessage)
+      dispatch('getListConversations')
     } catch(error) {
       console.log(error.response.data);
     }

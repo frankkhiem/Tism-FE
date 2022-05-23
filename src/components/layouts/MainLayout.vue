@@ -51,7 +51,8 @@ export default {
   },
   methods: {
     ...mapMutations({
-      logoutUser: "logoutUser",
+      logoutUser: 'logoutUser',
+      removeDeletedMessage: 'removeDeletedMessage'
     }),
 
     ...mapActions({
@@ -100,6 +101,12 @@ export default {
       this.playMessageSound()
     });
 
+    socket.on("deleted-message", (deletedMessage) => {
+      this.removeDeletedMessage(deletedMessage)
+      this.getListConversations()
+
+    });
+
     socket.on("friend-online", async () => {
       this.getListFriends()
       this.getListConversations()
@@ -115,6 +122,7 @@ export default {
   destroyed() {
     socket.off("connect_error")
     socket.off("new-message")
+    socket.off("deleted-message")
     socket.off("friend-online")
     socket.off("friend-offline")
     socket.disconnect()
