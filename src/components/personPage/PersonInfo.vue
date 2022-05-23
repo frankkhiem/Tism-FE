@@ -103,6 +103,7 @@ export default {
 
 		.info-value {
 			flex-basis: 600px;
+			padding-right: 2rem;
 
 			span.bold {
 				font-weight: 600;

@@ -8,7 +8,7 @@
     </div>
     <div v-else class="page-content">
       <div class="sub-content">
-        <div class="avatar">
+        <div class="avatar" @click="showAvatar">
           <div 
             v-if="person.avatar" 
             class="img-avatar" 
@@ -96,6 +96,7 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
+import AvatarModal from '@/components/personPage/AvatarModal'
 
 export default {
   computed: {
@@ -226,7 +227,19 @@ export default {
       this.$router.push({ name: routeName })
     },
 
-    
+    showAvatar() {
+      if( !this.person.avatar ) return
+      this.$modal.show(
+        AvatarModal,
+        {
+          avatarUrl: this.person.avatar
+        },
+        {
+          width: '80%',
+          height: '95%'
+        }
+      )
+    }
   },
 
   created() {
@@ -279,7 +292,6 @@ export default {
         width: 220px;
         height: 190px;
         margin: 0 auto;
-        cursor: default;
 
         &:hover {
           filter: brightness(95%) contrast(100%) saturate(100%) blur(0px) hue-rotate(0deg);
@@ -309,6 +321,7 @@ export default {
             height: 100%;
             border-radius: 50%;
             object-fit: cover;
+            cursor: pointer;
           }
         }
 
@@ -320,6 +333,7 @@ export default {
           color: #fff;
           background-color: #ccc;
           user-select: none;
+          cursor: default;
         }
       }
 

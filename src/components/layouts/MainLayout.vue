@@ -2,6 +2,7 @@
   <div class="app-main">
     <Header 
       @logout="logout" 
+      :userAvatar="userProfile.avatar"
       :userFirstName="userProfile.firstName"
       :userFirstNameLetter="userProfile.firstNameLetter"
     ></Header>
