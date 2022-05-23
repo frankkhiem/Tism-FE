@@ -237,8 +237,13 @@ export default {
     },
 
     toProfile() {
-      this.show_dropdown_menu = false
       if( this.$route.name !== 'Profile' ) this.$router.push({ name: 'Profile' })
+    }
+  },
+
+  watch: {
+    $route() {
+      this.hideDropdownMenu()
     }
   }
 };

@@ -31,7 +31,9 @@ const mutations = {
     state.user = {}
     localStorage.removeItem('accessToken')
     localStorage.removeItem('refreshToken')
-  }
+  },
+
+  nothingUserAction: () => {}
 };
 
 const actions = {
@@ -86,6 +88,25 @@ const actions = {
     } catch(error) {
       // statements
       // console.log(error.response);
+      return false
+    }
+  },
+
+  uploadUserAvatar: async ({ commit }, formData) => {
+    const accessToken = localStorage.getItem('accessToken')
+
+    try {
+      const response = await axios.post(`${process.env.VUE_APP_API_HOST}/user/avatar/upload`, formData, {
+        headers: {
+          "Authorization": `Bearer ${accessToken}`,
+          "Content-Type": "multipart/form-data"
+        }
+      })
+
+      commit('nothingUserAction')
+      return response.data.success
+    } catch(error) {
+      // console.log(error.response.data);
       return false
     }
   }

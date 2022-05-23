@@ -33,7 +33,10 @@
           style="display: none"
           @input="handleSendFile"
         >
-        <div class="link-option" @click="$refs.selectFile.click()">
+        <div 
+          class="link-option" 
+          @click="$refs.selectFile.value = null; $refs.selectFile.click()"
+        >
           <i class="fa-solid fa-paperclip"></i>
         </div>
         <input 
@@ -43,7 +46,10 @@
           style="display: none"
           @input="handleSendImage"
         >
-        <div class="image-option" @click="$refs.selectImage.click()">
+        <div 
+          class="image-option" 
+          @click="$refs.selectImage.value = null; $refs.selectImage.click()"
+        >
           <i class="fa-solid fa-image"></i>
         </div>
       </div>
