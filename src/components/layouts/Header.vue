@@ -150,19 +150,10 @@
               userSelect: 'none',
             }"
           >
-            <sui-icon
-              name="user"
-              size="large"
-              v-show="!userFirstName"
-              :style="{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                paddingLeft: '4px',
-              }"
-            >
-            </sui-icon>
-            <span class="user-name-icon" v-show="userFirstName">{{ userFirstNameLetter }}</span>
+            <span class="user-name-icon" v-if="userAvatar">
+              <img :src="userAvatar" alt="">
+            </span>
+            <span class="user-name-icon text" v-else>{{ userFirstNameLetter }}</span>
           </p>
           <span class="user-name">{{ userFirstName }}</span>
           <div 
@@ -215,6 +206,7 @@ export default {
   },
 
   props: {
+    userAvatar: String,
     userFirstName: String,
     userFirstNameLetter: String
   },
@@ -390,15 +382,28 @@ export default {
 }
 
 .user-name-icon {
+  height: 40px;
+}
+
+.user-name-icon.text {
+  height: 39px;
   text-transform: uppercase;
 }
 
+.user-name-icon img {
+  height: 45px;
+  width: 45px;
+  object-fit: cover;
+  transform: translateY(-2px);
+}
+
 .user-name {
-  padding: 12px 25px 12px 55px;
+  padding: 12px 22px 11px 52px;
   border-radius: 20px;
   background: white;
   position: relative;
   right: 42px;
+  font-weight: 700;
 }
 
 .user-name:hover {
