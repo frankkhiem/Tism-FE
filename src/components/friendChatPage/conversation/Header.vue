@@ -22,7 +22,10 @@
       </div>
     </div>
     <div class="conversation-actions">
-      <div class="action-btn">
+      <div 
+        class="action-btn"
+        @click="handleVideoCall"
+      >
         <i class="fa-solid fa-video"></i>
       </div>
       <div class="action-btn">
@@ -40,6 +43,11 @@
 </template>
 
 <script>
+import InitCallModal from './InitCallModal'
+import VideoCallModal from './VideoCallModal'
+
+import { mapGetters } from 'vuex'
+// import axios from 'axios'
 import socket from '@/helpers/socketClient'
 
 export default {
@@ -49,11 +57,18 @@ export default {
     }
   },
 
+  computed: {
+    ...mapGetters({
+      user: 'profile'
+    })
+  },
+
   data() {
     return {
       showInfo: false,
       friendStatus: 'offline',
-      realtimeOnline: false
+      realtimeOnline: false,
+      friendAccept: null
     }
   },
 
@@ -70,6 +85,79 @@ export default {
           personId: this.conversation.friendId
         }
       })
+    },
+
+    initialCall() {
+      this.$modal.show(
+        InitCallModal,
+        { 
+          conversation: this.conversation,
+          setConnected: this.setCallConnected
+        },
+        {
+          width: '500px',
+          height: '150px'
+        },
+        {
+          'closed': this.checkCanceledCall
+        }
+      )
+    },
+
+    checkCanceledCall() {
+      // console.log(this.friendAccept)
+      if( this.friendAccept === null ) {
+        socket.emit('cancel-video-call', {
+          caller: this.user.userId,
+          callerName: this.user.fullname,
+          receiver: this.conversation.friendId
+        })
+      }
+    },
+
+    setCallConnected(connected) {
+      this.friendAccept = connected
+    },
+
+    startCall() {
+      this.$modal.show(
+        VideoCallModal,
+        { 
+          conversation: this.conversation
+        },
+        {
+          width: '100%',
+          height: '100%'
+        },
+        {
+          'closed': this.endCall
+        }
+      )
+    },
+
+    endCall() {
+      socket.emit('end-video-call-from-caller', {
+        caller: this.user.userId,
+        callerName: this.user.fullname,
+        receiver: this.conversation.friendId
+      })
+    },
+
+    handleVideoCall() {
+      if( !this.realtimeOnline ) {
+        this.$confirm(
+          {
+            title: `Không thể gọi Video`,
+            message: `📞 Người dùng này hiện đang offline, hãy thực hiện lại cuộc gọi sau 🟢.`,
+            button: {
+              no: 'Đã hiểu!'
+            }          
+          }
+        )
+        return
+      }
+
+      this.initialCall()
     }
   },
 
@@ -96,7 +184,26 @@ export default {
   watch: {
     conversation(newData) {
       this.friendStatus = newData.friendStatus
+      this.realtimeOnline = this.friendStatus === 'online' ? true : false
     },
+
+    friendAccept(connected) {
+      if( connected ) {
+        this.startCall()
+      } else if ( connected === null ) {
+        return
+      } else {
+        this.$confirm(
+          {
+            title: `Gọi Video không thành công`,
+            message: `📞 Người dùng này hiện đang bận, vui lòng gọi lại sau.`,
+            button: {
+              no: 'Đã hiểu!'
+            }          
+          }
+        )
+      }
+    }
   }
 }
 </script>
