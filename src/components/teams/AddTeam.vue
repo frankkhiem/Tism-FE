@@ -27,15 +27,21 @@
     </div>
     <div class="modal-main">
       <div class="create-team-container">
-        <div class="create-team-name">
+        <div class="create-team-infor" :style="{ backgroundImage: `url(${teamAvatar})` }">
           <div>
-            <input type="text" name="name" placeholder="Thêm mới tên team của bạn" class="team-name-input">
+            <input type="text" name="name" placeholder="Thêm mới tên team của bạn" class="team-name-input" v-model="teamName">
+          </div>
+          <div class="create-team-status">
+            <input type="radio" id="public" name="team-status" value="1" v-model="teamStatus" />
+            <label for="public">Công khai</label>
+            <input type="radio" id="private" name="team-status" value="2" v-model="teamStatus" />
+            <label for="private">Riêng tư</label>
           </div>
         </div>
         <ul class="create-team-background">
           <li class="create-team-background-item" v-for="(imageUrl, index) in temaBackgroundImageUrls" :key="index">
-            <button class="create-team-background-item-btn" :style="{ backgroundImage: `url(${imageUrl})` }"></button>
-            <span class="icon-tick">✔</span>
+            <button class="create-team-background-item-btn" :class="{ 'selected-bg-btn': teamAvatar == imageUrl }" @click="teamAvatar = imageUrl" :style="{ backgroundImage: `url(${imageUrl})` }"></button>
+            <span class="icon-tick" :class="{ 'icon-hidden': teamAvatar == imageUrl }">✔</span>
           </li>
         </ul>
       </div>
@@ -44,7 +50,7 @@
       <div class="cancel-btn"  @click="$emit('close')">
         Hủy
       </div>
-      <div class="agree-btn">
+      <div class="agree-btn" :disabled="teamName == ''">
         Tạo
       </div>
     </div>
@@ -60,6 +66,9 @@ export default {
   data() {
     return {
       hoverClose: false,
+      teamName: '',
+      teamAvatar: require(`../../assets/img/bg8.jpg`),
+      teamStatus: 1,
       temaBackgroundImageUrls: [
         require(`../../assets/img/bg1.jpeg`),
         require(`../../assets/img/bg2.jpeg`),
@@ -105,8 +114,7 @@ export default {
       display: flex;
       width: 520px;
 
-      .create-team-name {
-        background-image: url('../../assets/img/bg1.jpeg');
+      .create-team-infor {
         background-color: transparent;
         box-sizing: border-box;
         height: 180px;
@@ -151,6 +159,24 @@ export default {
         &:focus {
           background: hsla(0, 0%, 100%, 0.3);
           //   outline: 0;
+        }
+
+        &::placeholder {
+            color: white;
+            opacity: 1;
+        }
+      }
+
+      .create-team-status {
+        margin-top: 30px;
+        input {
+          margin-right: 4px;
+        }
+
+        label {
+          margin-right: 30px;
+          position: relative;
+          bottom: 1px
         }
       }
 
@@ -208,12 +234,17 @@ export default {
           opacity: 0.3;
           outline: none;
           border: none;
+        }
 
-          + .icon-tick {
-            position: absolute;
-            top: 2px;
-            left: 8px;
-          }
+        .icon-tick {
+          position: absolute;
+          top: 3px;
+          left: 8px;
+          display: none;
+        }
+
+        .icon-tick.icon-hidden {
+          display: inline-block;
         }
       }
     }
@@ -244,6 +275,11 @@ export default {
       &:hover {
         background-color: #46b04a;
       }
+    }
+
+    .agree-btn[disabled=disabled] {
+      pointer-events: none;
+      opacity: 0.4;
     }
   }
 }

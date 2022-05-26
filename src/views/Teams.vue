@@ -1,40 +1,37 @@
 <template>
   <div id="teams-page" class="container">
-    <h2>Team công khai</h2>
     <div class="row">
-      <div class="col-12 col-lg-6 team" v-for="(team, index) in teams" :key="index">
-        <div class="team-container">
-          <img :src="require(`./../assets/img/${team.avatar}`)" alt="Avatar" class="image" style="width:100%">
-          <p class="team-name">{{ team.name }}</p>
-          <div class="middle">
-            <div class="text" @click="goToTeam(team.id)">Xem</div>
-          </div>
-        </div>
-      </div>
       <div class="col-12 col-lg-6 team">
         <div class="create-new-team" @click="createNewTeam">
           <i class="fa-solid fa-circle-plus"></i>
-          <span>Tạo mới Team công khai của bạn</span>
+          <span>Tạo mới nhóm của bạn</span>
         </div>
       </div>
+      <div class="col-12 col-lg-6 team-search">
+        <sui-input
+          v-model="keyword"
+          class="team-search-input"
+          inverted
+          color="blue"
+          fitted="true"
+          icon="blue search circular fitted inverted link icon"
+        ></sui-input>
+      </div>
     </div>
-    <h2>Team riêng tư</h2>
-    <div class="row">
-      <div class="col-12 col-lg-6 team" v-for="(team, index) in teams" :key="index">
-        <div class="team-container">
-          <img :src="require(`./../assets/img/${team.avatar}`)" alt="Avatar" class="image" style="width:100%">
-          <p class="team-name">{{ team.name }}</p>
-          <div class="middle">
-            <div class="text" @click="goToTeam(team.id)">Xem</div>
+    <div v-for="(groupTeambyStatus, status, index) in teamList" :key="index">
+      <h2>Team {{ status }}</h2>
+      <div class="row" v-if="groupTeambyStatus.length">
+        <div class="col-12 col-lg-6 team" v-for="(team, index) in groupTeambyStatus" :key="index">
+          <div class="team-container">
+            <img :src="require(`./../assets/img/${team.avatar}`)" alt="Avatar" class="image" style="width:100%">
+            <p class="team-name">{{ team.name }}</p>
+            <div class="middle">
+              <div class="text" @click="goToTeam(team.id)">Xem</div>
+            </div>
           </div>
         </div>
       </div>
-      <div class="col-12 col-lg-6 team">
-        <div class="add-new-team" @click="createNewTeam">
-          <i class="fa-solid fa-circle-plus"></i>
-          <span>Tạo mới Team riêng tư của bạn</span>
-        </div>
-      </div>
+      <div class="row text-no-team" v-else>Chưa có team {{ status }}</div>
     </div>
   </div>
 </template>
@@ -45,36 +42,44 @@ import AddTeam from '../components/teams/AddTeam.vue'
 export default {
   data() {
     return {
+      keyword: '',
+      teamList: {},
       teams: [
         {
           id: 1,
           name: "teams 1",
-          avatar: 'login-background-1.jpg'
+          avatar: 'login-background-1.jpg',
+          status: 1
         },
         {
           id: 2,
           name: "teams 2",
-          avatar: "login-background-1.jpg"
+          avatar: "login-background-1.jpg",
+          status: 1
         },
         {
           id: 3,
           name: "teams 3",
-          avatar: "login-background-1.jpg"
+          avatar: "login-background-1.jpg",
+          status: 1
         },
         {
           id: 4,
           name: "teams 4",
-          avatar: "login-background-1.jpg"
+          avatar: "login-background-1.jpg",
+          status: 2
         },
         {
           id: 5,
           name: "teams 5",
-          avatar: "login-background-1.jpg"
+          avatar: "login-background-1.jpg",
+          status: 1
         },
         {
           id: 6,
           name: "teams 6",
-          avatar: "login-background-1.jpg"
+          avatar: "login-background-1.jpg",
+          status: 1
         },
       ],
     };
@@ -103,6 +108,41 @@ export default {
           height: 'auto'
         }
       )
+    },
+
+    prepareTeamList (teams) {
+      this.teamList = {}
+      this.teamList['công khai'] = []
+      this.teamList['riêng tư'] = []
+      teams.forEach((team) => {
+        if( team.status == 1 ) {
+          this.teamList['công khai'].push(team)
+        } else {
+          this.teamList['riêng tư'].push(team)
+        }
+      })
+    },
+
+    searchTeam (keyword) {
+      const teams = this.teams.filter((team) => {
+        if (team.name.toLowerCase().includes(keyword.toLowerCase())) {
+          console.log('true')
+          return true
+        }
+        return false
+      })
+
+      this.prepareTeamList(teams)
+    }
+  },
+
+  created() {
+    this.prepareTeamList(this.teams)
+  },
+
+  watch: {
+    keyword() {
+      this.searchTeam(this.keyword)
     }
   }
 }
@@ -200,6 +240,24 @@ export default {
     span {
       margin-left: 15px;
     }
+  }
+  
+  .team-search {
+    display: flex;
+    justify-content: flex-end;
+
+    .team-search-input {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      max-height: 45px;
+      margin-right: 50px;
+    }
+  }
+
+  .text-no-team {
+    justify-content: center;
+    align-items: center;
+    margin: 4rem auto;
   }
 }
 </style>

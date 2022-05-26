@@ -1,9 +1,10 @@
 <template>
-  <div id="team-page" class="row">
+  <div class="team-page">
+    <TeamPageHeaderVue></TeamPageHeaderVue>
     <!-- Lists container -->
     <section class="lists-container">
       <div class="list">
-        <h3 class="list-title">Tasks to Do</h3>
+        <h3 class="list-title">Việc cần làm</h3>
 
         <ul class="list-items">
           <li>Complete mock-up for client website</li>
@@ -22,11 +23,11 @@
           <li>Listen to new CodePen Radio episode</li>
         </ul>
 
-        <button class="add-card-btn btn">Add a card</button>
+        <button class="add-card-btn btn" @click="createNewTask">Add a card</button>
       </div>
 
       <div class="list">
-        <h3 class="list-title">Pending Tasks</h3>
+        <h3 class="list-title">Việc đang làm</h3>
 
         <ul class="list-items">
           <li>Complete mock-up for client website</li>
@@ -45,11 +46,11 @@
           <li>Listen to new CodePen Radio episode</li>
         </ul>
 
-        <button class="add-card-btn btn">Add a card</button>
+        <button class="add-card-btn btn" @click="createNewTask">Add a card</button>
       </div>
 
       <div class="list">
-        <h3 class="list-title">Completed Tasks</h3>
+        <h3 class="list-title">Việc đã hoàn thành</h3>
 
         <ul class="list-items">
           <li>Clear email inbox</li>
@@ -57,29 +58,48 @@
           <li>Begin work on mock-up for client website</li>
         </ul>
 
-        <button class="add-card-btn btn">Add a card</button>
+        <button class="add-card-btn btn" @click="createNewTask">Add a card</button>
       </div>
     </section>
-    <!-- End of lists container -->
   </div>
 </template>
 
 <script>
-export default {};
+import TeamPageHeaderVue from '../components/teams/team/TeamPageHeader';
+import AddTask from '../components/tasks/AddTask.vue';
+
+export default {
+  components: {
+    TeamPageHeaderVue,
+  },
+
+  methods: {
+    createNewTask () {
+      this.$modal.show(
+        AddTask,
+        {
+          isUpdate: false
+        },
+        {
+          draggable: true,
+          // resizable: true,
+          adaptive: true,
+          width: 800,
+          height: 'auto'
+        }
+      )
+    },
+  }
+}
 </script>
 
 <style lang="scss" scoped>
-/*
-
-All grid code is placed in a 'supports' rule (feature query) at the bottom of the CSS (Line 320). 
-            
-The 'supports' rule will only run if your browser supports CSS grid.
-
-Flexbox is used as a fallback so that browsers which don't support grid will still recieve an identical layout.
-
-*/
-
-/* Base styles */
+.team-page {
+  // background-image: url('./../assets/img/bg1.jpeg');
+  //  background-repeat: no-repeat;
+  //  background-size: cover;
+  background-color: #fffdfa;
+}
 
 :root {
   font-size: 10px;
@@ -283,9 +303,9 @@ body {
 .lists-container {
   display: flex;
   align-items: start;
-  padding: 16px 30px;
+  padding: 16px;
   // overflow-x: auto;
-  height: calc(100vh - 8.6rem);
+  height: calc(100vh - 13rem);
 }
 
 .list {
@@ -293,8 +313,8 @@ body {
   display: flex;
   flex-direction: column;
   background-color: #e2e4e6;
-  max-height: calc(100vh - 10.8rem);
-  height: calc(100vh - 10.8rem);
+  max-height: calc(100vh - 15.8rem);
+  height: calc(100vh - 15.8rem);
   border-radius: 0.3rem;
   margin-right: 1rem;
 }
@@ -329,7 +349,7 @@ body {
 // }
 
 .list-items li {
-  font-size: 1.4rem;
+  // font-size: 1.4rem;
   font-weight: 400;
   line-height: 1.3;
   background-color: #fff;
