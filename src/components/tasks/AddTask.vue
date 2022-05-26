@@ -30,23 +30,26 @@
             <div class="input-title">Tên công việc</div>
             <input type="text" id="taskName_ipt" />
           </div>
-					<div class="input-wrapper" v-if="isAssigned">
+          <div class="input-wrapper" v-if="isAssigned">
             <div class="input-title">Thông tin chỉ định</div>
-            <date-range-picker
-              ref="picker"
-              :opens="'right'"
-              :locale-data="{ firstDay: 1, format: 'dd-mm-yyyy HH:mm:ss' }"
-              :showDropdowns="true"
-              :singleDatePicker="'range'"
-              :autoApply="true"
-							:apendToBody="true"
-              v-model="dateRange"
-              @finish-selection="logEvent('event: finishSelection', $event)"
-            >
-              <template v-slot:input="picker" style="min-width: 350px">
-                {{ picker.startDate | formatDate }} - {{ picker.endDate | formatDate}}
-              </template>
-            </date-range-picker>
+            <div class="assign-wrapper">
+              <div class="user-ava" v-tooltip="'You have new messages.'">{{ userFormatedName }}</div>
+              <date-range-picker
+                ref="picker"
+                :opens="'right'"
+                :locale-data="{ firstDay: 1, format: 'dd-mm-yyyy HH:mm:ss' }"
+                :showDropdowns="true"
+                :singleDatePicker="'range'"
+                :autoApply="true"
+                :apendToBody="true"
+                v-model="dateRange"
+              >
+                <template v-slot:input="picker" style="min-width: 350px">
+                  {{ picker.startDate | formatDate }} -
+                  {{ picker.endDate | formatDate }}
+                </template>
+              </date-range-picker>
+            </div>
           </div>
           <div class="input-wrapper">
             <div class="input-title">Miêu tả</div>
@@ -60,7 +63,7 @@
             <i class="fa-solid fa-user-plus" style="margin-right: 6px"></i>Chỉ
             định
           </div>
-          <div class="add-tag white-ver" @click="addDate()">
+          <div class="add-tag white-ver" @click="openCalendar">
             <i class="fa-solid fa-calendar-days" style="margin-right: 12px"></i
             >Đặt lịch
           </div>
@@ -90,33 +93,27 @@ export default {
     return {
       hoverClose: false,
       isAssigned: true,
-			dateRange: {
-				startDate: null,
-				endDate: null
-			},
+      dateRange: {
+        startDate: null,
+        endDate: null,
+      },
+      isShowCalendar: false,
+      userFormatedName: "?",
+			executorName: "",
     };
   },
   methods: {
-    // addDate() {
-    // 	this.$modal.show(
-    //     AddDate,
-    //     {
-    //     },
-    //     {
-    //       draggable: true,
-    //       // resizable: true,
-    //       adaptive: true,
-    //       width: 600,
-    //       height: 'auto'
-    //     }
-    //   )
-    // },
+    openCalendar() {
+      this.isShowCalendar = !this.isShowCalendar;
+      setTimeout(() => {
+        this.$refs.picker.togglePicker("boolean", this.isShowCalendar);
+      }, 200);
+    },
   },
 };
 </script>
 
 <style lang="scss" scoped>
-
 #add-new-task-modal {
   position: relative;
   font-family: "Source Sans Pro", "Fira Sans", Arial, sans-serif;
@@ -147,6 +144,23 @@ export default {
 
       .left-content {
         width: 60%;
+
+        .assign-wrapper {
+          display: flex;
+          justify-content: space-between;
+
+          .user-ava {
+            border-radius: 50%;
+            background-color: rgb(75, 72, 72);
+            color: #fff;
+            width: 36px;
+            height: 36px;
+            text-align: center;
+            line-height: 34px;
+            font-size: 28px;
+						cursor: pointer;
+          }
+        }
       }
 
       .right-content {
@@ -176,13 +190,9 @@ export default {
       .input-wrapper {
         margin: 10px;
 
-				.vue-daterange-picker {
-					width: 100%;
-				}
-
-				.reportrange {
-					width: 100%;
-				}
+        .vue-daterange-picker {
+          width: 87%;
+        }
 
         .input-title {
           margin-bottom: 10px;

@@ -22,6 +22,12 @@ Vue.component('vue-confirm-dialog', VueConfirmDialog.default)
 import VModal from 'vue-js-modal'
 Vue.use(VModal)
 
+import { VTooltip, VPopover, VClosePopover } from 'v-tooltip'
+
+Vue.directive('tooltip', VTooltip)
+Vue.directive('close-popover', VClosePopover)
+Vue.component('v-popover', VPopover)
+
 import VueClickOutsideElement from 'vue-click-outside-element'
 Vue.use(VueClickOutsideElement)
 
