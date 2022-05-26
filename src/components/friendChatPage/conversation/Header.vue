@@ -54,7 +54,8 @@ export default {
   props: {
     conversation: {
       type: Object
-    }
+    },
+    initVideoCall: Boolean
   },
 
   computed: {
@@ -68,7 +69,8 @@ export default {
       showInfo: false,
       friendStatus: 'offline',
       realtimeOnline: false,
-      friendAccept: null
+      friendAccept: null,
+      callId: null
     }
   },
 
@@ -92,11 +94,13 @@ export default {
         InitCallModal,
         { 
           conversation: this.conversation,
-          setConnected: this.setCallConnected
+          setConnected: this.setCallConnected,
+          setCallId: this.setCallId
         },
         {
           width: '500px',
-          height: '150px'
+          height: '150px',
+          clickToClose: false
         },
         {
           'closed': this.checkCanceledCall
@@ -105,9 +109,10 @@ export default {
     },
 
     checkCanceledCall() {
-      // console.log(this.friendAccept)
       if( this.friendAccept === null ) {
         socket.emit('cancel-video-call', {
+          callId: this.callId,
+          conversationId: this.conversation.conversationId,
           caller: this.user.userId,
           callerName: this.user.fullname,
           receiver: this.conversation.friendId
@@ -119,15 +124,21 @@ export default {
       this.friendAccept = connected
     },
 
+    setCallId(callId) {
+      this.callId = callId
+    },
+
     startCall() {
       this.$modal.show(
         VideoCallModal,
         { 
-          conversation: this.conversation
+          conversation: this.conversation,
+          callId: this.callId
         },
         {
           width: '100%',
-          height: '100%'
+          height: '100%',
+          clickToClose: false
         },
         {
           'closed': this.endCall
@@ -136,11 +147,7 @@ export default {
     },
 
     endCall() {
-      socket.emit('end-video-call-from-caller', {
-        caller: this.user.userId,
-        callerName: this.user.fullname,
-        receiver: this.conversation.friendId
-      })
+      this.$emit('end-video-call')
     },
 
     handleVideoCall() {
@@ -158,6 +165,7 @@ export default {
       }
 
       this.initialCall()
+      this.$emit('initialed-video-call')
     }
   },
 
@@ -188,7 +196,7 @@ export default {
     },
 
     friendAccept(connected) {
-      if( connected ) {
+      if( connected && this.callId ) {
         this.startCall()
       } else if ( connected === null ) {
         return
@@ -202,6 +210,12 @@ export default {
             }          
           }
         )
+      }
+    },
+
+    initVideoCall(isInit) {
+      if( isInit ) {
+        this.handleVideoCall()
       }
     }
   }

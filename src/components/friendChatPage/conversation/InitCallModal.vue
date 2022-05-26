@@ -24,7 +24,8 @@ import socket from '@/helpers/socketClient'
 export default {
 	props: {
 		conversation: Object,
-		setConnected: Function
+		setConnected: Function,
+		setCallId: Function
 	},
 
 	computed: {
@@ -35,7 +36,8 @@ export default {
 
 	data() {
 		return {
-			remainingTime: 20
+			remainingTime: 20,
+			callInfo: null
 		}
 	},
 
@@ -67,31 +69,49 @@ export default {
 		rejectCall() {
 			this.setConnected(false)
 			this.$emit('close')
+		},
+
+		handleDropConnectVideoCall(data) {
+			if( data.id === this.conversation.friendId ) {
+				socket.emit('reject-video-call', this.callInfo)
+				this.rejectCall()
+			}
 		}
 	},
 
 	created() {		
 		socket.emit('init-video-call', {
+			conversationId: this.conversation.conversationId,
 			caller: this.user.userId,
 			callerName: this.user.fullname,
 			receiver: this.conversation.friendId
 		})
 
+		socket.on('created-video-call', (callInfo) => {
+			if( callInfo.conversationId === this.conversation.conversationId ) {
+				this.callInfo = callInfo
+				this.setCallId(callInfo.callId)
+			}
+		})
+
 		socket.on('reject-video-call', (callInfo) => {
-			if( callInfo.receiver === this.conversation.friendId ) {
+			if( callInfo.conversationId === this.conversation.conversationId ) {
 				this.rejectCall()
 			}
 		})
 
 		socket.on('accept-video-call', (callInfo) => {
-			if( callInfo.receiver === this.conversation.friendId ) {
+			if( callInfo.conversationId === this.conversation.conversationId ) {
 				this.connectSuccess()
 			}
 		})
+
+		socket.on('friend-offline', this.handleDropConnectVideoCall)
 	},
 
 	mounted() {
 		this.setConnected(null)
+		this.setCallId(null)
 		this.countdown()
 		this.playRingTone()
 	},
@@ -100,6 +120,7 @@ export default {
 		this.stopRingTone()
 		socket.off('reject-video-call')
 		socket.off('accept-video-call')
+		socket.off('friend-offline', this.handleDropConnectVideoCall)
 	}
 }
 </script>

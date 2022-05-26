@@ -1,28 +1,50 @@
 <template>
   <div id="video-call-modal">
-    <h2>Video Call: {{ conversation.friendFullName }}</h2>
+    <div class="modal-title">
+      <div class="friend-name">
+        Đang gọi Video với 
+        <span>{{ conversation.friendFullName }}</span>
+      </div>
+      <div class="time-clock">
+        <i class="fa-solid fa-circle"></i>
+        <span>{{ duringTimesString }}</span>
+      </div>
+    </div>
     <div class="cameras-container">
       <div class="friend-camera">
         <div class="friend-camera__container">
+          <div v-show="loadingFriendStream" class="loading-video">
+            <img src="@/assets/img/Dual Ring-1s-200px.gif" alt="">
+          </div>
+          <div v-show="!loadingFriendStream && !friendCameraOn" class="friend-camera__off">
+            <img src="@/assets/img/camera-off.png" alt="">
+          </div>
           <video 
+            v-show="!loadingFriendStream && friendCameraOn"
             ref="friendCamera" 
             class="friend-camera__source" 
             autoplay
             playsinline
           ></video>
+          <div v-show="!loadingFriendStream && !friendAudioOn" class="friend-audio__off">
+            <b-icon class="" icon="mic-mute-fill"></b-icon>
+          </div>
         </div>
       </div>
       <div class="self-camera">
         <div class="self-camera__container">
+          <div v-show="loadingSelfStream" class="loading-video">
+            <img src="@/assets/img/Dual Ring-1s-200px.gif" alt="">
+          </div>
           <video 
-            v-show="cameraOn"
+            v-show="!loadingSelfStream && cameraOn"
             ref="selfCamera" 
             class="self-camera__source" 
             autoplay 
             muted 
             playsinline
           ></video>
-          <div v-show="!cameraOn" class="self-camera__status">
+          <div v-show="!loadingSelfStream && !cameraOn" class="self-camera__status">
             <div>
               Camera của bạn đang tắt!
             </div>
@@ -30,7 +52,7 @@
               Micro của bạn đang tắt!
             </div>
           </div>
-          <div v-show="!audioOn && cameraOn" class="self-audio__status">
+          <div v-show="!loadingSelfStream && !audioOn && cameraOn" class="self-audio__status">
             <b-icon class="" icon="mic-mute-fill"></b-icon>
           </div>
         </div>
@@ -53,7 +75,7 @@
         <b-icon class="action-icon" v-if="audioOn" icon="mic-fill"></b-icon>
         <b-icon class="action-icon" v-else icon="mic-mute-fill"></b-icon>
       </div>
-      <div class="end-call-btn" @click="endVideoCall">
+      <div class="end-call-btn" @click="requestEndVideoCall">
         <b-icon class="action-icon" icon="telephone-x-fill"></b-icon>
       </div>
     </div>
@@ -61,23 +83,44 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import socket from '@/helpers/socketClient'
 
 export default {
   props: {
-    conversation: Object
+    conversation: Object,
+    callId: String
+  },
+
+  computed: {
+    ...mapGetters({
+      user: 'profile'
+    }),
+
+    duringTimesString() {
+      if( this.duringTimes < 3600 ) {
+        return new Date(this.duringTimes * 1000).toISOString().substring(14, 19)
+      }
+      return new Date(this.duringTimes * 1000).toISOString().substring(11, 19)
+    }
   },
 
   data() {
     return {
+      dataConnect: null,
       call: null,
       selfStream: null,
       selfStreamContraints: {
         audio: true,
         video: true
       },
+      cameraOn: true,
+      friendCameraOn: true,
       audioOn: true,
-      cameraOn: true
+      friendAudioOn: true,
+      loadingSelfStream: false,
+      loadingFriendStream: false,
+      duringTimes: 0
     }
   },
 
@@ -102,39 +145,79 @@ export default {
     handleStopVideo() {
       this.cameraOn = !this.cameraOn
       this.selfStream.getVideoTracks()[0].enabled = this.cameraOn
+      this.dataConnect.send({ cameraOn: this.cameraOn })
     },
 
     handleMute() {
       this.audioOn = !this.audioOn
       this.selfStream.getAudioTracks()[0].enabled = this.audioOn
+      this.dataConnect.send({ audioOn: this.audioOn })
     },
 
     endVideoCall() {
       this.$emit('close')
-    }
+    },
+
+    requestEndVideoCall() {
+      socket.emit('end-video-call-from-caller', {
+        callId: this.callId,
+        conversationId: this.conversation.conversationId,
+        caller: this.user.userId,
+        callerName: this.user.fullname,
+        receiver: this.conversation.friendId,
+        duringTimes: this.duringTimesString
+      })
+      this.$emit('close')
+    },
+
+    handleDropConnectVideoCall(data) {
+      if( data.id === this.conversation.friendId ) {
+        this.requestEndVideoCall()
+      }
+    },
   },
 
-  created() {
+  created() {    
+    setInterval(() => {
+      this.duringTimes++
+    }, 1000)
+    this.loadingSelfStream = true
+    this.loadingFriendStream = true
+
     socket.on('end-video-call', (callInfo) => {
       if( callInfo.receiver === this.conversation.friendId ) {
         this.endVideoCall()
       }
     })
+
+    socket.on('friend-offline', this.handleDropConnectVideoCall)
   },
 
   async mounted() {
     await this.createMediaStream()
     this.$refs.selfCamera.srcObject = this.selfStream
-    // this.$refs.friendCamera.srcObject = this.selfStream
+    this.loadingSelfStream = false
+
+    this.dataConnect = this.$peer.connect(this.conversation.friendId)
+    this.dataConnect.on('data', data => {
+      if( Object.prototype.hasOwnProperty.call(data, 'cameraOn') ) {
+        this.friendCameraOn = data.cameraOn
+      }
+      if( Object.prototype.hasOwnProperty.call(data, 'audioOn') ) {
+        this.friendAudioOn = data.audioOn
+      }
+    })
     this.call = this.$peer.call(this.conversation.friendId, this.selfStream)
     this.call.on('stream', friendStream => {
       this.$refs.friendCamera.srcObject = friendStream
+      this.loadingFriendStream = false
     })
   },
 
   destroyed() {
     this.removeMediaStream()
     socket.off('end-video-call')
+    socket.off('friend-offline', this.handleDropConnectVideoCall)
   }
 }
 </script>
@@ -144,19 +227,65 @@ export default {
 
 }
 
+.modal-title {
+  .friend-name {
+    text-align: center;
+    font-size: 24px;
+    margin-top: 1rem;
+
+    span {
+      font-weight: 700;
+      color: #0e76c6;
+      cursor: pointer;
+
+      &:hover {
+        color: #10ac94;
+      }
+    }
+  }
+
+  .time-clock {
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    padding-left: calc(50% - 2.5rem);
+
+    i {
+      color: #0fd2b6;
+      font-size: 12px;
+      margin-right: .5rem;
+    }
+
+    span {
+      font-size: 16px;
+      font-weight: 600;
+    }
+  }
+}
+
 .cameras-container {
   display: flex;
+  margin-top: 20px;
 
   .friend-camera {
     flex-basis: 70%;
 
     &__container {
-      margin: 2rem auto;
-      width: 700px;
-      height: 400px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0 4rem 0 auto;
+      width: 800px;
+      height: 450px;
       background-color: #ddd;
       border: 1px solid #999;
       border-radius: 1rem;
+      position: relative;
+
+      .loading-video img {
+        width: 120px;
+        height: 120px;
+      }
     }
 
     &__source {
@@ -164,6 +293,37 @@ export default {
       height: 100%;
       border-radius: inherit;
       object-fit: contain;
+    }
+
+    &__off {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: inherit;
+
+      img {
+        width: 60%;
+        height: 60%;
+        object-fit: contain;
+      }
+    }
+
+    .friend-audio__off {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 42px;
+      height: 42px;
+      line-height: 42px;
+      text-align: center;
+      border-radius: 50%;
+      font-size: 20px;
+      color: #fff;
+      background-color: #6198d8;
+      box-shadow: 0 0 4px 1px rgba(0, 0, 0, .4);
+      transform: translate(50%, -30%);
     }
   }
 
@@ -174,13 +334,18 @@ export default {
       display: flex;
       justify-content: center;
       align-items: center;
-      margin: 2rem auto;
-      width: 356px;
-      height: 200px;
+      margin: 0 auto 0 0;
+      width: 368px;
+      height: 207px;
       background-color: #ddd;
       border: 1px solid #999;
       border-radius: .5rem;
       position: relative;
+
+      .loading-video img {
+        width: 60px;
+        height: 60px;
+      }
     }
 
     &__source {

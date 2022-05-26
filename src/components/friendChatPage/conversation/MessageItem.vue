@@ -56,6 +56,48 @@
           :style="{ display: 'none' }"
         ></a>
       </div>
+      <div
+        v-if="message.type === 'video-call'"
+        class="message-content video-call"
+        :class="{ self: message.from === userId }"
+      >
+        <div class="video-call__title">
+          <i 
+            v-if="message.description === 'success' || message.description === 'accept'" 
+            class="fa-solid fa-phone-flip"
+          ></i>
+          <i v-else class="fa-solid fa-phone-slash"></i>
+          Cuộc gọi Video
+        </div>
+        <div class="video-call__status">
+          <div v-if="message.description === 'success' && message.from === userId">
+            Cuộc gọi đi, trong {{ message.content }}
+          </div>
+          <div 
+            v-if="((message.description === 'cancel' 
+            || message.description === 'reject')
+            && message.from === userId)
+            || message.description === 'initial'"
+          >
+            Không thành công
+          </div>
+          <div v-if="message.description === 'success' && message.to === userId">
+            Cuộc gọi đến, trong {{ message.content }}
+          </div>
+          <div v-if="message.description === 'cancel' && message.to === userId">
+            Cuộc gọi nhỡ
+          </div>
+          <div v-if="message.description === 'reject' && message.to === userId">
+            Đã từ chối
+          </div>
+          <div v-if="message.description === 'accept'">
+            Thành công
+          </div>
+        </div>
+        <div class="video-call__btn" @click="initVideoCall">
+          Gọi lại
+        </div>
+      </div>
     </div>
     <div class="time-ago" ref="timeAgo" :datetime="message.createdAt"></div>
   </div>
@@ -100,6 +142,10 @@ export default {
     ...mapActions({
       deleteMessage: 'deleteMessage'
     }),
+
+    initVideoCall() {
+      this.$emit('init-video-call')
+    },
 
     showImageModal() {
       this.$modal.show(
@@ -310,6 +356,46 @@ export default {
 
       &:hover span {
         text-decoration: underline;
+      }
+    }
+
+    &.video-call {
+      padding: 12px 1rem;
+
+      .video-call__title i {
+        width: 32px;
+        height: 32px;
+        font-size: 18px;
+        line-height: 32px;
+        text-align: center;
+        margin-right: 6px;
+        color: #466292;
+        background-color: #d6d6d6;
+        border-radius: 50%;
+      }
+
+      .video-call__status {
+        font-size: 12px;
+        font-weight: 700;
+        padding-left: 44px;
+        padding-right: .5rem;
+      }
+
+      .video-call__btn {
+        margin-top: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        text-align: center;
+        padding: 4px 0;
+        border-radius: 6px;
+        color: #2c3e50;
+        background-color: #fff;
+        cursor: pointer;
+
+        &:hover {
+          background-color: #d6d6d6;
+        }
       }
     }
   }

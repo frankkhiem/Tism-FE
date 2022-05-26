@@ -100,7 +100,8 @@ export default {
         },
         {
           width: '500px',
-          height: '140px'
+          height: '140px',
+          clickToClose: false
         },
         {
           'closed': this.checkVideoCallConnected
@@ -127,7 +128,8 @@ export default {
         },
         {
           width: '100%',
-          height: '100%'
+          height: '100%',
+          clickToClose: false
         },
         {
           'closed': this.endCall
@@ -136,13 +138,14 @@ export default {
     },
 
     endCall() {
-      socket.emit('end-video-call-from-receiver', this.videoCallInfo)
+      // 
     }
   },
 
   async created() {
-    await this.getListFriends()
     if( this.isAuth ) {
+      await this.getListFriends()
+
       // connect to socket server
       socket.auth = {
         userId: this.userProfile.userId
@@ -186,7 +189,6 @@ export default {
 
   mounted() {
     console.log(this.userProfile.userId)
-    
   },
 
   destroyed() {

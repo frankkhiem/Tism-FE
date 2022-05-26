@@ -42,7 +42,7 @@ export default {
 
 	data() {
 		return {
-			accept: false
+			accept: null
 		}
 	},
 
@@ -68,6 +68,13 @@ export default {
 		acceptVideoCall() {
 			this.accept = true
 			this.$emit('close')
+		},
+
+		handleDropConnectVideoCall(data) {
+			if( data.id === this.callInfo.caller ) {
+				socket.emit('cancel-video-call', this.callInfo)
+        this.$emit('close')
+      }
 		}
 	},
 
@@ -78,6 +85,7 @@ export default {
 				this.$emit('close')
 			}
 		})
+		socket.on('friend-offline', this.handleDropConnectVideoCall)
 	},
 
 	mounted() {
@@ -86,6 +94,10 @@ export default {
 
 	destroyed() {
 		this.stopRingTone()
+		socket.off('cancel-video-call')
+		socket.off('friend-offline', this.handleDropConnectVideoCall)
+
+		// đoạn if này cần đặt dưới cùng destroyed() vì có return theo điều kiện
 		if( this.accept ) {
 			socket.emit('accept-video-call', this.callInfo)
 			this.setConnected(true)
@@ -94,8 +106,6 @@ export default {
 		} else {
 			socket.emit('reject-video-call', this.callInfo)
 		}
-
-		socket.off('cancel-video-call')
 	}
 }
 </script>

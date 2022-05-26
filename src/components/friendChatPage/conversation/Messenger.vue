@@ -18,6 +18,7 @@
         :message="mess"
         :friendAvatar="friendAvatar"
         :userId="user.userId"
+        @init-video-call="$emit('init-video-call')"
       ></MessageItem>
     </div>
     <div v-show="showScrollToBottom" class="scroll-to-bottom">
