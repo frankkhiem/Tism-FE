@@ -309,7 +309,7 @@ export default {
             transform: translate(-50%, -100%);
             border: 10px solid transparent;
             border-bottom: 10px solid #fff;
-            filter: drop-shadow(0px -4px 2px rgba(0, 0, 0, 0.1))
+            filter: drop-shadow(0px -4px 2px rgba(0, 0, 0, 0.1));
           }
 
           > div {

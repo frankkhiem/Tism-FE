@@ -162,7 +162,7 @@
             v-click-outside-element="hideDropdownMenu"
           >
             <div class="option" v-for="(option, index) in options" :key="index">
-              <div v-if="index === 0" @click="toProfile">
+              <div v-if="index === 0" @click.stop="toProfile">
                 <i aria-hidden="true" class="icon" :class="option.icon"></i>
                 <span class="text">{{ option.text }}</span>
               </div>
@@ -229,6 +229,7 @@ export default {
     },
 
     toProfile() {
+      this.show_dropdown_menu = false
       if( this.$route.name !== 'Profile' ) this.$router.push({ name: 'Profile' })
     }
   },

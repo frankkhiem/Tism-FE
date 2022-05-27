@@ -39,8 +39,12 @@ const mutations = {
     state.listConversations = data
   },
 
-  updateConversationSelected: (state, data) => {
+ updateConversationSelected: (state, data) => {
     state.conversation = data
+  },
+
+ updateFriendStatusInConversationSelected: (state, data) => {
+    state.conversation.friendStatus = data
   },
 
   addSendedMessage: (state, message) => {
@@ -84,6 +88,17 @@ const mutations = {
         conversation.isSeen = false
         conversation.lastMessage = message
         conversation.lastUpdated = lastUpdated
+        break
+      }
+    }
+  },
+
+  removeDeletedMessage: (state, deletedMessage) => {
+    if( state.conversation.conversationId !== deletedMessage.friendship ) return
+    for( let i = 0; i < state.conversation.messages.length; i++ ) {
+      let message = state.conversation.messages[i]
+      if( message._id === deletedMessage._id ) {
+        state.conversation.messages.splice(i, 1)
         break
       }
     }
@@ -187,15 +202,29 @@ const actions = {
 
   unSeenConversation: async ({ commit }, conversationId) => {
     commit('updateSeenTagConversation', { conversationId, seen: false })
-    // const accessToken = localStorage.getItem('accessToken')
+    const accessToken = localStorage.getItem('accessToken')
+
+    try {
+      await axios.patch(`${process.env.VUE_APP_API_HOST}/conversations/${conversationId}/unseen`, {}, {
+        headers: {"Authorization" : `Bearer ${accessToken}`}
+      })
+    } catch(error) {
+      console.log(error.response.data);
+    }
   },
 
-  receiveNewMessage: ({ commit }, { conversationId, newMessage, lastUpdated }) => {
+  receiveNewMessage: async ({ commit }, { conversationId, newMessage, lastUpdated }) => {
     commit('receiveNewMessageToConversation', {
       conversationId,
       message: newMessage,
       lastUpdated
     })
+  },
+
+  changeConversationStatus: async ({ state, commit, dispatch }) => {
+    if( !state.conversation.friendId ) return
+    const friendStatus = await dispatch('getPersonStatus', state.conversation.friendId)
+    commit('updateFriendStatusInConversationSelected', friendStatus)
   },
 
   getOlderMessages: async ({ commit }, { conversationId, skip, take }) => {
@@ -210,6 +239,21 @@ const actions = {
         }
       })
       commit('addOlderMessages', response.data.messages)
+    } catch(error) {
+      console.log(error.response.data);
+    }
+  },
+
+  deleteMessage: async ({ commit, dispatch }, { conversationId, messageId }) => {
+    const accessToken = localStorage.getItem('accessToken')
+
+    try {
+      const response = await axios.delete(`${process.env.VUE_APP_API_HOST}/conversations/${conversationId}/messages/${messageId}`, {
+        headers: {"Authorization" : `Bearer ${accessToken}`}
+      })
+
+      commit('removeDeletedMessage', response.data.deletedMessage)
+      dispatch('getListConversations')
     } catch(error) {
       console.log(error.response.data);
     }

@@ -66,6 +66,8 @@ export default {
         newMessage.content = 'Ảnh gửi lên.'
       } else if( message.type === 'file' ) {
         newMessage.content = 'Tệp đính kèm.'
+      } else if( message.type === 'video-call' ) {
+        newMessage.content = 'Cuộc gọi Video.'
       } else {
         newMessage.content = message.content
       }

@@ -18,6 +18,7 @@
         :message="mess"
         :friendAvatar="friendAvatar"
         :userId="user.userId"
+        @init-video-call="$emit('init-video-call')"
       ></MessageItem>
     </div>
     <div v-show="showScrollToBottom" class="scroll-to-bottom">
@@ -143,7 +144,8 @@ export default {
       sendImageMessage: 'sendImageMessage',
       sendFileMessage: 'sendFileMessage',
       seenConversation: 'seenConversation',
-      getOlderMessages: 'getOlderMessages'
+      getOlderMessages: 'getOlderMessages',
+      changeConversationStatus: 'changeConversationStatus'
     }),
 
     resizeInput(e) {
@@ -250,9 +252,10 @@ export default {
   },
 
   created() {
-    socket.on('new-message', (message) => {
+    socket.on('new-message', async (message) => {
       // console.log(message.friendship === this.$route.params.chatRoomId)
       if( message.friendship === this.$route.params.chatRoomId ) {
+        // await this.changeConversationStatus()
         this.messages.push(message)
       }
     })

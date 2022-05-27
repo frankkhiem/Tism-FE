@@ -109,6 +109,24 @@ const actions = {
       // console.log(error.response.data);
       return false
     }
+  },
+
+  getPersonStatus: async ({ commit }, personId) => {
+    const accessToken = localStorage.getItem('accessToken')
+
+    try {
+      const response = await axios.get(`${process.env.VUE_APP_API_HOST}/user/${personId}/status`, {
+        headers: {
+          "Authorization": `Bearer ${accessToken}`
+        }
+      })
+
+      commit('nothingUserAction')
+      return response.data.status
+    } catch(error) {
+      // console.log(error.response.data);
+      return null
+    }
   }
 };
 
