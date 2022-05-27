@@ -73,7 +73,7 @@ export default {
 
 		handleDropConnectVideoCall(data) {
 			if( data.id === this.conversation.friendId ) {
-				socket.emit('reject-video-call', this.callInfo)
+				socket.emit('reject-video-call', this.callInfo, true)
 				this.rejectCall()
 			}
 		}

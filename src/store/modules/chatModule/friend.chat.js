@@ -39,8 +39,12 @@ const mutations = {
     state.listConversations = data
   },
 
-  updateConversationSelected: (state, data) => {
+ updateConversationSelected: (state, data) => {
     state.conversation = data
+  },
+
+ updateFriendStatusInConversationSelected: (state, data) => {
+    state.conversation.friendStatus = data
   },
 
   addSendedMessage: (state, message) => {
@@ -201,12 +205,18 @@ const actions = {
     // const accessToken = localStorage.getItem('accessToken')
   },
 
-  receiveNewMessage: ({ commit }, { conversationId, newMessage, lastUpdated }) => {
+  receiveNewMessage: async ({ commit }, { conversationId, newMessage, lastUpdated }) => {
     commit('receiveNewMessageToConversation', {
       conversationId,
       message: newMessage,
       lastUpdated
     })
+  },
+
+  changeConversationStatus: async ({ state, commit, dispatch }) => {
+    if( !state.conversation.friendId ) return
+    const friendStatus = await dispatch('getPersonStatus', state.conversation.friendId)
+    commit('updateFriendStatusInConversationSelected', friendStatus)
   },
 
   getOlderMessages: async ({ commit }, { conversationId, skip, take }) => {

@@ -158,7 +158,7 @@ export default {
       this.$emit('close')
     },
 
-    requestEndVideoCall() {
+    requestEndVideoCall({ error = false }) {
       socket.emit('end-video-call-from-caller', {
         callId: this.callId,
         conversationId: this.conversation.conversationId,
@@ -166,13 +166,13 @@ export default {
         callerName: this.user.fullname,
         receiver: this.conversation.friendId,
         duringTimes: this.duringTimesString
-      })
+      }, error)
       this.$emit('close')
     },
 
     handleDropConnectVideoCall(data) {
       if( data.id === this.conversation.friendId ) {
-        this.requestEndVideoCall()
+        this.requestEndVideoCall({ error: true })
       }
     },
   },
@@ -249,6 +249,7 @@ export default {
     display: flex;
     align-items: center;
     padding-left: calc(50% - 2.5rem);
+    cursor: default;
 
     i {
       color: #0fd2b6;
@@ -259,6 +260,7 @@ export default {
     span {
       font-size: 16px;
       font-weight: 600;
+      user-select: none;
     }
   }
 }

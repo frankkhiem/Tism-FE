@@ -15,9 +15,13 @@
           <span class="online-badge"></span>
           Online
         </div>
-        <div v-else class="friend-status">
+        <div v-else-if="friendStatus === 'offline'" class="friend-status">
           <span class="offline-badge"></span>
           Offline
+        </div>
+        <div v-else class="friend-status">
+          <span class="offline-badge"></span>
+          ...
         </div>
       </div>
     </div>
@@ -46,7 +50,7 @@
 import InitCallModal from './InitCallModal'
 import VideoCallModal from './VideoCallModal'
 
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 // import axios from 'axios'
 import socket from '@/helpers/socketClient'
 
@@ -75,6 +79,11 @@ export default {
   },
 
   methods: {
+    ...mapActions({
+      getPersonStatus: 'getPersonStatus',
+      changeConversationStatus: 'changeConversationStatus'
+    }),
+
     toggleInfo() {
       this.showInfo = !this.showInfo
       this.$emit('toggle-info')
@@ -150,12 +159,22 @@ export default {
       this.$emit('end-video-call')
     },
 
-    handleVideoCall() {
-      if( !this.realtimeOnline ) {
+    async handleVideoCall() {
+      const friendStatus = await this.getPersonStatus(this.conversation.friendId)
+
+      if( friendStatus !== 'online' ) {
+        let message
+        if( friendStatus === 'offline' ) {
+          message = `📞 Người dùng này hiện đang offline, hãy thực hiện lại cuộc gọi sau 🟢.`
+        } else if( friendStatus === 'busy' ) {
+          message = `📞 Người dùng này hiện đang bận, hãy thực hiện lại cuộc gọi sau 🟢.`
+        } else {
+          message = `📞 Hệ thống đang gặp lỗi, vui lòng thử lại sau.`
+        }
         this.$confirm(
           {
             title: `Không thể gọi Video`,
-            message: `📞 Người dùng này hiện đang offline, hãy thực hiện lại cuộc gọi sau 🟢.`,
+            message,
             button: {
               no: 'Đã hiểu!'
             }          
@@ -166,27 +185,40 @@ export default {
 
       this.initialCall()
       this.$emit('initialed-video-call')
+    },
+
+    async handleFriendOnline(data) {
+      if( data.id === this.conversation.friendId ) {
+        this.friendStatus = 'online'
+        this.realtimeOnline = true
+        await this.changeConversationStatus()
+      }
+    },
+
+    async handleFriendOffline(data) {
+      if( data.id === this.conversation.friendId ) {
+        setTimeout(() => {
+          this.realtimeOnline = false
+        }, 500)
+        setTimeout(async () => {
+          if( !this.realtimeOnline ) {
+            this.friendStatus = 'offline'
+            await this.changeConversationStatus()
+          }
+        }, 5000)
+      }
     }
   },
 
   created() {
-    socket.on('friend-online', (data) => {
-      if( data.id === this.conversation.friendId ) {
-        this.friendStatus = 'online'
-        this.realtimeOnline = true
-      }
-    })
+    socket.on('friend-online', this.handleFriendOnline)
 
-    socket.on('friend-offline', (data) => {
-      if( data.id === this.conversation.friendId ) {
-        this.realtimeOnline = false
-        setTimeout(() => {
-          if( !this.realtimeOnline ) {
-            this.friendStatus = 'offline'
-          }
-        }, 5000)
-      }
-    })
+    socket.on('friend-offline', this.handleFriendOffline)
+  },
+
+  destroyed() {
+    socket.off('friend-online', this.handleFriendOnline)
+    socket.off('friend-offline', this.handleFriendOffline)
   },
 
   watch: {

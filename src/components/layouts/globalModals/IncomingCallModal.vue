@@ -72,7 +72,7 @@ export default {
 
 		handleDropConnectVideoCall(data) {
 			if( data.id === this.callInfo.caller ) {
-				socket.emit('cancel-video-call', this.callInfo)
+				socket.emit('cancel-video-call', this.callInfo, true)
         this.$emit('close')
       }
 		}
