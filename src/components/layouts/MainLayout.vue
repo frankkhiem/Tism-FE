@@ -143,6 +143,8 @@ export default {
   },
 
   async created() {
+    await new Promise(resolve => setTimeout(resolve, 0))
+    console.log(this.userProfile.userId)
     if( this.isAuth ) {
       await this.getListFriends()
 
@@ -188,7 +190,7 @@ export default {
   },
 
   mounted() {
-    console.log(this.userProfile.userId)
+    // console.log(this.userProfile.userId)
   },
 
   destroyed() {

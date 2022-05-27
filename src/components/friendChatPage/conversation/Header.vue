@@ -32,8 +32,23 @@
       >
         <i class="fa-solid fa-video"></i>
       </div>
-      <div class="action-btn">
+      <div 
+        class="action-btn setting"
+        @click="handleShowSetting"
+      >
         <i class="fa-solid fa-gear"></i>
+        <div 
+          v-if="showSetting"
+          class="setting-container"
+          v-click-outside-element="handleHideSetting"
+        >
+          <div class="setting-option" @click.stop="unseenConversation">
+            Đánh dấu là chưa đọc
+          </div>
+          <div class="setting-option" @click.stop="settingMore">
+            Cài đặt khác
+          </div>
+        </div>
       </div>
       <div 
         class="action-btn"
@@ -71,6 +86,7 @@ export default {
   data() {
     return {
       showInfo: false,
+      showSetting: false,
       friendStatus: 'offline',
       realtimeOnline: false,
       friendAccept: null,
@@ -81,11 +97,36 @@ export default {
   methods: {
     ...mapActions({
       getPersonStatus: 'getPersonStatus',
-      changeConversationStatus: 'changeConversationStatus'
+      changeConversationStatus: 'changeConversationStatus',
+      unSeenConversation: 'unSeenConversation'
     }),
 
     toggleInfo() {
       this.showInfo = !this.showInfo
+      this.$emit('toggle-info')
+    },
+
+    handleShowSetting() {
+      setTimeout(() => {
+        this.showSetting = true
+      }, 0)
+    },
+
+    handleHideSetting() {
+      setTimeout(() => {
+        this.showSetting = false
+      }, 1)
+    },
+
+    unseenConversation() {
+      this.showSetting = false
+      this.unSeenConversation(this.conversation.conversationId)
+    },
+
+    settingMore() {
+      this.showSetting = false
+      if( this.showInfo ) return
+      this.showInfo = true
       this.$emit('toggle-info')
     },
 
@@ -159,7 +200,8 @@ export default {
       this.$emit('end-video-call')
     },
 
-    async handleVideoCall() {
+    async handleVideoCall() {      
+      this.$emit('initialed-video-call')
       const friendStatus = await this.getPersonStatus(this.conversation.friendId)
 
       if( friendStatus !== 'online' ) {
@@ -184,7 +226,6 @@ export default {
       }
 
       this.initialCall()
-      this.$emit('initialed-video-call')
     },
 
     async handleFriendOnline(data) {
@@ -357,6 +398,59 @@ export default {
       i {
         border: 5px solid #cce6ff;
         border-radius: 50%;
+      }
+    }
+
+    &.setting {
+      position: relative;
+    }
+  }
+
+  .setting-container {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translate(-70%, calc(100% + 10px));
+    width: 200px;
+    padding: .5rem;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 0 4px 1px rgba(0, 0, 0, .2);
+    z-index: 2;
+
+    &::before {
+      position: absolute;
+      top: 0;
+      right: 52px;
+      transform: translateY(calc(-100% + 1px));
+      content: '';
+      border: 8px solid transparent;
+      border-bottom: 8px solid #fff;
+      filter: drop-shadow(0 -3px 2px rgba(0, 0, 0, .2));
+    }
+
+    .setting-option {
+      font-size: 1rem;
+      padding: 5px 10px;
+      color: #2c3e50;
+      border-radius: 5px;
+      position: relative;
+
+      &:hover {
+        background-color: #eee;
+      }
+
+      &:first-child {
+        margin-bottom: 5px;
+
+        &::after {
+          position: absolute;
+          bottom: -3px;
+          left: 5px;
+          content: '';
+          width: calc(100% - 10px);
+          border-bottom: 1px solid #ddd;
+        }
       }
     }
   }

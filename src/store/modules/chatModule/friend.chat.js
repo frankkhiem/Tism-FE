@@ -202,7 +202,15 @@ const actions = {
 
   unSeenConversation: async ({ commit }, conversationId) => {
     commit('updateSeenTagConversation', { conversationId, seen: false })
-    // const accessToken = localStorage.getItem('accessToken')
+    const accessToken = localStorage.getItem('accessToken')
+
+    try {
+      await axios.patch(`${process.env.VUE_APP_API_HOST}/conversations/${conversationId}/unseen`, {}, {
+        headers: {"Authorization" : `Bearer ${accessToken}`}
+      })
+    } catch(error) {
+      console.log(error.response.data);
+    }
   },
 
   receiveNewMessage: async ({ commit }, { conversationId, newMessage, lastUpdated }) => {
