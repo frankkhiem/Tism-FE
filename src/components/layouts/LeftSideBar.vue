@@ -9,28 +9,28 @@ export default {
 
       menu: [
         {
-          href: '/',
-          title: 'Home',
+          href: { path: '/' },
+          title: 'Trang chủ',
           icon: 'fa-solid fa-house-chimney'
         },
         {
-          href: 'contacts',
-          title: 'Contacts',
+         href: { path: '/contacts' },
+          title: 'Liên hệ',
           icon: 'fa-solid fa-address-book'
         },
         {
-          href: 'teams',
-          title: 'Teams',
+          href: { path: '/teams' },
+          title: 'Nhóm',
           icon: 'fa-solid fa-people-group'
         },
         {
-          href: 'friends',
-          title: 'Friend',
+          href: { path: '/friends' },
+          title: 'Bạn bè',
           icon: 'fa-solid fa-user-group'
         },
          {
-          href: 'about',
-          title: 'About Us',
+          href: { path: '/about' },
+          title: 'Giới thiệu',
           icon: 'fa-solid fa-circle-info'
         },
       ]
@@ -46,20 +46,38 @@ export default {
 </script>
 <style>
 .v-sidebar-menu {
-  background-color: #026aa7;
+  background-color: #f2f4f7;
   top:58px;
   bottom: 80px;
 }
 .v-sidebar-menu .vsm--link_level-1 .vsm--icon {
+  color: black;
   background-color: transparent;
 }
 
 .v-sidebar-menu .vsm--mobile-bg {
-  background-color: #1a9de9;
+  background-color: #616c73;
   z-index: 0;
 }
 
 .v-sidebar-menu .vsm--list {
   margin-top: 50px;
+}
+
+.v-sidebar-menu .vsm--toggle-btn {
+  background-color: #bbc5d6;
+  color: black;
+}
+
+.v-sidebar-menu .vsm--toggle-btn::after {
+  content: '\f03a';
+}
+
+.v-sidebar-menu .vsm--title {
+  color: black;
+}
+
+.v-sidebar-menu .vsm--link_mobile-item .vsm--title {
+  color: #f2f4f7;
 }
 </style>
