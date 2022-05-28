@@ -198,7 +198,7 @@ export default {
     this.$refs.selfCamera.srcObject = this.selfStream
     this.loadingSelfStream = false
 
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await new Promise(resolve => setTimeout(resolve, 2000))
     this.dataConnect = this.$peer.connect(this.conversation.friendId)
     this.dataConnect.on('data', data => {
       if( Object.prototype.hasOwnProperty.call(data, 'cameraOn') ) {
