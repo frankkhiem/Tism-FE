@@ -198,6 +198,7 @@ export default {
     this.$refs.selfCamera.srcObject = this.selfStream
     this.loadingSelfStream = false
 
+    await new Promise(resolve => setTimeout(resolve, 1000))
     this.dataConnect = this.$peer.connect(this.conversation.friendId)
     this.dataConnect.on('data', data => {
       if( Object.prototype.hasOwnProperty.call(data, 'cameraOn') ) {
@@ -224,14 +225,17 @@ export default {
 
 <style lang="scss" scoped>
 #video-call-modal {
-
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .modal-title {
   .friend-name {
     text-align: center;
     font-size: 24px;
-    margin-top: 1rem;
+    // margin-top: 1rem;
 
     span {
       font-weight: 700;

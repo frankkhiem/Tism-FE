@@ -216,14 +216,17 @@ export default {
 
 <style lang="scss" scoped>
 #video-call-modal {
-  
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .modal-title {
   .friend-name {
     text-align: center;
     font-size: 24px;
-    margin-top: 1rem;
+    // margin-top: 1rem;
 
     span {
       font-weight: 700;
