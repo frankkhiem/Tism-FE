@@ -2,6 +2,7 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
+import moment from 'moment'
 
 import SeUIVue from 'semantic-ui-vue'
 import 'semantic-ui-css/semantic.min.css';
@@ -21,6 +22,12 @@ Vue.component('vue-confirm-dialog', VueConfirmDialog.default)
 import VModal from 'vue-js-modal'
 Vue.use(VModal)
 
+import { VTooltip, VPopover, VClosePopover } from 'v-tooltip'
+
+Vue.directive('tooltip', VTooltip)
+Vue.directive('close-popover', VClosePopover)
+Vue.component('v-popover', VPopover)
+
 import VueClickOutsideElement from 'vue-click-outside-element'
 Vue.use(VueClickOutsideElement)
 
@@ -30,8 +37,14 @@ import VueSidebarMenu from 'vue-sidebar-menu'
 import 'vue-sidebar-menu/dist/vue-sidebar-menu.css'
 Vue.use(VueSidebarMenu)
 
+Vue.filter('formatDate', function(value) {
+    if (value) {
+        return moment(String(value)).format('DD/MM/YYYY')
+    }
+})
+
 new Vue({
-  router,
-  store,
-  render: h => h(App),
+    router,
+    store,
+    render: h => h(App),
 }).$mount('#app')
