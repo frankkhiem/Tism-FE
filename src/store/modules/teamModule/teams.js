@@ -21,10 +21,8 @@ const actions = {
   const accessToken = localStorage.getItem('accessToken')
 
   try {
-    const response = await axios.get(`${process.env.VUE_APP_ZATO_ESB_MODULE_HOST}/`, {
-      params: {
-        accessToken
-      }
+    const response = await axios.get(`${process.env.VUE_APP_API_HOST}/team/getallteam`, {
+      headers: {"Authorization" : `Bearer ${accessToken}`}
     })
 
     commit('updateTeamList', response.data)
@@ -33,15 +31,16 @@ const actions = {
   }
   },
 
-  createTeam: async ({ dispatch }) => {
+  createTismTeam: async ({ dispatch }, { teamName, type, avatar }) => {
     const accessToken = localStorage.getItem('accessToken')
 
     try {
-      const response = await axios.post(`${process.env.VUE_APP_ZATO_ESB_MODULE_HOST}/contact`, {
-        accessToken,
+      const response = await axios.post(`${process.env.VUE_APP_API_HOST}/team/newteam`, { teamName, type, avatar }, {
+        headers: {"Authorization" : `Bearer ${accessToken}`},
       })
 
-      if( response.data.success ) {
+      console.log(response.data)
+      if( response.data.teamId ) {
         await dispatch('getTeamList')
       }
       return response.data
@@ -51,12 +50,12 @@ const actions = {
     }
   },
 
-  updateTeam: async ({ dispatch }) => {
+  updateTismTeam: async ({ dispatch }, { teamId, teamName, type, avatar }) => {
     const accessToken = localStorage.getItem('accessToken')
 
     try {
-      const response = await axios.put(`${process.env.VUE_APP_ZATO_ESB_MODULE_HOST}`, {
-        accessToken,
+      const response = await axios.put(`${process.env.VUE_APP_API_HOST}/team/updateteam`, { teamId, teamName, type, avatar }, {
+        headers: {"Authorization" : `Bearer ${accessToken}`},
       })
 
       if( response.data.success ) {

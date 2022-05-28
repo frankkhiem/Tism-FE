@@ -19,73 +19,51 @@
       </div>
     </div>
     <div v-for="(groupTeambyStatus, status, index) in teamList" :key="index">
-      <h2>Team {{ status }}</h2>
+      <h2 v-if="status === 'public'">Team công khai</h2>
+      <h2 v-if="status === 'private'">Team riêng tư</h2>
       <div class="row" v-if="groupTeambyStatus.length">
         <div class="col-12 col-lg-6 team" v-for="(team, index) in groupTeambyStatus" :key="index">
           <div class="team-container">
             <img :src="require(`./../assets/img/${team.avatar}`)" alt="Avatar" class="image" style="width:100%">
-            <p class="team-name">{{ team.name }}</p>
+            <p class="team-name">{{ team.teamName }}</p>
             <div class="middle">
-              <div class="text" @click="goToTeam(team.id)">Xem</div>
+              <div class="update-text" @click="updateTeam(team)">Chỉnh sửa</div>
+              <div class="text" @click="goToTeam(team.teamId)">Xem</div>
             </div>
           </div>
         </div>
       </div>
-      <div class="row text-no-team" v-else>Chưa có team {{ status }}</div>
+      <div class="row text-no-team" v-else>
+        <span v-if="status === 'public'">Chưa có team công khai</span>
+        <span v-if="status === 'private'">Chưa có team riêng tư</span>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import AddTeam from '../components/teams/AddTeam.vue'
+import { mapGetters, mapActions } from 'vuex'
 
 export default {
   data() {
     return {
       keyword: '',
       teamList: {},
-      teams: [
-        {
-          id: 1,
-          name: "teams 1",
-          avatar: 'login-background-1.jpg',
-          status: 1
-        },
-        {
-          id: 2,
-          name: "teams 2",
-          avatar: "login-background-1.jpg",
-          status: 1
-        },
-        {
-          id: 3,
-          name: "teams 3",
-          avatar: "login-background-1.jpg",
-          status: 1
-        },
-        {
-          id: 4,
-          name: "teams 4",
-          avatar: "login-background-1.jpg",
-          status: 2
-        },
-        {
-          id: 5,
-          name: "teams 5",
-          avatar: "login-background-1.jpg",
-          status: 1
-        },
-        {
-          id: 6,
-          name: "teams 6",
-          avatar: "login-background-1.jpg",
-          status: 1
-        },
-      ],
     };
   },
 
+  computed: {
+    ...mapGetters({
+      teams: 'teamList',
+    })
+  },
+
   methods: {
+    ...mapActions({
+      getTeamList: 'getTeamList',
+    }),
+
     getTeamAvatar(teamAvatar) {
       return require('./../assets/img/' + teamAvatar)
     },
@@ -110,22 +88,39 @@ export default {
       )
     },
 
+    updateTeam (team) {
+      this.$modal.show(
+        AddTeam,
+        {
+          targetTeam: team,
+          isUpdate: true
+        },
+        {
+          draggable: true,
+          // resizable: true,
+          adaptive: true,
+          width: 600,
+          height: 'auto'
+        }
+      )
+    },
+
     prepareTeamList (teams) {
       this.teamList = {}
-      this.teamList['công khai'] = []
-      this.teamList['riêng tư'] = []
+      this.teamList['public'] = []
+      this.teamList['private'] = []
       teams.forEach((team) => {
-        if( team.status == 1 ) {
-          this.teamList['công khai'].push(team)
+        if( team.type === 'public' ) {
+          this.teamList['public'].push(team)
         } else {
-          this.teamList['riêng tư'].push(team)
+          this.teamList['private'].push(team)
         }
       })
     },
 
     searchTeam (keyword) {
       const teams = this.teams.filter((team) => {
-        if (team.name.toLowerCase().includes(keyword.toLowerCase())) {
+        if (team.teamName.toLowerCase().includes(keyword.toLowerCase())) {
           console.log('true')
           return true
         }
@@ -136,13 +131,18 @@ export default {
     }
   },
 
-  created() {
+  async created() {
+    await this.getTeamList()
     this.prepareTeamList(this.teams)
   },
 
   watch: {
-    keyword() {
-      this.searchTeam(this.keyword)
+    keyword(keyword) {
+      this.searchTeam(keyword)
+    },
+
+    teams(newTeams) {
+      this.prepareTeamList(newTeams)
     }
   }
 }
@@ -185,6 +185,9 @@ export default {
       transform: translate(-50%, -50%);
       -ms-transform: translate(-50%, -50%);
       text-align: center;
+      display: flex;
+      justify-content: space-between;
+      width: 80%;
     }
 
     .team-name {
@@ -197,6 +200,7 @@ export default {
       transform: translate(-50%, -50%);
       -ms-transform: translate(-50%, -50%);
       text-align: center;
+      color: white;
     }
 
     .team-container:hover {
@@ -207,6 +211,10 @@ export default {
       .middle {
         opacity: 1;
       }
+
+      .team-name {
+        color: rgb(47, 43, 43);
+      }
     }
 
     .text {
@@ -214,7 +222,17 @@ export default {
       border-radius: 10px;
       color: white;
       font-size: 16px;
-      padding: 8px 48px;
+      padding: 8px 30px;
+      margin-left: 10px;
+    }
+
+    .update-text {
+      background-color: #30b859;
+      border-radius: 10px;
+      color: white;
+      font-size: 16px;
+      padding: 8px 20px;
+      margin-right: 10px;
     }
   }
 

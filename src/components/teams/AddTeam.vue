@@ -27,21 +27,21 @@
     </div>
     <div class="modal-main">
       <div class="create-team-container">
-        <div class="create-team-infor" :style="{ backgroundImage: `url(${teamAvatar})` }">
+        <div class="create-team-infor" :style="{ backgroundImage: `url(${require(`../../assets/img/${teamAvatar}`)})` }">
           <div>
             <input type="text" name="name" placeholder="Thêm mới tên team của bạn" class="team-name-input" v-model="teamName">
           </div>
           <div class="create-team-status">
-            <input type="radio" id="public" name="team-status" value="1" v-model="teamStatus" />
+            <input type="radio" id="public" name="team-status" value="public" v-model="teamType" />
             <label for="public">Công khai</label>
-            <input type="radio" id="private" name="team-status" value="2" v-model="teamStatus" />
+            <input type="radio" id="private" name="team-status" value="private" v-model="teamType" />
             <label for="private">Riêng tư</label>
           </div>
         </div>
         <ul class="create-team-background">
-          <li class="create-team-background-item" v-for="(imageUrl, index) in temaBackgroundImageUrls" :key="index">
-            <button class="create-team-background-item-btn" :class="{ 'selected-bg-btn': teamAvatar == imageUrl }" @click="teamAvatar = imageUrl" :style="{ backgroundImage: `url(${imageUrl})` }"></button>
-            <span class="icon-tick" :class="{ 'icon-hidden': teamAvatar == imageUrl }">✔</span>
+          <li class="create-team-background-item" v-for="(image, index) in teamBackgroundImages" :key="index">
+            <button class="create-team-background-item-btn" :class="{ 'selected-bg-btn': teamAvatar == image }" @click="teamAvatar = image" :style="{ backgroundImage: `url(${require(`../../assets/img/${image}`)})` }"></button>
+            <span class="icon-tick" :class="{ 'icon-hidden': teamAvatar == image }">✔</span>
           </li>
         </ul>
       </div>
@@ -50,38 +50,98 @@
       <div class="cancel-btn"  @click="$emit('close')">
         Hủy
       </div>
-      <div class="agree-btn" :disabled="teamName == ''">
+      <div class="agree-btn" v-if="!isUpdate" :disabled="teamName == ''" @click="createTeam">
         Tạo
+      </div>
+      <div class="agree-btn" v-else :disabled="teamName == ''" @click="updateTeam">
+        Sửa
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 
 export default {
   props: {
     isUpdate: Boolean,
+    targetTeam: Object
   },
+
   data() {
     return {
       hoverClose: false,
+      teamId: '',
       teamName: '',
-      teamAvatar: require(`../../assets/img/bg8.jpg`),
-      teamStatus: 1,
-      temaBackgroundImageUrls: [
-        require(`../../assets/img/bg1.jpeg`),
-        require(`../../assets/img/bg2.jpeg`),
-        require(`../../assets/img/bg3.jpeg`),
-        require(`../../assets/img/bg4.jpeg`),
-        require(`../../assets/img/bg5.jpeg`),
-        require(`../../assets/img/bg6.jpg`),
-        require(`../../assets/img/bg7.jpg`),
-        require(`../../assets/img/bg8.jpg`),
-        require(`../../assets/img/bg9.jpg`),
+      teamAvatar: 'bg8.jpg',
+      teamType: 'public',
+      teamBackgroundImages: [
+        'bg1.jpeg',
+        'bg2.jpeg',
+        'bg3.jpeg',
+        'bg4.jpeg',
+        'bg5.jpeg',
+        'bg6.jpg',
+        'bg7.jpg',
+        'bg8.jpg',
+        'bg9.jpg',
       ]
     }
   },
+
+  methods: {
+    ...mapActions({
+      createTismTeam: 'createTismTeam',
+      updateTismTeam: 'updateTismTeam',
+    }),
+
+    async createTeam() {
+      try {
+        const response = await this.createTismTeam({
+          teamName: this.teamName,
+          type: this.teamType,
+          avatar: this.teamAvatar
+        })
+        if( response.teamId ) {
+          this.$emit('close')
+        } else {
+          // console.log(response)
+          return
+        }
+      } catch(error) {
+        console.log(error);
+      }
+    },
+
+    async updateTeam() {
+      try {
+        const response = await this.updateTismTeam({
+          teamId: this.teamId,
+          teamName: this.teamName,
+          type: this.teamType,
+          avatar: this.teamAvatar
+        })
+        if( response.success ) {
+          this.$emit('close')
+        } else {
+          // console.log(response)
+          return
+        }
+      } catch(error) {
+        console.log(error);
+      }
+    },
+  },
+
+  created() {
+    if(this.isUpdate && this.targetTeam) {
+      this.teamName = this.targetTeam.teamName
+      this.teamAvatar = this.targetTeam.avatar
+      this.teamType = this.targetTeam.type
+      this.teamId = this.targetTeam.teamId
+    }
+  }
 }
 </script>
 
@@ -176,7 +236,9 @@ export default {
         label {
           margin-right: 30px;
           position: relative;
-          bottom: 1px
+          bottom: 1px;
+          font-size: 16px;
+          font-weight: 700;
         }
       }
 
