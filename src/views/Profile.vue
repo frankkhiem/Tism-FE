@@ -8,17 +8,47 @@
     </div>
     <div v-else class="page-content">
       <div class="sub-content">
-        <div class="avatar">
+        <div class="avatar" @click="handleShowAvatarActions">
           <div 
             v-if="user.avatar" 
-            class="img-avatar" 
+            class="avatar__content img-avatar" 
             :class="{ online: user.status === 'online' }"
           >
             <img :src="user.avatar" alt="">
           </div>
-          <div v-else class="text-avatar" :class="{ online: user.status === 'online' }">
+          <div 
+            v-else 
+            class="avatar__content text-avatar" 
+            :class="{ online: user.status === 'online' }"
+          >
             {{ user.firstNameLetter }}
           </div>
+          <div 
+            v-if="showAvatarActions" 
+            class="avatar__actions"
+            v-click-outside-element="hideAvatarActions"
+          >
+            <div 
+              v-if="user.avatar"
+              class="show-avatar" 
+              @click.stop="showAvatar"
+            >
+              <b-icon class="icon" icon="person-bounding-box"></b-icon>
+              Xem ảnh đại diện
+            </div>
+            <div class="upload-avatar" @click.stop="uploadAvatar">
+              <b-icon class="icon" icon="images"></b-icon>
+              {{ user.avatar ? 'Thay ảnh đại diện' : 'Cập nhật ảnh đại diện' }}
+            </div>
+          </div>
+          <!-- input ẩn chọn ảnh thay đổi avatar -->
+          <input 
+            type="file" 
+            ref="selectAvatar" 
+            accept="image/*" 
+            :style="{ display: 'none' }"
+            @input="handleUploadAvatar"
+          >
         </div>
         <div class="name">
           {{ user.fullname }}
@@ -69,7 +99,9 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import AvatarModal from '@/components/profilePage/AvatarModal'
+
+import { mapGetters, mapActions } from 'vuex'
 
 export default {
   computed: {
@@ -86,23 +118,91 @@ export default {
 
   data() {
     return {
-      loading: false
+      loading: false,
+      showAvatarActions: false
     }
   },
 
   methods: {
+    ...mapActions({
+      fetchUserProfile: 'fetchUserProfile',
+      uploadUserAvatar: 'uploadUserAvatar'
+    }),
+
     toListFriends() {
       this.$router.push({ name: 'ListFriends' })
     },
 
     redirect(routeName) {
       if( this.$route.name !== routeName ) this.$router.push({ name: routeName })
+    },
+
+    showAvatar() {
+      this.showAvatarActions = false
+      this.$modal.show(
+        AvatarModal,
+        {
+          avatarUrl: this.user.avatar
+        },
+        {
+          width: '80%',
+          height: '95%'
+        }
+      )
+    },
+
+    uploadAvatar() {
+      this.showAvatarActions = false
+      this.$refs.selectAvatar.value = null
+      this.$refs.selectAvatar.click()
+    },
+
+    handleUploadAvatar(e) {
+      let file = e.target.files[0]
+      if( !file ) return
+      this.$confirm(
+        {
+          title: `Thay đổi ảnh đại diện`,
+          message: `Bạn có chắc muốn thực hiện điều này?`,
+          button: {
+            no: 'Hủy',
+            yes: 'Thực hiện'
+          },
+          callback: async confirm => {
+            if (confirm) {
+              this.loading = true
+              let formData = new FormData()
+              formData.append('avatar', file)
+              const success = await this.uploadUserAvatar(formData)
+              if( success ) {
+                await this.fetchUserProfile()
+                this.loading = false
+              } else {
+                this.$router.push({ name: 'Not Found' })
+              }
+            }
+          }
+        }
+      )
+    },
+
+    handleShowAvatarActions() {
+      setTimeout(() => {
+        this.showAvatarActions = true
+      }, 0)
+    },
+
+    hideAvatarActions() {
+      setTimeout(() => {
+        this.showAvatarActions = false
+      }, 1)
     }
   },
 
   async created() {
     this.loading = true
     await new Promise(resolve => setTimeout(resolve, 200))
+    await this.fetchUserProfile()
     this.loading = false
   }
 }
@@ -147,16 +247,17 @@ export default {
         margin: 0 auto;
         cursor: default;
 
-        &:hover {
-          filter: brightness(95%) contrast(100%) saturate(100%) blur(0px) hue-rotate(0deg);
-        }
-
-        > div {
+        .avatar__content {
           position: absolute;
           top: -30px;
           width: 220px;
           height: 220px;
           border-radius: 50%;
+          cursor: pointer;
+
+          &:hover {
+            filter: brightness(95%) contrast(100%) saturate(100%) blur(0px) hue-rotate(0deg);
+          }
 
           &.online::after {
             content: '';
@@ -186,6 +287,52 @@ export default {
           color: #fff;
           background-color: #ccc;
           user-select: none;
+        }
+
+        .avatar__actions {
+          position: absolute;
+          bottom: 0;
+          transform: translateY(calc(100% + 20px));
+          width: 100%;
+          padding: .5rem;
+          background-color: #fff;
+          box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, .25);
+          border-radius: 8px;
+
+          &::before {
+            content: '';
+            position: absolute;
+            top: 1px;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            transform: translate(-50%, -100%);
+            border: 10px solid transparent;
+            border-bottom: 10px solid #fff;
+            filter: drop-shadow(0px -4px 2px rgba(0, 0, 0, 0.1));
+          }
+
+          > div {
+            padding: 5px;
+            padding-left: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            user-select: none;
+            font-size: 16px;
+            font-weight: 600;
+
+            &:hover {
+              background-color: #eee;
+            }
+
+            .icon {
+              margin-right: 6px;
+            }
+          }
+
+          .show-avatar {
+            margin-bottom: 2px;
+          }
         }
       }
 

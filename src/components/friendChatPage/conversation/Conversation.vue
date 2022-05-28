@@ -6,7 +6,9 @@
 		<ChatHeader 
 			v-show="!loading"
 			:conversation="conversationSelected"
+			:initVideoCall="initVideoCall"
 			@toggle-info="showInfo = ! showInfo"
+			@initialed-video-call="initVideoCall = false"
 		></ChatHeader>
 		<Info 
 			v-show="!loading && showInfo"
@@ -18,6 +20,7 @@
 			:totalMessages="conversationSelected.totalMessages"
 			:messages="conversationSelected.messages"
 			:friendAvatar="conversationSelected.friendAvatar"
+			@init-video-call='initVideoCall = true'
 		></Messenger>
 	</div>
 </template>
@@ -45,7 +48,8 @@ export default {
 	data() {
 		return {
 			loading: false,
-			showInfo: false
+			showInfo: false,
+			initVideoCall: false
 		}
 	},
 
@@ -63,7 +67,7 @@ export default {
 			} catch(error) {
 				this.$router.replace({ name: 'Not Found' })
 			}
-		},
+		}
 	},
 
 	created() {

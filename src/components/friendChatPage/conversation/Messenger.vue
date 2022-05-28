@@ -18,6 +18,7 @@
         :message="mess"
         :friendAvatar="friendAvatar"
         :userId="user.userId"
+        @init-video-call="$emit('init-video-call')"
       ></MessageItem>
     </div>
     <div v-show="showScrollToBottom" class="scroll-to-bottom">
@@ -33,7 +34,10 @@
           style="display: none"
           @input="handleSendFile"
         >
-        <div class="link-option" @click="$refs.selectFile.click()">
+        <div 
+          class="link-option" 
+          @click="$refs.selectFile.value = null; $refs.selectFile.click()"
+        >
           <i class="fa-solid fa-paperclip"></i>
         </div>
         <input 
@@ -43,7 +47,10 @@
           style="display: none"
           @input="handleSendImage"
         >
-        <div class="image-option" @click="$refs.selectImage.click()">
+        <div 
+          class="image-option" 
+          @click="$refs.selectImage.value = null; $refs.selectImage.click()"
+        >
           <i class="fa-solid fa-image"></i>
         </div>
       </div>
@@ -137,7 +144,8 @@ export default {
       sendImageMessage: 'sendImageMessage',
       sendFileMessage: 'sendFileMessage',
       seenConversation: 'seenConversation',
-      getOlderMessages: 'getOlderMessages'
+      getOlderMessages: 'getOlderMessages',
+      changeConversationStatus: 'changeConversationStatus'
     }),
 
     resizeInput(e) {
@@ -244,9 +252,10 @@ export default {
   },
 
   created() {
-    socket.on('new-message', (message) => {
+    socket.on('new-message', async (message) => {
       // console.log(message.friendship === this.$route.params.chatRoomId)
       if( message.friendship === this.$route.params.chatRoomId ) {
+        // await this.changeConversationStatus()
         this.messages.push(message)
       }
     })
