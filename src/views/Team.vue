@@ -1,8 +1,15 @@
 <template>
   <div class="team-page">
-    <TeamPageHeaderVue></TeamPageHeaderVue>
+    <TeamPageHeaderVue 
+    @team-tasks="type='team-tasks'"
+    @team-chat="type='team-chat'"
+    @calendar="type='calendar'"
+    :type = "type"
+    :team = "team"
+    >
+    </TeamPageHeaderVue>
     <!-- Lists container -->
-    <section class="lists-container">
+    <section v-if="type == 'team-tasks'" class="lists-container">
       <div class="list">
         <h3 class="list-title">Việc cần làm</h3>
 
@@ -61,19 +68,46 @@
         <button class="add-card-btn btn" @click="createNewTask">Add a card</button>
       </div>
     </section>
+    <section v-if="type == 'team-chat'" class="lists-container">Tính năng chat nhóm đang được phát triển</section>
+    <section v-if="type == 'calendar'" class="lists-container">Tính năng theo dõi lịch đang được phát triển</section>
   </div>
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex'
 import TeamPageHeaderVue from '../components/teams/team/TeamPageHeader';
 import AddTask from '../components/tasks/AddTask.vue';
 
 export default {
+  computed: {
+    ...mapGetters({
+      team: 'team'
+    })
+  },
+
+  data() {
+    return {
+      type: 'team-tasks',
+    }
+  },
+
   components: {
     TeamPageHeaderVue,
   },
 
   methods: {
+    ...mapActions({
+      getTeam: 'getTeam'
+    }),
+
+    async refreshTeamPage() {
+      try {
+        await this.getTeam(this.$route.params.teamId)
+      } catch (error) {
+        console.log(error)
+      }
+    },
+
     createNewTask () {
       this.$modal.show(
         AddTask,
@@ -89,6 +123,10 @@ export default {
         }
       )
     },
+  },
+
+  created() {
+    this.refreshTeamPage()
   }
 }
 </script>
