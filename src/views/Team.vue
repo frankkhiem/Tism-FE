@@ -5,6 +5,7 @@
     @team-chat="type='team-chat'"
     @calendar="type='calendar'"
     :type = "type"
+    :team = "team"
     >
     </TeamPageHeaderVue>
     <!-- Lists container -->
@@ -73,19 +74,59 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex'
 import TeamPageHeaderVue from '../components/teams/team/TeamPageHeader';
+import AddTask from '../components/tasks/AddTask.vue';
+
 export default {
   computed: {
+    ...mapGetters({
+      team: 'team'
+    })
   },
+
   data() {
     return {
       type: 'team-tasks',
     }
   },
+
   components: {
     TeamPageHeaderVue,
   },
+
   methods: {
+    ...mapActions({
+      getTeam: 'getTeam'
+    }),
+
+    async refreshTeamPage() {
+      try {
+        await this.getTeam(this.$route.params.teamId)
+      } catch (error) {
+        console.log(error)
+      }
+    },
+
+    createNewTask () {
+      this.$modal.show(
+        AddTask,
+        {
+          isUpdate: false
+        },
+        {
+          draggable: true,
+          // resizable: true,
+          adaptive: true,
+          width: 800,
+          height: 'auto'
+        }
+      )
+    },
+  },
+
+  created() {
+    this.refreshTeamPage()
   }
 }
 </script>
@@ -254,9 +295,11 @@ body {
   white-space: nowrap;
 }
 /* Lists */
+
 // .lists-container::-webkit-scrollbar {
 //   height: 2.4rem;
 // }
+
 // .lists-container::-webkit-scrollbar-thumb {
 //   background-color: #66a3c7;
 //   border: 0.8rem solid #0079bf;
@@ -296,9 +339,11 @@ body {
   padding: 0 0.6rem 0.5rem;
   overflow-y: auto;
 }
+
 // .list-items::-webkit-scrollbar {
 //   width: 1.6rem;
 // }
+
 // .list-items::-webkit-scrollbar-thumb {
 //   background-color: #c4c9cc;
 //   border-right: 0.6rem solid #e2e4e6;
