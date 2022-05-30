@@ -227,6 +227,18 @@ export default {
   &.self {
     align-items: flex-end;
   }
+
+  &:first-child {
+    .main-message .message-actions .actions-container {
+      top: 50%;
+      left: 0;
+      transform: translate(calc(-100% - 1rem), -50%);
+
+      &::after {
+        display: none;
+      }
+    }
+  }
 }
 
 .main-message {

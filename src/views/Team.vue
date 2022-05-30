@@ -67,13 +67,17 @@
         <button class="add-card-btn btn" @click="createNewTask">Add a card</button>
       </div>
     </section>
-    <section v-if="type == 'team-chat'" class="lists-container">Tính năng chat nhóm đang được phát triển</section>
+    <section v-if="type == 'team-chat'" class="lists-container">
+      <TeamChat></TeamChat>
+    </section>
     <section v-if="type == 'calendar'" class="lists-container">Tính năng theo dõi lịch đang được phát triển</section>
   </div>
 </template>
 
 <script>
 import TeamPageHeaderVue from '../components/teams/team/TeamPageHeader';
+import TeamChat from '../components/teams/team/TeamChat';
+
 export default {
   computed: {
   },
@@ -84,6 +88,7 @@ export default {
   },
   components: {
     TeamPageHeaderVue,
+    TeamChat
   },
   methods: {
   }

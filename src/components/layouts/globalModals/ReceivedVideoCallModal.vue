@@ -184,19 +184,23 @@ export default {
           },
           callback: async confirm => {
             if (confirm) {
-              const screenStream = await navigator.mediaDevices.getDisplayMedia({
-                video: true
-              })
+              try {
+                const screenStream = await navigator.mediaDevices.getDisplayMedia({
+                  video: true
+                })
 
-              this.screenTrack = screenStream.getVideoTracks()[0]
-              this.screenTrack.onended = () => {
-                this.stopShareScreen()
+                this.screenTrack = screenStream.getVideoTracks()[0]
+                this.screenTrack.onended = () => {
+                  this.stopShareScreen()
+                }
+                const videoSender = this.call.peerConnection.getSenders().find(sender => {
+                  return sender.track.kind === 'video'
+                })
+                videoSender.replaceTrack(this.screenTrack)
+                this.dataConnect.send({ cameraOn: true, sharedScreen: true })
+              } catch(e) {
+                this.screenOn = false
               }
-              const videoSender = this.call.peerConnection.getSenders().find(sender => {
-                return sender.track.kind === 'video'
-              })
-              videoSender.replaceTrack(this.screenTrack)
-              this.dataConnect.send({ cameraOn: true, sharedScreen: true })
             } else {
               this.screenOn = false
             }
