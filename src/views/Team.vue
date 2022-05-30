@@ -138,24 +138,20 @@ export default {
   //  background-size: cover;
   background-color: #fffdfa;
 }
-
 :root {
   font-size: 10px;
 }
-
 *,
 *::before,
 *::after {
   box-sizing: border-box;
 }
-
 body {
   font-family: Arial, sans-serif;
   display: flex;
   flex-direction: column;
   background-color: #0079bf;
 }
-
 .btn {
   display: flex;
   justify-content: center;
@@ -167,13 +163,10 @@ body {
   padding: 0;
   cursor: pointer;
 }
-
 :focus {
   outline-color: #fa0;
 }
-
 /* Masthead */
-
 .masthead {
   flex-basis: 4rem;
   display: flex;
@@ -182,22 +175,18 @@ body {
   background-color: #0067a3;
   box-shadow: 0 0.1rem 0.1rem rgba(0, 0, 0, 0.1);
 }
-
 .masthead .btn {
   background-color: #4c94be;
   border-radius: 0.3rem;
   transition: background-color 150ms;
 }
-
 .masthead .btn:hover {
   background-color: #3385b5;
 }
-
 .boards-menu {
   display: flex;
   flex-shrink: 0;
 }
-
 .boards-btn {
   flex-basis: 9rem;
   font-size: 1.4rem;
@@ -206,17 +195,14 @@ body {
   margin-right: 0.8rem;
   padding: 0.6rem 0.8rem;
 }
-
 .boards-btn-icon {
   font-size: 1.7rem;
   padding-right: 1.2rem;
 }
-
 .board-search {
   flex-basis: 18rem;
   position: relative;
 }
-
 .board-search-input {
   height: 3rem;
   border: none;
@@ -226,11 +212,9 @@ body {
   padding: 0 3rem 0 1rem;
   color: #fff;
 }
-
 .board-search-input:hover {
   background-color: #66a4c8;
 }
-
 .search-icon {
   font-size: 1.5rem;
   position: absolute;
@@ -239,7 +223,6 @@ body {
   transform: translateY(-50%) rotate(90deg);
   color: #fff;
 }
-
 .logo {
   flex: 1;
   font-family: "Courgette", cursive;
@@ -252,33 +235,26 @@ body {
   white-space: nowrap;
   cursor: pointer;
 }
-
 .logo:hover {
   color: rgba(255, 255, 255, 0.8);
 }
-
 .logo-icon {
   padding-right: 0.4rem;
 }
-
 .user-settings {
   display: flex;
   height: 3rem;
   color: #fff;
 }
-
 .user-settings-btn {
   font-size: 1.5rem;
   width: 3rem;
   margin-right: 0.8rem;
 }
-
 .user-settings-btn:last-of-type {
   margin-right: 0;
 }
-
 /* Board info bar */
-
 .board-info-bar {
   flex-basis: 3rem;
   display: flex;
@@ -288,19 +264,15 @@ body {
   padding: 0 1rem;
   color: #f6f6f6;
 }
-
 .board-controls {
   display: flex;
 }
-
 .board-controls .btn {
   margin-right: 1rem;
 }
-
 .board-controls .btn:last-of-type {
   margin-right: 0;
 }
-
 .board-info-bar .btn {
   font-size: 1.4rem;
   font-weight: 400;
@@ -309,23 +281,19 @@ body {
   border-radius: 0.3rem;
   height: 3rem;
 }
-
 .board-info-bar .btn:hover {
   background-color: #006aa8;
 }
-
 .private-btn-icon,
 .menu-btn-icon {
   padding-right: 0.6rem;
   white-space: nowrap;
 }
-
 .board-title h2 {
   font-size: 1.8rem;
   font-weight: 700;
   white-space: nowrap;
 }
-
 /* Lists */
 
 // .lists-container::-webkit-scrollbar {
@@ -337,7 +305,6 @@ body {
 //   border: 0.8rem solid #0079bf;
 //   border-top-width: 0;
 // }
-
 .lists-container {
   display: flex;
   align-items: start;
@@ -345,7 +312,6 @@ body {
   // overflow-x: auto;
   height: calc(100vh - 13rem);
 }
-
 .list {
   flex: 0 0 27rem;
   display: flex;
@@ -356,18 +322,15 @@ body {
   border-radius: 0.3rem;
   margin-right: 1rem;
 }
-
 .list:last-of-type {
   margin-right: 0;
 }
-
 .list-title {
   font-size: 1.4rem;
   font-weight: 700;
   color: #333;
   padding: 1rem;
 }
-
 .list-items {
   flex: 1;
   display: flex;
@@ -385,7 +348,6 @@ body {
 //   background-color: #c4c9cc;
 //   border-right: 0.6rem solid #e2e4e6;
 // }
-
 .list-items li {
   // font-size: 1.4rem;
   font-weight: 400;
@@ -399,15 +361,12 @@ body {
   word-wrap: break-word;
   cursor: pointer;
 }
-
 .list-items li:last-of-type {
   margin-bottom: 0;
 }
-
 .list-items li:hover {
   background-color: #eee;
 }
-
 .add-card-btn {
   display: block;
   font-size: 1.4rem;
@@ -417,13 +376,11 @@ body {
   text-align: left;
   cursor: pointer;
 }
-
 .add-card-btn:hover {
   background-color: #cdd2d4;
   color: #4d4d4d;
   text-decoration: underline;
 }
-
 .add-list-btn {
   flex: 0 0 27rem;
   display: block;
@@ -437,72 +394,57 @@ body {
   transition: background-color 150ms;
   text-align: left;
 }
-
 .add-list-btn:hover {
   background-color: #005485;
 }
-
 .add-card-btn::after,
 .add-list-btn::after {
   content: "...";
 }
-
 /*
-
 The following rule will only run if your browser supports CSS grid.
-
 Remove or comment-out the code block below to see how the browser will fall-back to flexbox styling. 
-
 */
-
 @supports (display: grid) {
   body {
     display: grid;
     grid-template-rows: 4rem 3rem auto;
     grid-row-gap: 0.8rem;
   }
-
   .masthead {
     display: grid;
     grid-template-columns: auto 1fr auto;
     grid-column-gap: 2rem;
   }
-
   .boards-menu {
     display: grid;
     grid-template-columns: 9rem 18rem;
     grid-column-gap: 0.8rem;
   }
-
   .user-settings {
     display: grid;
     grid-template-columns: repeat(4, auto);
     grid-column-gap: 0.8rem;
   }
-
   .board-controls {
     display: grid;
     grid-auto-flow: column;
     grid-column-gap: 1rem;
   }
-
   .lists-container {
     display: grid;
     // grid-auto-columns: 27rem;
     grid-auto-flow: column;
     grid-column-gap: 1.5rem;
   }
-
   .list {
     display: grid;
     grid-template-rows: auto minmax(auto, 1fr) auto;
   }
-
   .list-items {
     display: grid;
     grid-row-gap: 0.6rem;
   }
-
   .logo,
   .list,
   .list-items li,

@@ -60,14 +60,12 @@ export default {
   // 		type: 'team-tasks',
   // 	}
   // },
-
   props: {
     type: String,
     team: Object,
     // userFirstName: String,
     // userFirstNameLetter: String
   },
-
   methods: {
     inviteMemberModal() {
       this.$modal.show(
@@ -97,7 +95,6 @@ export default {
     display: flex;
     justify-content: flex-end;
     align-items: center;
-
     > div {
       width: 185px;
       text-align: center;
@@ -112,36 +109,29 @@ export default {
       cursor: pointer;
       transition: all 0.1s linear;
       user-select: none;
-
       &:hover {
         background-color: #f4f5fd;
       }
-
       &.activated {
         color: #fff;
         background-color: #1b74e4;
       }
     }
-
     i {
       margin-right: 4px;
     }
   }
-
   .page-information {
     display: flex;
     justify-content: space-between;
     align-items: center;
-
     > div {
       margin: 1rem 12px;
     }
-
     .team-name {
       font-size: 25px;
       font-weight: 600;
     }
-
     .invite-member {
       padding: 5px 2rem;
       border-radius: 8px;
@@ -153,13 +143,11 @@ export default {
       user-select: none;
       color: #fff;
       background-color: #1b74e4;
-
       &:hover {
         color: black;
         background-color: #f4f5fd;
       }
     }
-
     .team-admin {
       p {
         margin-bottom: 0;
@@ -180,13 +168,11 @@ export default {
         overflow: hidden;
         white-space: nowrap;
       }
-
       .admin-name {
         margin-left: 9px;
         font-size: 14px;
         font-weight: 600;
       }
-
       .admin-name-icon {
         img {
           object-fit: cover;
