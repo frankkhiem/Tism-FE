@@ -118,7 +118,7 @@ const routes = [
       //   component: () => import('../views/HomeTest')
       // }
       {
-        path: '/team/:id',
+        path: '/team/:teamId',
         name: 'Team',
         props: true,
         component: () => import('../views/Team')
