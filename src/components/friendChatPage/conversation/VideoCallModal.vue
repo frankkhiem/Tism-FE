@@ -74,6 +74,14 @@
       >
         <b-icon class="action-icon" v-if="audioOn" icon="mic-fill"></b-icon>
         <b-icon class="action-icon" v-else icon="mic-mute-fill"></b-icon>
+      </div>      
+      <div 
+        class="share-screen-btn"
+        :class="{ shared: screenOn }"
+        @click="handleShareScreen"
+      >
+        <b-icon class="action-icon" v-if="screenOn" icon="display-fill"></b-icon>
+        <b-icon class="action-icon" v-else icon="display"></b-icon>
       </div>
       <div class="end-call-btn" @click="requestEndVideoCall">
         <b-icon class="action-icon" icon="telephone-x-fill"></b-icon>
@@ -120,7 +128,8 @@ export default {
       friendAudioOn: true,
       loadingSelfStream: false,
       loadingFriendStream: false,
-      duringTimes: 0
+      duringTimes: 0,
+      screenOn: false
     }
   },
 
@@ -145,7 +154,7 @@ export default {
     handleStopVideo() {
       this.cameraOn = !this.cameraOn
       this.selfStream.getVideoTracks()[0].enabled = this.cameraOn
-      this.dataConnect.send({ cameraOn: this.cameraOn })
+      this.dataConnect.send({ cameraOn: this.cameraOn, sharedScreen: this.screenOn })
     },
 
     handleMute() {
@@ -154,7 +163,75 @@ export default {
       this.dataConnect.send({ audioOn: this.audioOn })
     },
 
+    handleShareScreen() {
+      if( !this.call ) {
+        this.$confirm(
+          {
+            title: `Đang kết nối`,
+            message: `Vui lòng đợi kết nối thành công!`,
+            button: {
+              no: 'Đã hiểu',
+            }
+          }
+        )
+      } else {
+        this.screenOn = !this.screenOn
+        if( this.screenOn ) {
+          this.shareScreen()
+        } else {
+          this.stopShareScreen()
+        }
+      }
+    },
+
+    shareScreen() {
+      this.$confirm(
+        {
+          title: `Chia sẻ màn hình`,
+          message: `Khi chia sẻ màn hình, camera của bạn sẽ không được hiển thị với bạn bè. Bạn có muốn chia sẻ màn hình không?`,
+          button: {
+            no: 'Hủy',
+            yes: 'Thực hiện'
+          },
+          callback: async confirm => {
+            if (confirm) {
+              const screenStream = await navigator.mediaDevices.getDisplayMedia({
+                video: true
+              })
+
+              this.screenTrack = screenStream.getVideoTracks()[0]
+              this.screenTrack.onended = () => {
+                this.stopShareScreen()
+              }
+              const videoSender = this.call.peerConnection.getSenders().find(sender => {
+                return sender.track.kind === 'video'
+              })
+              videoSender.replaceTrack(this.screenTrack)
+              this.dataConnect.send({ cameraOn: true, sharedScreen: true })
+            } else {
+              this.screenOn = false
+            }
+          }
+        }
+      )
+      
+    },
+
+    stopShareScreen() {
+      this.screenOn = false
+      if( this.screenTrack ) {
+        this.screenTrack.stop()
+      }
+      const cameraTrack = this.selfStream.getVideoTracks()[0]
+      const videoSender = this.call.peerConnection.getSenders().find(sender => {
+        return sender.track.kind === 'video'
+      })
+      videoSender.replaceTrack(cameraTrack)
+      this.dataConnect.send({ cameraOn: this.cameraOn, sharedScreen: false })
+    },
+
     endVideoCall() {
+      this.stopShareScreen()
       this.$emit('close')
     },
 
@@ -167,6 +244,7 @@ export default {
         receiver: this.conversation.friendId,
         duringTimes: this.duringTimesString
       }, error)
+      this.stopShareScreen()
       this.$emit('close')
     },
 
@@ -198,11 +276,14 @@ export default {
     this.$refs.selfCamera.srcObject = this.selfStream
     this.loadingSelfStream = false
 
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    await new Promise(resolve => setTimeout(resolve, 1500))
     this.dataConnect = this.$peer.connect(this.conversation.friendId)
     this.dataConnect.on('data', data => {
-      if( Object.prototype.hasOwnProperty.call(data, 'cameraOn') ) {
+      if( Object.prototype.hasOwnProperty.call(data, 'cameraOn') && !data.sharedScreen ) {
         this.friendCameraOn = data.cameraOn
+      }
+      if( Object.prototype.hasOwnProperty.call(data, 'cameraOn') && data.sharedScreen ) {
+        this.friendCameraOn = true
       }
       if( Object.prototype.hasOwnProperty.call(data, 'audioOn') ) {
         this.friendAudioOn = data.audioOn
@@ -416,7 +497,7 @@ export default {
     color: #303030;
     background-color: #fff;
 
-    &.stoped, &.muted {
+    &.stoped, &.muted, &.shared {
       color: #fff;
       background-color: #444;
     }
@@ -426,11 +507,7 @@ export default {
     }
   }
 
-  .stop-video-btn {
-    @include action-btn;
-  }
-
-  .mute-btn {
+  .stop-video-btn, .mute-btn, .share-screen-btn {
     @include action-btn;
   }
 

@@ -172,6 +172,16 @@ export default {
 					&:last-child {
 						border-bottom: none;
 					}
+
+					&:first-child {
+						border-top-left-radius: 10px;
+						border-top-right-radius: 10px;
+					}
+
+					&:last-child {
+						border-bottom-left-radius: 10px;
+						border-bottom-right-radius: 10px;
+					}
 				}
 			}
 		}
