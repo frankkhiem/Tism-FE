@@ -1,7 +1,7 @@
 <template>
   <div class="team-page-header">
     <div class="page-information">
-      <div class="team-name">kkkk</div>
+      <div class="team-name">{{ team.teamName }}</div>
       <div class="team-admin">
         <p
           :style="{
@@ -11,16 +11,18 @@
             userSelect: 'none',
           }"
         >
-          <!-- <span class="admin-name-icon">
-            <img :src="adminAvatar" alt="" />
-          </span> -->
+          <span class="admin-name-icon" v-if="team.adminAvatar">
+            <img :src="team.adminAvatar" alt="" />
+          </span>
           <!-- admin first name first letter -->
-          <span class="admin-name-icon text">A</span>
+          <span class="admin-name-icon text" v-else>{{
+            team.adminName.slice(0, 1).toUpperCase()
+          }}</span>
         </p>
         <!-- admin first name -->
-        <span class="admin-name">Admin</span>
+        <span class="admin-name">{{ team.adminName.split(" ").pop() }}</span>
       </div>
-      <div class="invite-member">
+      <div class="invite-member" @click="inviteMemberModal">
         <i class="fa-solid fa-user-plus"></i>Mời
       </div>
     </div>
@@ -51,6 +53,7 @@
 </template>
 
 <script>
+import InviteMemberModal from './InviteMemberModal.vue'
 export default {
   // data() {
   // 	return {
@@ -59,8 +62,26 @@ export default {
   // },
   props: {
     type: String,
+    team: Object,
     // userFirstName: String,
     // userFirstNameLetter: String
+  },
+  methods: {
+    inviteMemberModal() {
+      this.$modal.show(
+        InviteMemberModal,
+        {
+          isUpdate: false
+        },
+        {
+          draggable: true,
+          // resizable: true,
+          adaptive: true,
+          width: 600,
+          height: 'auto'
+        }
+      );
+    },
   },
 };
 </script>
