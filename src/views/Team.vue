@@ -79,7 +79,9 @@
 import { mapGetters, mapActions } from 'vuex'
 import TeamPageHeaderVue from '../components/teams/team/TeamPageHeader';
 import AddTask from '../components/tasks/AddTask.vue';
-import TeamChat from '../components/teams/team/TeamChat';
+import TeamChat from '../components/teams/team/teamChat/TeamChat';
+
+import socket from '@/helpers/socketClient'
 
 export default {
   computed: {
@@ -101,12 +103,15 @@ export default {
 
   methods: {
     ...mapActions({
-      getTeam: 'getTeam'
+      getTeam: 'getTeam',
+      getMembersInfo: 'getMembersInfo',
+      playTeamMessageSound: 'playTeamMessageSound'
     }),
 
     async refreshTeamPage() {
       try {
-        await this.getTeam(this.$route.params.teamId)
+        this.getTeam(this.$route.params.teamId)
+        this.getMembersInfo(this.$route.params.teamId)
       } catch (error) {
         console.log(error)
       }
@@ -131,6 +136,16 @@ export default {
 
   created() {
     this.refreshTeamPage()
+    socket.on('new-team-message', (newMessage) => {
+      if( newMessage.team === this.$route.params.teamId ) {
+        this.playTeamMessageSound()
+      }
+    })
+  },
+
+  destroyed() {
+    socket.off('new-team-message')
+    socket.off('deleted-team-message')
   }
 }
 </script>
@@ -312,9 +327,9 @@ body {
 .lists-container {
   display: flex;
   align-items: start;
-  padding: 16px;
+  padding: 12px 16px 0;
   // overflow-x: auto;
-  height: calc(100vh - 13rem);
+  height: calc(100vh - 220px);
 }
 .list {
   flex: 0 0 27rem;

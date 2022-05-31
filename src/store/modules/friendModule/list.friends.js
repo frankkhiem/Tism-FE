@@ -10,6 +10,7 @@ const getters = {
 			const firstNameLetter = friend.name.split(' ').pop().slice(0, 1).toUpperCase()
 			return {
 				...friend,
+				history: new Date(friend.history).toLocaleDateString('en-GB'),
 				firstNameLetter
 			}
 		})
@@ -32,7 +33,9 @@ const getters = {
 					firstNameLetter
 				}
 			})
-		return friends
+		return friends.sort((friend1, friend2) => {
+			return friend1.name.localeCompare(friend2.name)
+		})
 	}
 }
 
