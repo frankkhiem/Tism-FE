@@ -12,6 +12,7 @@ const mutations = {
 
 const audios = {
   newMessageSound: new Audio(`${location.protocol}//${location.host}/sounds/new_facebook_notify.mp3`),
+  newTeamMessageSound: new Audio(`${location.protocol}//${location.host}/sounds/notification-sound-1.mp3`),
   ringTone1: new Audio(`${location.protocol}//${location.host}/sounds/nhac-cho-video-call.mp3`),
   ringTone2: new Audio(`${location.protocol}//${location.host}/sounds/nhac-chuong-video-call.mp3`)
 }
@@ -19,6 +20,10 @@ const audios = {
 const actions = {
   playMessageSound: () => {
     audios.newMessageSound.play()
+  },
+
+  playTeamMessageSound: () => {
+    audios.newTeamMessageSound.play()
   },
 
   playRingTone1: () => {

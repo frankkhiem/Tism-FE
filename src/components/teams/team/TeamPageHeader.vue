@@ -163,6 +163,7 @@ export default {
     .team-name {
       font-size: 25px;
       font-weight: 600;
+      color: #1b74e4;
     }
     .invite-member {
       padding: 5px 2rem;

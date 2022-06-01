@@ -75,19 +75,34 @@
       </div>
     </section>
     <section v-if="type == 'team-chat'" class="lists-container">
+<<<<<<< HEAD
       Tính năng chat nhóm đang được phát triển
     </section>
     <section v-if="type == 'calendar'" class="lists-container calendar-container">
       <TeamCalendar></TeamCalendar>
     </section>
+=======
+      <TeamChat></TeamChat>
+    </section>
+    <section v-if="type == 'calendar'" class="lists-container">Tính năng theo dõi lịch đang được phát triển</section>
+>>>>>>> 332329b8212e0693c5ecca7ff58006361976690f
   </div>
 </template>
 
 <script>
+<<<<<<< HEAD
 import { mapGetters, mapActions } from "vuex";
 import TeamPageHeaderVue from "../components/teams/team/TeamPageHeader";
 import AddTask from "../components/tasks/AddTask.vue";
 import TeamCalendar from "../components/teams/team/TeamCalendar";
+=======
+import { mapGetters, mapActions } from 'vuex'
+import TeamPageHeaderVue from '../components/teams/team/TeamPageHeader';
+import AddTask from '../components/tasks/AddTask.vue';
+import TeamChat from '../components/teams/team/teamChat/TeamChat';
+
+import socket from '@/helpers/socketClient'
+>>>>>>> 332329b8212e0693c5ecca7ff58006361976690f
 
 export default {
   computed: {
@@ -104,20 +119,35 @@ export default {
 
   components: {
     TeamPageHeaderVue,
+<<<<<<< HEAD
     TeamCalendar,
+=======
+    TeamChat
+>>>>>>> 332329b8212e0693c5ecca7ff58006361976690f
   },
 
   methods: {
     ...mapActions({
+<<<<<<< HEAD
       getTeam: "getTeam",
+=======
+      getTeam: 'getTeam',
+      getMembersInfo: 'getMembersInfo',
+      playTeamMessageSound: 'playTeamMessageSound'
+>>>>>>> 332329b8212e0693c5ecca7ff58006361976690f
     }),
 
     async refreshTeamPage() {
       try {
+<<<<<<< HEAD
         await this.getTeam(this.$route.params.teamId);
         if ('success' in this.team) {
           this.$router.push({ name: 'Not Found' })
         }
+=======
+        this.getTeam(this.$route.params.teamId)
+        this.getMembersInfo(this.$route.params.teamId)
+>>>>>>> 332329b8212e0693c5ecca7ff58006361976690f
       } catch (error) {
         console.log(error)
       }
@@ -141,9 +171,25 @@ export default {
   },
 
   created() {
+<<<<<<< HEAD
     this.refreshTeamPage();
   },
 };
+=======
+    this.refreshTeamPage()
+    socket.on('new-team-message', (newMessage) => {
+      if( newMessage.team === this.$route.params.teamId ) {
+        this.playTeamMessageSound()
+      }
+    })
+  },
+
+  destroyed() {
+    socket.off('new-team-message')
+    socket.off('deleted-team-message')
+  }
+}
+>>>>>>> 332329b8212e0693c5ecca7ff58006361976690f
 </script>
 
 <style lang="scss" scoped>
@@ -323,9 +369,9 @@ body {
 .lists-container {
   display: flex;
   align-items: start;
-  padding: 16px;
+  padding: 12px 16px 0;
   // overflow-x: auto;
-  height: calc(100vh - 13rem);
+  height: calc(100vh - 220px);
 }
 .list {
   flex: 0 0 27rem;

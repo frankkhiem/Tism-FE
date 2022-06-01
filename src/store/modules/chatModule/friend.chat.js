@@ -48,7 +48,9 @@ const mutations = {
   },
 
   addSendedMessage: (state, message) => {
+    if( state.conversation.conversationId !== message.friendship ) return
     state.conversation.messages.push(message)
+    state.conversation.totalMessages++
     let lastMessage = {}
 
     if( message.type === 'image' ) {
@@ -83,6 +85,9 @@ const mutations = {
   },
 
   receiveNewMessageToConversation: (state, { conversationId, message, lastUpdated }) => {
+    if( state.conversation.conversationId === conversationId ) {
+      state.conversation.totalMessages++
+    }
     for (let conversation of state.listConversations) {
       if( conversation.conversationId === conversationId ) {
         conversation.isSeen = false
@@ -95,6 +100,7 @@ const mutations = {
 
   removeDeletedMessage: (state, deletedMessage) => {
     if( state.conversation.conversationId !== deletedMessage.friendship ) return
+    state.conversation.totalMessages--
     for( let i = 0; i < state.conversation.messages.length; i++ ) {
       let message = state.conversation.messages[i]
       if( message._id === deletedMessage._id ) {

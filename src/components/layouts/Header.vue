@@ -148,6 +148,7 @@
               height: '42px',
               width: '42px',
               userSelect: 'none',
+              transform: 'translateX(-1px)',
             }"
           >
             <span class="user-name-icon" v-if="userAvatar">
@@ -399,7 +400,7 @@ export default {
 }
 
 .user-name {
-  padding: 12px 22px 11px 52px;
+  padding: 12px 20px 11px 50px;
   border-radius: 20px;
   background: white;
   position: relative;

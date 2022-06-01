@@ -1,5 +1,6 @@
 <template>
   <div class="message-item" :class="{ self: message.from === userId }">
+    <div v-show="message.from !== userId" class="sender-name">{{ senderName }}</div>
     <div class="main-message"
       @mouseenter="hoverMessage = true"
       @mouseleave="handleBlurMessage"
@@ -18,13 +19,13 @@
           class="actions-container"
           v-click-outside-element="hideMoreActions"
         >
-          <div class="delete-message" @click="handleDeleteMessage">
+          <div class="delete-message" @click="confirmDeleteMessage">
             Xóa tin nhắn
           </div>
         </div>
       </div>
-      <div v-if="message.to === userId" class="message-avatar">
-        <img v-if="friendAvatar" :src="friendAvatar" alt="">
+      <div v-if="message.from !== userId" class="message-avatar">
+        <img v-if="message.senderAvatar" :src="message.senderAvatar" alt="">
         <img v-else src="@/assets/img/anonymous.png" alt="">
       </div>
       <div 
@@ -57,7 +58,7 @@
         ></a>
       </div>
       <div
-        v-if="message.type === 'video-call'"
+        v-if="message.type === 'meeting'"
         class="message-content video-call"
         :class="{ self: message.from === userId }"
       >
@@ -117,9 +118,6 @@ export default {
     message: {
       type: Object
     },
-    friendAvatar: {
-      type: String
-    },
     userId: {
       type: String
     }
@@ -128,6 +126,10 @@ export default {
   computed: {
     timeago() {
       return format(this.message.createdAt)
+    },
+
+    senderName() {
+      return this.message.senderName?.trim().split(' ').pop()
     }
   },
 
@@ -140,7 +142,7 @@ export default {
 
   methods: {
     ...mapActions({
-      deleteMessage: 'deleteMessage'
+      deleteTeamMessage: 'deleteTeamMessage'
     }),
 
     initVideoCall() {
@@ -184,7 +186,7 @@ export default {
       }, 1)
     },
 
-    handleDeleteMessage() {
+    confirmDeleteMessage() {
       this.hideMoreActions()
       this.$confirm(
         {
@@ -196,34 +198,34 @@ export default {
           },
           callback: async confirm => {
             if (confirm) {
-              await this.deleteMessage({ 
-                conversationId: this.message.friendship,
-                messageId: this.message._id
-              })
-              // console.log('xoa thanh cong')
+              await this.handleDeleteMessage()
             }
           }
         }
       )
+    },
+
+    async handleDeleteMessage() {
+      const deletedMessage = await this.deleteTeamMessage({ 
+        teamId: this.message.team,
+        messageId: this.message._id
+      })
+      
+      if( deletedMessage && deletedMessage._id === this.message._id ) {
+        this.$emit('deleted')
+      }
     }
   },
 
   mounted() {
     render(this.$refs.timeAgo, 'VN')
-  },
-
-  watch: {
-    async message() {
-      await new Promise(resolve => setTimeout(resolve, 0))
-      render(this.$refs.timeAgo, 'VN')
-    }
   }
 }
 </script>
 
 <style lang="scss" scoped>
 .message-item {
-  margin: 1.5rem 1.5rem 0;
+  margin: 1rem 1.5rem 0;
   display: flex;
   flex-direction: column;
 
@@ -420,9 +422,15 @@ export default {
   }
 }
 
+.sender-name {
+  color: #666;
+  font-size: 12px;
+  margin: 0 0 2px 50px;
+}
+
 .time-ago {
   color: #666;
   font-size: 12px;
-  margin-top: 8px;
+  margin-top: 2px;
 }
 </style>

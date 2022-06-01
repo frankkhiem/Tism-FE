@@ -1,31 +1,34 @@
 <template>
-  <div class="messenger" @click="seen">
+  <div class="team-chatbox">
+    <div v-if="loading" class="loading-page">
+      <img src="@/assets/img/Dual Ring-1s-200px.gif" alt="">
+    </div>
     <div v-show="loadingMore" class="loading-more">
       <img src="@/assets/img/Dual Ring-1s-200px.gif" alt="">
     </div>
-    <div v-show="messages.length === 0" class="no-messages">
-      Chưa có tin nhắn trong cuộc trò chuyện!
+    <div v-if="!loading" v-show="messages.length === 0" class="no-messages">
+      Chưa có tin nhắn thảo luận trong nhóm!
     </div>
     <div 
-      v-show="messages.length > 0" 
+      v-show="!loading && messages.length > 0" 
       class="messages"
       ref="listMessages"
       @scroll.passive="checkScroll"
     >
-      <MessageItem
+      <TeamMessageItem
         v-for="(mess, index) in messages"
         :key="index"
         :message="mess"
-        :friendAvatar="friendAvatar"
         :userId="user.userId"
-        @init-video-call="$emit('init-video-call')"
-      ></MessageItem>
+        @deleted="removeMessage(index)"
+      ></TeamMessageItem>
     </div>
     <div v-show="showScrollToBottom" class="scroll-to-bottom">
       <span class="scroll-btn" @click="scrollToBottom">
         <i class="fa-solid fa-arrow-down"></i>
       </span>
     </div>
+    <!--  -->
     <div class="chatbox">
       <div class="send-options">
         <input 
@@ -61,8 +64,8 @@
             placeholder="Aa..."
             rows="1"
             @input="resizeInput"
-            @keydown="checkEnterSubmit"
-            @keyup="enterSubmit"
+            @keydown.enter.exact.prevent
+            @keyup.enter.exact="handleSendTextMessage"
             v-model="message"
           ></textarea>
           <emoji-picker @emoji="insertEmoji">
@@ -102,7 +105,7 @@
 </template>
 
 <script>
-import MessageItem from './MessageItem'
+import TeamMessageItem from './TeamMessage'
 import EmojiPicker from 'vue-emoji-picker'
 
 import { mapGetters, mapActions } from 'vuex'
@@ -110,18 +113,8 @@ import socket from '@/helpers/socketClient'
 
 export default {
   components: {
-    MessageItem,
+    TeamMessageItem,
     EmojiPicker
-  },
-
-  props: {
-    totalMessages: Number,
-    messages: {
-      type: Array
-    },
-    friendAvatar: {
-      type: String
-    }
   },
 
   computed: {
@@ -132,52 +125,27 @@ export default {
 
   data() {
     return {
-      message: '',
+      loading: false,
       loadingMore: false,
-      showScrollToBottom: false
+      showScrollToBottom: false,
+      messages: [],
+      totalMessages: 0,
+      message: '',
     }
   },
 
   methods: {
     ...mapActions({
-      sendTextMessage: 'sendTextMessage',
-      sendImageMessage: 'sendImageMessage',
-      sendFileMessage: 'sendFileMessage',
-      seenConversation: 'seenConversation',
-      getOlderMessages: 'getOlderMessages',
-      changeConversationStatus: 'changeConversationStatus'
+      getRecentTeamMessages: 'getRecentTeamMessages',
+      sendTeamTextMessage: 'sendTeamTextMessage',
+      sendTeamImageMessage: 'sendTeamImageMessage',
+      sendTeamFileMessage: 'sendTeamFileMessage'
     }),
-
-    resizeInput(e) {
-      // textarea auto resize
-      e.target.style.height = 'auto'
-      e.target.style.height = `${e.target.scrollHeight + 2}px`
-    },
-
-    checkEnterSubmit(e) {
-      if( e.keyCode == 13 && !e.shiftKey ) {
-        e.preventDefault()
-      } 
-    },
-
-    enterSubmit(e) {
-      if( e.keyCode == 13 && !e.shiftKey ) {
-        this.handleSendTextMessage()
-      }
-    },
-
-    scrollToBottom() {
-      const messages = this.$refs.listMessages
-
-      setTimeout(() => {
-        messages.scrollTop = messages.scrollHeight /*- listMessages.offsetHeight*/
-      }, 0)
-    },
 
     checkScroll() {
       const messages = this.$refs.listMessages
       let scrollRangeFromBottom = messages.scrollHeight - messages.offsetHeight - messages.scrollTop
-      if( scrollRangeFromBottom > 500 ) {
+      if( scrollRangeFromBottom > 400 ) {
         this.showScrollToBottom = true
       } else {
         this.showScrollToBottom = false
@@ -185,33 +153,59 @@ export default {
 
       if( messages.scrollTop === 0 && this.messages.length < this.totalMessages ) {
         this.handleLoadMoreMessages(scrollRangeFromBottom)
+        console.log(scrollRangeFromBottom)
       }
+    }, 
+
+    scrollToBottom() {
+      const messages = this.$refs.listMessages
+
+      setTimeout(() => {
+        messages.scrollTop = messages.scrollHeight /*- messages.offsetHeight*/
+      }, 0)
+    },
+
+    async handleLoadMoreMessages(scrollRangeFromBottom) {
+      this.loadingMore = true
+      await new Promise(resolve => setTimeout(resolve, 200))
+      const data = await this.getRecentTeamMessages({
+        teamId: this.$route.params.teamId,
+        skip: this.messages.length,
+        take: 10
+      })
+      this.totalMessages = data.totalMessages
+      await new Promise(resolve => setTimeout(() => {
+        this.messages.unshift(...data.messages)
+        resolve()
+      }, 0))
+      const messages = this.$refs.listMessages
+      console.log(messages.scrollHeight, messages.offsetHeight, scrollRangeFromBottom)
+      messages.scrollTop = messages.scrollHeight - messages.offsetHeight - scrollRangeFromBottom
+      this.loadingMore = false
+    },
+
+    resizeInput(e) {
+      // textarea auto resize
+      e.target.style.height = 'auto'
+      e.target.style.height = `${e.target.scrollHeight + 2}px`
     },
 
     insertEmoji(emoji) {
       this.message += emoji
     },
 
-    async handleLoadMoreMessages(scrollRangeFromBottom) {
-      this.loadingMore = true
-      await new Promise(resolve => setTimeout(resolve, 200))
-      await this.getOlderMessages({
-        conversationId: this.$route.params.chatRoomId,
-        skip: this.messages.length,
-        take: 10
-      })
-      const messages = this.$refs.listMessages
-      messages.scrollTop = messages.scrollHeight - messages.offsetHeight - scrollRangeFromBottom
-      this.loadingMore = false
-    },
-
     async handleSendTextMessage() {
       const content = this.message.trim()
       if( content !== '' ) {
-        await this.sendTextMessage({
-          conversationId: this.$route.params.chatRoomId, 
+        // console.log('gui ' + content)
+        const sendedMessage = await this.sendTeamTextMessage({
+          teamId: this.$route.params.teamId,
           content
         })
+        if( sendedMessage ) {
+          this.messages.push(sendedMessage)
+          this.totalMessages++
+        }
       }
       this.message = ''
       document.querySelector('textarea.chat-input').style.height = '36px'
@@ -222,72 +216,107 @@ export default {
       if( !file ) return
       let formData = new FormData()
       formData.append('image-message', file)
-      await this.sendImageMessage({
-        conversationId: this.$route.params.chatRoomId,
+      const sendedMessage = await this.sendTeamImageMessage({
+        teamId: this.$route.params.teamId,
         formData
       })
+      if( sendedMessage ) {
+        this.messages.push(sendedMessage)
+        this.totalMessages++
+      }
     },
 
     async handleSendFile(e) {
       let file = e.target.files[0]
       if( !file ) return
       let formData = new FormData()
+      let sendedMessage
       if( (/^image\/.+$/).test(file.type) ) {
         formData.append('image-message', file)
-        await this.sendImageMessage({
-          conversationId: this.$route.params.chatRoomId,
+        sendedMessage = await this.sendTeamImageMessage({
+          teamId: this.$route.params.teamId,
           formData
         })
       } else {
         formData.append('file-message', file)
-        await this.sendFileMessage({
-          conversationId: this.$route.params.chatRoomId,
+        sendedMessage = await this.sendTeamFileMessage({
+          teamId: this.$route.params.teamId,
           formData
         })
       }
+      if( sendedMessage ) {
+        this.messages.push(sendedMessage)
+        this.totalMessages++
+      }
     },
 
-    seen() {
-      this.seenConversation(this.$route.params.chatRoomId)
+    removeMessage(index) {
+      this.messages.splice(index, 1)
+      this.totalMessages--
     }
   },
 
-  created() {
-    socket.on('new-message', async (message) => {
-      if( message.friendship === this.$route.params.chatRoomId ) {
-        this.messages.push(message)
+  async created() {
+    this.loading = true
+    const data = await this.getRecentTeamMessages({
+      teamId: this.$route.params.teamId,
+      skip: 0,
+      take: 10
+    })
+    this.totalMessages = data.totalMessages
+    this.messages = data.messages
+    this.loading = false
+    // listen event new-team-message
+    socket.on('new-team-message', newMessage => {
+      if( newMessage.team === this.$route.params.teamId ) {
+        this.messages.push(newMessage)
+        this.totalMessages++
+      }
+    })
+    // listen event deleted-team-message
+    socket.on('deleted-team-message', deletedMessage => {
+      if( deletedMessage.team === this.$route.params.teamId ) {
+        for( let i = 0; i < this.messages.length; i++ ) {
+          if( this.messages[i]._id === deletedMessage._id ) {
+            this.messages.splice(i, 1)
+            break
+          }
+        }
+        this.totalMessages--
       }
     })
   },
 
-  async mounted() {
-    await new Promise(resolve => setTimeout(resolve, 50))
-    this.scrollToBottom()
-  },
-
   watch: {
-    async messages(newValue, oldValue) {
-      if( newValue[newValue.length - 1]?._id != oldValue[oldValue.length - 1]?._id ) {
-        await new Promise(resolve => setTimeout(resolve, 50))
-        this.scrollToBottom()
-        this.showScrollToBottom = false
-        return
-      }
+    async messages() {
       if( !this.showScrollToBottom ) {
-        await new Promise(resolve => setTimeout(resolve, 350))
+        await new Promise(resolve => setTimeout(resolve, 200))
         this.scrollToBottom()
-      }      
+      }
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.messenger {
-  height: calc(100% - 60px);
+.team-chatbox {
   display: flex;
   flex-direction: column;
   position: relative;
+  padding: 0 1rem 0 2rem;
+}
+
+.loading-page {
+  flex-grow: 1;
+  width: 100%;
+  display: grid;
+  place-items: center;
+
+  img {
+    width: 60px;
+    height: 60px;
+    transform: translateY(-50%)
+  }
 }
 
 .loading-more {
@@ -362,7 +391,7 @@ export default {
   .send-options {
     display: flex;
     align-items: center;
-    margin: 0 1rem;
+    margin: 0 1.5rem 0 0rem;
 
     div {
       align-self: flex-end;
@@ -373,7 +402,7 @@ export default {
       border-radius: 50%;
       font-size: 20px;
       color: #026aa7;
-      margin-left: 6px;
+      margin-left: 16px;
       margin-bottom: .5rem;
       cursor: pointer;
 
@@ -414,7 +443,7 @@ export default {
 
     .emoji-invoker {
       position: absolute;
-      right: 52px;
+      right: 60px;
       bottom: 10px;
       font-size: 20px;
       color: #026aa7;
@@ -484,7 +513,7 @@ export default {
       font-size: 22px;
       color: #026aa7;
       background-color: #fff;
-      margin-left: 1rem;
+      margin-left: 1.5rem;
       margin-bottom: .5rem;
 
       &:hover {
