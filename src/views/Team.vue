@@ -1,11 +1,11 @@
 <template>
   <div class="team-page">
-    <TeamPageHeaderVue 
-    @team-tasks="type='team-tasks'"
-    @team-chat="type='team-chat'"
-    @calendar="type='calendar'"
-    :type = "type"
-    :team = "team"
+    <TeamPageHeaderVue
+      @team-tasks="type = 'team-tasks'"
+      @team-chat="type = 'team-chat'"
+      @calendar="type = 'calendar'"
+      :type="type"
+      :team="team"
     >
     </TeamPageHeaderVue>
     <!-- Lists container -->
@@ -30,7 +30,9 @@
           <li>Listen to new CodePen Radio episode</li>
         </ul>
 
-        <button class="add-card-btn btn" @click="createNewTask">Add a card</button>
+        <button class="add-card-btn btn" @click="createNewTask">
+          Add a card
+        </button>
       </div>
 
       <div class="list">
@@ -53,7 +55,9 @@
           <li>Listen to new CodePen Radio episode</li>
         </ul>
 
-        <button class="add-card-btn btn" @click="createNewTask">Add a card</button>
+        <button class="add-card-btn btn" @click="createNewTask">
+          Add a card
+        </button>
       </div>
 
       <div class="list">
@@ -65,70 +69,81 @@
           <li>Begin work on mock-up for client website</li>
         </ul>
 
-        <button class="add-card-btn btn" @click="createNewTask">Add a card</button>
+        <button class="add-card-btn btn" @click="createNewTask">
+          Add a card
+        </button>
       </div>
     </section>
-    <section v-if="type == 'team-chat'" class="lists-container">Tính năng chat nhóm đang được phát triển</section>
-    <section v-if="type == 'calendar'" class="lists-container">Tính năng theo dõi lịch đang được phát triển</section>
+    <section v-if="type == 'team-chat'" class="lists-container">
+      Tính năng chat nhóm đang được phát triển
+    </section>
+    <section v-if="type == 'calendar'" class="lists-container calendar-container">
+      <TeamCalendar></TeamCalendar>
+    </section>
   </div>
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
-import TeamPageHeaderVue from '../components/teams/team/TeamPageHeader';
-import AddTask from '../components/tasks/AddTask.vue';
+import { mapGetters, mapActions } from "vuex";
+import TeamPageHeaderVue from "../components/teams/team/TeamPageHeader";
+import AddTask from "../components/tasks/AddTask.vue";
+import TeamCalendar from "../components/teams/team/TeamCalendar";
 
 export default {
   computed: {
     ...mapGetters({
-      team: 'team'
-    })
+      team: "team",
+    }),
   },
 
   data() {
     return {
-      type: 'team-tasks',
-    }
+      type: "team-tasks",
+    };
   },
 
   components: {
     TeamPageHeaderVue,
+    TeamCalendar,
   },
 
   methods: {
     ...mapActions({
-      getTeam: 'getTeam'
+      getTeam: "getTeam",
     }),
 
     async refreshTeamPage() {
       try {
-        await this.getTeam(this.$route.params.teamId)
+        await this.getTeam(this.$route.params.teamId);
+        if ('success' in this.team) {
+          this.$router.push({ name: 'Not Found' })
+        }
       } catch (error) {
         console.log(error)
       }
     },
 
-    createNewTask () {
+    createNewTask() {
       this.$modal.show(
         AddTask,
         {
-          isUpdate: false
+          isUpdate: false,
         },
         {
           draggable: true,
           // resizable: true,
           adaptive: true,
           width: 800,
-          height: 'auto'
+          height: "auto",
         }
-      )
+      );
     },
   },
 
   created() {
-    this.refreshTeamPage()
-  }
-}
+    this.refreshTeamPage();
+  },
+};
 </script>
 
 <style lang="scss" scoped>
@@ -454,5 +469,9 @@ Remove or comment-out the code block below to see how the browser will fall-back
   .user-settings-btn {
     margin: 0;
   }
+
+  // .calendar-container {
+  //   overflow-y: hidden;
+  // }
 }
 </style>

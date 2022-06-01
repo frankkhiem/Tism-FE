@@ -292,7 +292,7 @@ export default {
   top: 5px;
 }
 .home-link .home-link-img {
-  background-image: url("./../../assets/img/header-logo-2x.01ef898811a879595cea.png");
+  background-image: url("./../../assets/img/tismlogo.png");
   background-position: 100% 0;
   background-repeat: no-repeat;
   background-size: 120px 42px;

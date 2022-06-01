@@ -21,21 +21,28 @@
       ></b-icon>
     </div>
     <div class="modal-title">
-      <div>
-        Thêm mới team
+      <div v-if="!isUpdate">
+        Thêm mới nhóm
+      </div>
+      <div v-else>
+        Chỉnh sửa nhóm
       </div>
     </div>
     <div class="modal-main">
       <div class="create-team-container">
         <div class="create-team-infor" :style="{ backgroundImage: `url(${require(`../../assets/img/${teamAvatar}`)})` }">
           <div>
-            <input type="text" name="name" placeholder="Thêm mới tên team của bạn" class="team-name-input" v-model="teamName">
+            <input type="text" name="name" placeholder="Thêm mới tên nhóm của bạn" class="team-name-input" v-model="teamName">
           </div>
           <div class="create-team-status">
-            <input type="radio" id="public" name="team-status" value="public" v-model="teamType" />
-            <label for="public">Công khai</label>
-            <input type="radio" id="private" name="team-status" value="private" v-model="teamType" />
-            <label for="private">Riêng tư</label>
+            <p>Loại nhóm</p>
+            <div class="type-input">
+              <input type="text" name="name" placeholder="Thêm thể loại" class="team-name-input" v-model="teamType">
+              <select v-model="teamType">
+                <option disabled value="">Chọn thể loại có sẵn</option>
+                <option v-for="(type, index) in typeList" :key="index" :value="type">{{ type }}</option>
+              </select>
+            </div>
           </div>
         </div>
         <ul class="create-team-background">
@@ -50,7 +57,7 @@
       <div class="cancel-btn"  @click="$emit('close')">
         Hủy
       </div>
-      <div class="agree-btn" v-if="!isUpdate" :disabled="teamName == ''" @click="createTeam">
+      <div class="agree-btn" v-if="!isUpdate" :disabled="teamName == '' || teamType == ''" @click="createTeam">
         Tạo
       </div>
       <div class="agree-btn" v-else :disabled="teamName == ''" @click="updateTeam">
@@ -66,7 +73,8 @@ import { mapActions } from 'vuex'
 export default {
   props: {
     isUpdate: Boolean,
-    targetTeam: Object
+    targetTeam: Object,
+    typeList: Array
   },
 
   data() {
@@ -74,18 +82,15 @@ export default {
       hoverClose: false,
       teamId: '',
       teamName: '',
-      teamAvatar: 'bg8.jpg',
-      teamType: 'public',
+      teamAvatar: 'bgg1.jpg',
+      teamType: '',
       teamBackgroundImages: [
-        'bg1.jpeg',
-        'bg2.jpeg',
-        'bg3.jpeg',
-        'bg4.jpeg',
-        'bg5.jpeg',
-        'bg6.jpg',
-        'bg7.jpg',
-        'bg8.jpg',
-        'bg9.jpg',
+        'bgg1.jpg',
+        'bgg2.jpg',
+        'bgg3.jpg',
+        'bgg4.jpg',
+        'bgg5.jpg',
+        'bgg6.jpg',
       ]
     }
   },
@@ -193,9 +198,8 @@ export default {
       }
 
       .team-name-input {
-        background: transparent;
         border: none;
-        color: #fff;
+        color: white;
         font-size: 16px;
         font-weight: 700;
         line-height: 24px;
@@ -212,6 +216,7 @@ export default {
         transition-property: background-color, border-color, box-shadow;
         transition-duration: 85ms;
         transition-timing-function: ease;
+        background: hsla(0, 0%, 5%, 0.15);
         &:hover {
           background: hsla(0, 0%, 100%, 0.15);
           //   border-radius: 3px;
@@ -228,7 +233,44 @@ export default {
       }
 
       .create-team-status {
-        margin-top: 30px;
+        margin-top: 20px;
+        .type-input {
+          display: flex;
+        }
+
+        select {
+          border: none;
+          // color: #312e2e;
+          color: white;
+          font-size: 16px;
+          font-weight: 700;
+          line-height: 24px;
+          background: hsla(0, 0%, 5%, 0.15);
+          &:hover {
+            background: hsla(0, 0%, 100%, 0.15);
+            //   border-radius: 3px;
+          }
+          &:focus {
+            background: hsla(0, 0%, 100%, 0.3);
+            //   outline: 0;
+          }
+
+          option {
+            color: #312e2e;
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 24px;
+          }
+        }
+
+        p {
+          margin-left: -8px;
+          color: #312e2e;
+          font-size: 16px;
+          font-weight: 700;
+          line-height: 24px;
+        }
+
         input {
           margin-right: 4px;
         }
