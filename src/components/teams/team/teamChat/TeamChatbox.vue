@@ -105,7 +105,7 @@
 </template>
 
 <script>
-import TeamMessageItem from './TeamMessage'
+import TeamMessageItem from './TeamMessageItem'
 import EmojiPicker from 'vue-emoji-picker'
 
 import { mapGetters, mapActions } from 'vuex'
@@ -153,7 +153,7 @@ export default {
 
       if( messages.scrollTop === 0 && this.messages.length < this.totalMessages ) {
         this.handleLoadMoreMessages(scrollRangeFromBottom)
-        console.log(scrollRangeFromBottom)
+        // console.log(scrollRangeFromBottom)
       }
     }, 
 
@@ -179,7 +179,7 @@ export default {
         resolve()
       }, 0))
       const messages = this.$refs.listMessages
-      console.log(messages.scrollHeight, messages.offsetHeight, scrollRangeFromBottom)
+      // console.log(messages.scrollHeight, messages.offsetHeight, scrollRangeFromBottom)
       messages.scrollTop = messages.scrollHeight - messages.offsetHeight - scrollRangeFromBottom
       this.loadingMore = false
     },
@@ -271,6 +271,24 @@ export default {
       if( newMessage.team === this.$route.params.teamId ) {
         this.messages.push(newMessage)
         this.totalMessages++
+      }
+    })
+    // listen event new-team-meeting
+    socket.on('new-team-meeting', newMessage => {
+      if( newMessage.team === this.$route.params.teamId ) {
+        this.messages.push(newMessage)
+        this.totalMessages++
+      }
+    })
+    // listen event end-team-meeting
+    socket.on('end-team-meeting', meeting => {
+      if( meeting.team === this.$route.params.teamId ) {
+        for( let i = 0; i < this.messages.length; i++ ) {
+          if( meeting._id === this.messages[i]._id ) {
+            this.messages.splice(i, 1, meeting)
+            break
+          }
+        }
       }
     })
     // listen event deleted-team-message

@@ -140,6 +140,11 @@ const routes = [
     name: 'Google Code',
     component: () => import('../views/GoogleCode')
   },
+  {
+    path: '/meeting/:meetingId',
+    name: 'TeamMeeting',
+    component: () => import('../views/Meeting')
+  },
   // {
   //   path: '/zalo/get-auth-code',
   //   name: 'Zalo Code',

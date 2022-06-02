@@ -341,6 +341,10 @@ export default {
     &.image {
       padding: 0;
 
+      &.self {
+        background-color: #ebe6eb;
+      }
+
       img {
         max-width: 300px;
         max-height: 300px;

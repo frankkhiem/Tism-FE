@@ -86,6 +86,7 @@ import socket from '@/helpers/socketClient'
 export default {
   computed: {
     ...mapGetters({
+      user: 'profile',
       team: 'team'
     })
   },
@@ -141,11 +142,18 @@ export default {
         this.playTeamMessageSound()
       }
     })
+    socket.on('new-team-meeting', (newMessage) => {
+      if( newMessage.team === this.$route.params.teamId && newMessage.from !== this.user.userId ) {
+        this.playTeamMessageSound()
+      }
+    })
   },
 
   destroyed() {
     socket.off('new-team-message')
     socket.off('deleted-team-message')
+    socket.off('new-team-meeting')
+    socket.off('end-team-meeting')
   }
 }
 </script>

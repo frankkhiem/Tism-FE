@@ -217,8 +217,7 @@ export default {
             }
           }
         }
-      )
-      
+      )      
     },
 
     stopShareScreen() {
