@@ -34,7 +34,7 @@
           <img src="@/assets/img/Dual Ring-1s-200px.gif" alt="">
         </div>
         <div v-show="!loadingSelfStream" class="member-name">
-          Bạn
+          {{ isOwner ? 'Bạn đang chủ trì cuộc họp' : 'Bạn' }}
         </div>
         <video 
           v-show="!loadingSelfStream && cameraOn"
@@ -67,6 +67,7 @@
           <img src="@/assets/img/Dual Ring-1s-200px.gif" alt="">
         </div>
         <div v-show="member.memberName" class="member-name">
+          <span v-show="member.isHost" class="member-host">Host: </span>
           {{ member.memberName }}
         </div>
         <video 
@@ -88,43 +89,52 @@
       </div>
     </div>
     <div class="meeting-actions">
-      <div 
-        class="stop-video-btn"
-        :class="{ stoped: !cameraOn }"
-        @click="handleStopVideo"
-      >
-        <b-icon class="action-icon" v-if="cameraOn" icon="camera-video-fill"></b-icon>
-        <b-icon class="action-icon" v-else icon="camera-video-off-fill"></b-icon>
+      <div class="meeting-name">
+        Cuộc họp: <span>{{ meetingName }}</span>
       </div>
-      <div 
-        class="mute-btn"
-        :class="{ muted: !audioOn }"
-        @click="handleMute"
-      >
-        <b-icon class="action-icon" v-if="audioOn" icon="mic-fill"></b-icon>
-        <b-icon class="action-icon" v-else icon="mic-mute-fill"></b-icon>
-      </div>      
-      <div 
-        class="share-screen-btn"
-        :class="{ shared: screenOn }"
-        @click="handleShareScreen"
-      >
-        <b-icon class="action-icon" v-if="screenOn" icon="display-fill"></b-icon>
-        <b-icon class="action-icon" v-else icon="display"></b-icon>
+      <div class="meeting-btns">
+        <div 
+          class="stop-video-btn"
+          :class="{ stoped: !cameraOn }"
+          @click="handleStopVideo"
+        >
+          <b-icon class="action-icon" v-if="cameraOn" icon="camera-video-fill"></b-icon>
+          <b-icon class="action-icon" v-else icon="camera-video-off-fill"></b-icon>
+        </div>
+        <div 
+          class="mute-btn"
+          :class="{ muted: !audioOn }"
+          @click="handleMute"
+        >
+          <b-icon class="action-icon" v-if="audioOn" icon="mic-fill"></b-icon>
+          <b-icon class="action-icon" v-else icon="mic-mute-fill"></b-icon>
+        </div>      
+        <div 
+          class="share-screen-btn"
+          :class="{ shared: screenOn }"
+          @click="handleShareScreen"
+        >
+          <b-icon class="action-icon" v-if="screenOn" icon="display-fill"></b-icon>
+          <b-icon class="action-icon" v-else icon="display"></b-icon>
+        </div>
+        <div class="end-call-btn">
+          <b-icon 
+            v-if="isOwner" 
+            class="action-icon" 
+            icon="telephone-x-fill"
+            @click="handleEndTeamMeeting"
+          ></b-icon>
+          <b-icon 
+            v-else 
+            class="action-icon" 
+            icon="arrow-bar-right"
+            @click="handleLeaveTeamMeeting"
+          ></b-icon>
+        </div>
       </div>
-      <div class="end-call-btn">
-        <b-icon 
-          v-if="isOwner" 
-          class="action-icon" 
-          icon="telephone-x-fill"
-          @click="handleEndTeamMeeting"
-        ></b-icon>
-        <b-icon 
-          v-else 
-          class="action-icon" 
-          icon="arrow-bar-right"
-          @click="handleLeaveTeamMeeting"
-        ></b-icon>
+      <div class="meeting-times">
+        <div class="during-times-icon">🟢</div>
+        <div class="during-times">{{ isOwner ? duringTimesString : 'Đang diễn ra' }}</div>
       </div>
     </div>
   </div>
@@ -140,13 +150,22 @@ export default {
     ...mapGetters({
       isAuth: "userAuthenticated",
       user: 'profile'
-    })
+    }),
+
+    duringTimesString() {
+      if( this.duringTimes < 3600 ) {
+        return new Date(this.duringTimes * 1000).toISOString().substring(14, 19)
+      }
+      return new Date(this.duringTimes * 1000).toISOString().substring(11, 19)
+    }
   },
 
   data() {
     return {
+      meetingName: '',
       isOwner: false,
       pinMode: false,
+      duringTimes: 0,
       selfStream: null,
       loadingSelfStream: false,
       selfStreamContraints: {
@@ -166,6 +185,7 @@ export default {
 
   methods: {
     ...mapActions({
+      getMeetingPermissionAccess: 'getMeetingPermissionAccess',
       endTeamMeeting: 'endTeamMeeting'
     }),
 
@@ -339,6 +359,9 @@ export default {
         const existMemberIndex = this.members.findIndex(member => {
           return member.memberPeer === dataConnect.peer 
         })
+        if( this.members[existMemberIndex].memberPeer === this.memberSelected?.memberPeer ) {
+          this.pinMode = false
+        }
         this.members.splice(existMemberIndex, 1)
       })
 
@@ -375,17 +398,24 @@ export default {
         const existMemberIndex = this.members.findIndex(member => {
           return member.memberPeer === call.peer 
         })
+        if( this.members[existMemberIndex].memberPeer === this.memberSelected?.memberPeer ) {
+          this.pinMode = false
+        }
         this.members.splice(existMemberIndex, 1)
       })
 
       await new Promise(resolve => setTimeout(resolve, 5000))
-      dataConnect.send({
+      let peerInfo = {
         memberId: this.user.userId,
         memberName: this.user.fullname,
         cameraOn: this.cameraOn,
         audioOn: this.audioOn,
         screenOn: this.screenOn
-      })
+      }
+      if( this.isOwner ) {
+        peerInfo.isHost = true
+      }
+      dataConnect.send(peerInfo)
     },
 
     async renderMember(memberIndex, memberStream) {
@@ -396,9 +426,22 @@ export default {
   },
 
   async created() {
-    if( this.$route.query.isOwner === 'true' ) {
-      this.isOwner = true
+    try {
+      const response = await this.getMeetingPermissionAccess(this.$route.params.meetingId)
+      if( response.success ) {
+        this.isOwner = response.isOwner
+        this.meetingName = response.meetingName
+      } else {
+        throw new Error(response.message)
+      }
+    } catch(error) {
+      console.log(error)
+      this.$router.replace({ name: 'Not Found' })
+      return
     }
+    setInterval(() => {
+      this.duringTimes++
+    }, 1000)
     this.loadingSelfStream = true
 
     await new Promise(resolve => setTimeout(resolve, 1000))
@@ -433,6 +476,14 @@ export default {
           })
           let member = this.members[existMemberIndex]
           member.memberCameraOn = data.cameraOn
+          this.$set(this.members, existMemberIndex, member)
+        }
+        if( Object.prototype.hasOwnProperty.call(data, 'isHost') ) {
+          const existMemberIndex = this.members.findIndex(member => {
+            return member.memberPeer === dataConnect.peer 
+          })
+          let member = this.members[existMemberIndex]
+          member.isHost = data.isHost
           this.$set(this.members, existMemberIndex, member)
         }
         if( Object.prototype.hasOwnProperty.call(data, 'memberId') ) {
@@ -472,6 +523,9 @@ export default {
         const existMemberIndex = this.members.findIndex(member => {
           return member.memberPeer === dataConnect.peer 
         })
+        if( this.members[existMemberIndex].memberPeer === this.memberSelected?.memberPeer ) {
+          this.pinMode = false
+        }
         this.members.splice(existMemberIndex, 1)
       })
 
@@ -517,6 +571,9 @@ export default {
         const existMemberIndex = this.members.findIndex(member => {
           return member.memberPeer === call.peer 
         })
+        if( this.members[existMemberIndex].memberPeer === this.memberSelected?.memberPeer ) {
+          this.pinMode = false
+        }
         this.members.splice(existMemberIndex, 1)
       })
     })
@@ -711,12 +768,17 @@ export default {
       height: 60px;
       text-align: center;
       font-size: 18px;
+      font-weight: 600;
       padding-top: 4px;
-      color: #f8ff16;
+      color: #1dfeff;
       background: linear-gradient(180deg, rgba(0,0,0,0.26) 0%, rgba(0,0,0,0) 100%);
       border-top-left-radius: 6px;
       border-top-right-radius: 6px;
       z-index: 2;
+
+      .member-host {
+        color: #f05710;
+      }
     }
 
     .camera__source {
@@ -758,7 +820,7 @@ export default {
       border: 2px solid #1c64db;
 
       .member-name {
-        color: #1dffd1;
+        color: #f8ff16;
       }
 
       .camera__source {
@@ -789,50 +851,86 @@ export default {
   height: 10%;
   min-height: 60px;
   display: flex;
-  justify-content: center;
   align-items: center;
 
-  > div {
-    width: 40px;
-    height: 40px;
-    line-height: 40px;
-    text-align: center;
-    border: 1px solid #ccc;
-    border-radius: 50%;
-    cursor: pointer;
-    margin: 0 14px;
-    box-shadow: 0 0 4px 0px rgba(0, 0, 0, .3);
+  .meeting-name, .meeting-times {
+    flex-basis: 30%;
   }
 
-  .action-icon {
+  .meeting-name {
+    padding-left: 2rem;
     font-size: 18px;
+
+    span {
+      font-weight: 700;
+      font-size: 20px;
+    }
   }
 
-  @mixin action-btn {
-    color: #303030;
-    background-color: #fff;
+  .meeting-times {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-right: 3rem;
+    font-size: 14px;
 
-    &.stoped, &.muted, &.shared {
+    .during-times {
+      margin-left: 4px;
+      font-size: 18px;
+    }
+
+    .during-times-icon {
+      padding-top: 3px;
+    }
+  }
+
+  .meeting-btns {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+
+    > div {
+      width: 40px;
+      height: 40px;
+      line-height: 40px;
+      text-align: center;
+      border: 1px solid #ccc;
+      border-radius: 50%;
+      cursor: pointer;
+      margin: 0 14px;
+      box-shadow: 0 0 4px 0px rgba(0, 0, 0, .3);
+    }
+
+    .action-icon {
+      font-size: 18px;
+    }
+
+    @mixin action-btn {
+      color: #303030;
+      background-color: #fff;
+
+      &.stoped, &.muted, &.shared {
+        color: #fff;
+        background-color: #444;
+      }
+
+      &:hover {
+        filter: brightness(90%);
+      }
+    }
+
+    .stop-video-btn, .mute-btn, .share-screen-btn {
+      @include action-btn;
+    }
+
+    .end-call-btn {
       color: #fff;
-      background-color: #444;
+      background-color: #f6382b;
+
+      &:hover {
+        filter: brightness(90%);
+      }
     }
-
-    &:hover {
-      filter: brightness(90%);
-    }
-  }
-
-  .stop-video-btn, .mute-btn, .share-screen-btn {
-    @include action-btn;
-  }
-
-  .end-call-btn {
-    color: #fff;
-    background-color: #f6382b;
-
-    &:hover {
-      filter: brightness(90%);
-    }
-  }
+  }  
 }
 </style>

@@ -144,11 +144,14 @@ const actions = {
   },
 
 
-  createTeamMeeting: async ({ commit }, teamId) => {
+  createTeamMeeting: async ({ commit }, { teamId, meetingName }) => {
     const accessToken = localStorage.getItem('accessToken')
 
     try {
-      const response = await axios.post(`${process.env.VUE_APP_API_HOST}/team/${teamId}/meeting`, {},
+      const response = await axios.post(`${process.env.VUE_APP_API_HOST}/team/${teamId}/meeting`, 
+      {
+        meetingName
+      },
       { 
         headers: {"Authorization" : `Bearer ${accessToken}`}
       })
@@ -159,6 +162,24 @@ const actions = {
       }
     } catch(error) {
       console.log(error.response.data);
+    }
+  },
+
+  getMeetingPermissionAccess: async ({ commit }, meetingId) => {
+    const accessToken = localStorage.getItem('accessToken')
+
+    try {
+      const response = await axios.get(`${process.env.VUE_APP_API_HOST}/team/meeting/${meetingId}/permission`, { 
+        headers: {"Authorization" : `Bearer ${accessToken}`}
+      })
+
+      if( response.data.success ) {
+        commit('nothingTeamAction')
+        return response.data
+      }
+    } catch(error) {
+      console.log(error.response.data)
+      throw error
     }
   },
 
