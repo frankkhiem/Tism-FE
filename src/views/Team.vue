@@ -78,6 +78,9 @@ export default {
         },
       ],
       pendingTasks: [
+         {
+          name: "Nhiệm vụ thứ nhất",
+        },
       ],
       finishedTasks: [
         {
@@ -362,17 +365,17 @@ body {
 }
 
 .to-do.list-items li {
-  background-color: #58cfbe;
+  background-color: #f1d45e;
   color: #fffffff2;
 }
 
 .pending.list-items li {
-  background-color: #c858cf;
+  background-color: #4da9e2;
   color: #fffffff2;
 }
 
 .finished.list-items li {
-  background-color: #cf7958;
+  background-color: #63de69;
   color: #fffffff2;
 }
 
