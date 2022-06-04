@@ -13,84 +13,51 @@
       <div class="list">
         <h3 class="list-title">Việc cần làm</h3>
 
-        <ul class="list-items">
-          <li>Complete mock-up for client website</li>
-          <li>Email mock-up to client for feedback</li>
-          <li>Update personal website header background image</li>
-          <li>Update personal website heading fonts</li>
-          <li>Add google map to personal website</li>
-          <li>Begin draft of CSS Grid article</li>
-          <li>Read new CSS-Tricks articles</li>
-          <li>Read new Smashing Magazine articles</li>
-          <li>Read other bookmarked articles</li>
-          <li>Look through portfolios to gather inspiration</li>
-          <li>Create something cool for CodePen</li>
-          <li>Post latest CodePen work on Twitter</li>
-          <li>Listen to new Syntax.fm episode</li>
-          <li>Listen to new CodePen Radio episode</li>
+        <ul class="list-items to-do">
+          <li v-for="(task, index) in toDoTasks" :task="task" :key="index">{{task.name}}</li>
         </ul>
 
         <button class="add-card-btn btn" @click="createNewTask">
-          Add a card
+          Thêm công việc
         </button>
       </div>
 
       <div class="list">
         <h3 class="list-title">Việc đang làm</h3>
 
-        <ul class="list-items">
-          <li>Complete mock-up for client website</li>
-          <li>Email mock-up to client for feedback</li>
-          <li>Update personal website header background image</li>
-          <li>Update personal website heading fonts</li>
-          <li>Add google map to personal website</li>
-          <li>Begin draft of CSS Grid article</li>
-          <li>Read new CSS-Tricks articles</li>
-          <li>Read new Smashing Magazine articles</li>
-          <li>Read other bookmarked articles</li>
-          <li>Look through portfolios to gather inspiration</li>
-          <li>Create something cool for CodePen</li>
-          <li>Post latest CodePen work on Twitter</li>
-          <li>Listen to new Syntax.fm episode</li>
-          <li>Listen to new CodePen Radio episode</li>
+        <ul class="list-items pending">
+          <li v-for="(task, index) in pendingTasks" :task="task" :key="index">{{task.name}}</li>
         </ul>
-
-        <button class="add-card-btn btn" @click="createNewTask">
-          Add a card
-        </button>
       </div>
 
       <div class="list">
         <h3 class="list-title">Việc đã hoàn thành</h3>
 
-        <ul class="list-items">
-          <li>Clear email inbox</li>
-          <li>Finalise requirements for client web design</li>
-          <li>Begin work on mock-up for client website</li>
+        <ul class="list-items finished">
+          <li v-for="(task, index) in finishedTasks" :task="task" :key="index">{{task.name}}</li>
         </ul>
-
-        <button class="add-card-btn btn" @click="createNewTask">
-          Add a card
-        </button>
       </div>
     </section>
     <section v-if="type == 'team-chat'" class="lists-container">
       <TeamChat></TeamChat>
     </section>
-    <section v-if="type == 'calendar'" class="lists-container calendar-container">
+    <section
+      v-if="type == 'calendar'"
+      class="lists-container calendar-container"
+    >
       <TeamCalendar></TeamCalendar>
     </section>
   </div>
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
-import TeamPageHeaderVue from '../components/teams/team/TeamPageHeader';
-import AddTask from '../components/tasks/AddTask.vue';
-import TeamChat from '../components/teams/team/teamChat/TeamChat';
+import { mapGetters, mapActions } from "vuex";
+import TeamPageHeaderVue from "../components/teams/team/TeamPageHeader";
+import AddTask from "../components/tasks/AddTask.vue";
+import TeamChat from "../components/teams/team/teamChat/TeamChat";
 import TeamCalendar from "../components/teams/team/TeamCalendar";
 
-import socket from '@/helpers/socketClient'
+import socket from "@/helpers/socketClient";
 
 export default {
   computed: {
@@ -102,13 +69,28 @@ export default {
   data() {
     return {
       type: "team-tasks",
+      toDoTasks: [
+        {
+          name: "Nhiệm vụ thứ nhất",
+        },
+        {
+          name: "Nhiệm vụ thứ hai",
+        },
+      ],
+      pendingTasks: [
+      ],
+      finishedTasks: [
+        {
+          name: "Nhiệm vụ thứ ba",
+        },
+      ],
     };
   },
 
   components: {
     TeamPageHeaderVue,
     TeamCalendar,
-    TeamChat
+    TeamChat,
   },
 
   methods: {
@@ -122,13 +104,13 @@ export default {
     async refreshTeamPage() {
       try {
         await this.getTeam(this.$route.params.teamId);
-        if ('success' in this.team) {
-          this.$router.push({ name: 'Not Found' })
+        if ("success" in this.team) {
+          this.$router.push({ name: "Not Found" });
         }
         this.getMembersInfo(this.$route.params.teamId)
         this.getTaskList(this.$route.params.teamId)
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
     },
 
@@ -150,19 +132,19 @@ export default {
   },
 
   created() {
-    this.refreshTeamPage()
-    socket.on('new-team-message', (newMessage) => {
-      if( newMessage.team === this.$route.params.teamId ) {
-        this.playTeamMessageSound()
+    this.refreshTeamPage();
+    socket.on("new-team-message", (newMessage) => {
+      if (newMessage.team === this.$route.params.teamId) {
+        this.playTeamMessageSound();
       }
-    })
+    });
   },
 
   destroyed() {
-    socket.off('new-team-message')
-    socket.off('deleted-team-message')
-  }
-}
+    socket.off("new-team-message");
+    socket.off("deleted-team-message");
+  },
+};
 </script>
 
 <style lang="scss" scoped>
@@ -170,7 +152,7 @@ export default {
   // background-image: url('./../assets/img/bg1.jpeg');
   //  background-repeat: no-repeat;
   //  background-size: cover;
-  background-color: #fffdfa;
+  background-color: #e9edd5;
 }
 :root {
   font-size: 10px;
@@ -342,19 +324,21 @@ body {
 .lists-container {
   display: flex;
   align-items: start;
+  justify-content: center;
   padding: 12px 16px 0;
+  height: 100%;
   // overflow-x: auto;
-  height: calc(100vh - 220px);
+  height: calc(100vh - 58px - 80px - 70px);
 }
 .list {
   flex: 0 0 27rem;
   display: flex;
   flex-direction: column;
-  background-color: #e2e4e6;
-  max-height: calc(100vh - 15.8rem);
-  height: calc(100vh - 15.8rem);
+  background-color: #f9f6f6;
+  height: 96%;
   border-radius: 0.3rem;
   margin-right: 1rem;
+  width: 280px;
 }
 .list:last-of-type {
   margin-right: 0;
@@ -362,8 +346,11 @@ body {
 .list-title {
   font-size: 1.4rem;
   font-weight: 700;
-  color: #333;
+  color: #484848;
   padding: 1rem;
+  background-color: #f3d921e6;
+  border-top-left-radius: 0.3rem;
+  border-top-right-radius: 0.3rem;
 }
 .list-items {
   flex: 1;
@@ -372,6 +359,21 @@ body {
   align-content: start;
   padding: 0 0.6rem 0.5rem;
   overflow-y: auto;
+}
+
+.to-do.list-items li {
+  background-color: #58cfbe;
+  color: #fffffff2;
+}
+
+.pending.list-items li {
+  background-color: #c858cf;
+  color: #fffffff2;
+}
+
+.finished.list-items li {
+  background-color: #cf7958;
+  color: #fffffff2;
 }
 
 // .list-items::-webkit-scrollbar {

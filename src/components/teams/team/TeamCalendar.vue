@@ -1,7 +1,7 @@
 <template>
   <div id="team-calendar">
     <ejs-schedule
-      height="550px"
+      :height="calendarHeight"
       width="100%"
       :selectedDate="selectedDate"
       :eventSettings="eventSettings"
@@ -60,6 +60,7 @@ export default {
     return {
       selectedDate: new Date(),
       allowMultiple: true,
+      calendarHeight: 300,
       typeDataSource: [
         { TypeText: "To do", Id: 1, TypeColor: "#f8a398" },
         { TypeText: "Doing", Id: 2, TypeColor: "#ffaa00" },
@@ -100,8 +101,11 @@ export default {
   },
   created() {
     this.prepareDataForCalendar()
+    this.calendarHeight = window.innerHeight - 58 - 168;
   },
 };
 </script>
 
-<style></style>
+<style lang="scss" scoped>
+
+</style>

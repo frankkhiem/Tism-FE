@@ -1,13 +1,13 @@
 <template>
   <div id="teams-page" class="container">
-    <div class="row">
-      <div class="col-12 col-lg-6 team">
+    <div class="row-header">
+      <div class="team">
         <div class="create-new-team" @click="createNewTeam">
           <i class="fa-solid fa-circle-plus"></i>
-          <span>Tạo mới nhóm của bạn</span>
+          <span style="margin-left: 8px;">Tạo mới nhóm của bạn</span>
         </div>
       </div>
-      <div class="col-12 col-lg-6 team-search">
+      <div class="team-search">
         <sui-input
           v-model="keyword"
           class="team-search-input"
@@ -18,7 +18,9 @@
         ></sui-input>
         <div class="invite-join-team" v-if="invites.length">
           <span>Bạn có {{ invites.length }} lời mời tham gia nhóm. </span>
-          <span class="show-invites-modal" @click="showInvitesModal">Bấm vào đây để xem</span>
+          <span class="show-invites-modal" @click="showInvitesModal"
+            >Bấm vào đây để xem</span
+          >
         </div>
       </div>
     </div>
@@ -28,9 +30,18 @@
     <div v-for="(groupTeambyStatus, status, index) in teamList" :key="index">
       <h2>{{ status }}</h2>
       <div class="row">
-        <div class="col-12 col-lg-6 team" v-for="(team, index) in groupTeambyStatus" :key="index">
+        <div
+          class="col-12 col-lg-6 team"
+          v-for="(team, index) in groupTeambyStatus"
+          :key="index"
+        >
           <div class="team-container">
-            <img :src="require(`./../assets/img/${team.avatar}`)" alt="Avatar" class="image" style="width:100%">
+            <img
+              :src="require(`./../assets/img/${team.avatar}`)"
+              alt="Avatar"
+              class="image"
+              style="width: 100%"
+            />
             <p class="team-name">{{ team.teamName }}</p>
             <div class="middle">
               <div class="update-text" @click="updateTeam(team)">Chỉnh sửa</div>
@@ -44,14 +55,14 @@
 </template>
 
 <script>
-import InvitesModal from '../components/teams/InvitesModal.vue';
-import AddTeam from '../components/teams/AddTeam.vue'
-import { mapGetters, mapActions } from 'vuex'
+import InvitesModal from "../components/teams/InvitesModal.vue";
+import AddTeam from "../components/teams/AddTeam.vue";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
   data() {
     return {
-      keyword: '',
+      keyword: "",
       teamList: {},
       teamTypeList: [],
     };
@@ -59,100 +70,100 @@ export default {
 
   computed: {
     ...mapGetters({
-      teams: 'teamList',
-      invites: 'inviteList'
-    })
+      teams: "teamList",
+      invites: "inviteList",
+    }),
   },
 
   methods: {
     ...mapActions({
-      getTeamList: 'getTeamList',
-      getInviteList: 'getInviteList'
+      getTeamList: "getTeamList",
+      getInviteList: "getInviteList",
     }),
 
     getTeamAvatar(teamAvatar) {
-      return require('./../assets/img/' + teamAvatar)
+      return require("./../assets/img/" + teamAvatar);
     },
 
     goToTeam(id) {
-      this.$router.push('/team/' + id);
+      this.$router.push("/team/" + id);
     },
 
-    createNewTeam () {
+    createNewTeam() {
       this.$modal.show(
         AddTeam,
         {
           isUpdate: false,
-          typeList: this.teamTypeList
+          typeList: this.teamTypeList,
         },
         {
           draggable: true,
           // resizable: true,
           adaptive: true,
           width: 600,
-          height: 'auto'
+          height: "auto",
         }
-      )
+      );
     },
 
-    updateTeam (team) {
+    updateTeam(team) {
       this.$modal.show(
         AddTeam,
         {
           targetTeam: team,
           isUpdate: true,
-          typeList: this.teamTypeList
+          typeList: this.teamTypeList,
         },
         {
           draggable: true,
           // resizable: true,
           adaptive: true,
           width: 600,
-          height: 'auto'
+          height: "auto",
         }
-      )
+      );
     },
 
-    prepareTeamList (teams) {
-      this.teamList = {}
+    prepareTeamList(teams) {
+      this.teamList = {};
       teams.forEach((team) => {
-        const teamType = team.type
-        if( this.teamList[teamType] ) {
-          this.teamList[teamType].push(team)
+        const teamType = team.type;
+        if (this.teamList[teamType]) {
+          this.teamList[teamType].push(team);
         } else {
-          this.teamList[teamType] = []
-          this.teamList[teamType].push(team)
+          this.teamList[teamType] = [];
+          this.teamList[teamType].push(team);
         }
-      })
+      });
     },
 
-    getTypeList (teams) {
-      this.teamTypeList = []
+    getTypeList(teams) {
+      this.teamTypeList = [];
       teams.forEach((team) => {
-        const teamType = team.type
-        if( !this.teamTypeList.includes(teamType) ) {
-          this.teamTypeList.push(teamType)
+        const teamType = team.type;
+        if (!this.teamTypeList.includes(teamType)) {
+          this.teamTypeList.push(teamType);
         }
-      })
+      });
     },
 
-    searchTeam (keyword) {
+    searchTeam(keyword) {
       const teams = this.teams.filter((team) => {
         if (team.teamName.toLowerCase().includes(keyword.toLowerCase())) {
-          console.log('true')
-          return true
+          console.log("true");
+          return true;
         }
-        return false
-      })
+        return false;
+      });
 
-      this.prepareTeamList(teams)
+      this.prepareTeamList(teams);
     },
 
-    showInvitesModal () { 
+    showInvitesModal() {
       this.$modal.show(
         InvitesModal,
         {
-          isUpdate: true
+          isUpdate: true,
         },
         {
           draggable: true,
@@ -161,48 +172,49 @@ export default {
           width: 600,
           height: 600,
         }
-      )
+      );
     },
   },
 
   async created() {
-    await this.getTeamList()
-    await this.getInviteList()
-    this.getTypeList(this.teams)
+    await this.getTeamList();
+    await this.getInviteList();
+    this.getTypeList(this.teams);
   },
 
   watch: {
     keyword(keyword) {
-      this.searchTeam(keyword)
+      this.searchTeam(keyword);
     },
 
     teams(newTeams) {
-      this.prepareTeamList(newTeams)
-      this.getTypeList(newTeams)
+      this.prepareTeamList(newTeams);
+      this.getTypeList(newTeams);
     },
 
     invites() {
-      this.getTeamList()
-    }
-  }
-}
+      this.getTeamList();
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
 #teams-page {
-  padding: 3rem 4rem 0;
+  padding: 1rem 1rem 0;
 
   .team {
-    margin-bottom: 3rem;
+    margin-bottom: 1rem;
 
     .team-container {
-        width: 80%;
-        height: 100%;
-        margin: 0 auto;
-        border-radius: 5px;
-        position: relative;
-        box-shadow: 0 1px 4px rgba(9, 30, 66, .25), 0 0 8px 1px rgba(9, 30, 66, .08);
-        cursor: pointer;
+      width: 84%;
+      height: 100%;
+      margin: 0;
+      border-radius: 5px;
+      position: relative;
+      box-shadow: 0 1px 4px rgba(9, 30, 66, 0.25),
+        0 0 8px 1px rgba(9, 30, 66, 0.08);
+      cursor: pointer;
     }
 
     .image {
@@ -211,13 +223,13 @@ export default {
       width: 100%;
       max-height: 200px;
       height: auto;
-      transition: .5s ease;
+      transition: 0.5s ease;
       backface-visibility: hidden;
       border-radius: 5px;
     }
 
     .middle {
-      transition: .5s ease;
+      transition: 0.5s ease;
       opacity: 0;
       position: absolute;
       top: 80%;
@@ -234,13 +246,16 @@ export default {
       text-transform: uppercase;
       font-weight: 800;
       font-size: 18px;
+      min-width: 120px;
       position: absolute;
       top: 10%;
       left: 50%;
       transform: translate(-50%, -50%);
       -ms-transform: translate(-50%, -50%);
       text-align: center;
-      color: white;
+      color: #333;
+      background-image: url('~@/assets/img/bg_noodles.png');
+      background-size: cover;
     }
 
     .team-container:hover {
@@ -276,33 +291,59 @@ export default {
     }
   }
 
-  .create-new-team {
-    width: 80%;
-    height: 200px;
-    margin: 0 auto;
-    border-radius: 5px;
-    position: relative;
-    box-shadow: 0 1px 4px rgba(9, 30, 66, .25), 0 0 8px 1px rgba(9, 30, 66, .08);
-    cursor: pointer;
-    font-size: 25px;
+  // .create-new-team {
+  //   width: 80%;
+  //   height: 200px;
+  //   margin: 0 auto;
+  //   border-radius: 5px;
+  //   position: relative;
+  //   box-shadow: 0 1px 4px rgba(9, 30, 66, 0.25),
+  //     0 0 8px 1px rgba(9, 30, 66, 0.08);
+  //   cursor: pointer;
+  //   font-size: 25px;
+  //   display: flex;
+  //   justify-content: center;
+  //   align-items: center;
+
+  //   &:hover {
+  //     transition: 0.5s ease;
+  //     color: white;
+  //     background: gray;
+  //   }
+
+  //   span {
+  //     margin-left: 15px;
+  //   }
+  // }
+
+  .row-header {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: space-between;
+  }
 
+  .create-new-team {
+    width: 300px;
+    padding: 5px 2rem;
+    border-radius: 8px;
+    font-size: 20px;
+    font-weight: 600;
+    box-shadow: 0px 1px 3px 1px rgba(9, 30, 66, 0.25);
+    cursor: pointer;
+    transition: all 0.1s linear;
+    user-select: none;
+    color: #fff;
+    background-color: #1b74e4;
     &:hover {
-      transition: .5s ease;
-      color: white;
-      background: gray;
-    }
-
-    span {
-      margin-left: 15px;
+      color: black;
+      background-color: #f4f5fd;
     }
   }
-  
+
   .team-search {
     display: flex;
     flex-flow: column;
+    width: 100%;
+    margin: 0 36px;
 
     .team-search-input {
       border: 1px solid #ccc;

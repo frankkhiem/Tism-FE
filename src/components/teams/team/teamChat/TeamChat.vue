@@ -19,18 +19,20 @@ export default {
 
 <style lang="scss" scoped>
 .team-chat {
-	height: inherit;
+	height: calc(100vh - 58px - 168px);
+	width: calc(100vw - 64px);
 	display: flex;
 
 	.team-members {
 		flex-basis: 300px;
-		background-color: #fffdfa;
+		background-color: #fff;
+		border-radius: 6px;
 		flex-shrink: 0;
 	}
 
 	.team-chatbox {
 		flex-grow: 1;
-		background-color: #fffdfa;
+		//background-color: #fff;
 	}
 }
 </style>
