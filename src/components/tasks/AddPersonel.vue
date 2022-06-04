@@ -26,30 +26,30 @@
     <div class="modal-main">
       <div class="add-personel-container">
         <div class="list-members">
-          <MemberItem
+          <MemberAssignee
             v-for="(member, index) in membersNotMe"
             :member="member"
             :key="index"
-          ></MemberItem>
+            @assigned="assignThis(member)"
+          ></MemberAssignee>
         </div>
       </div>
     </div>
     <div class="modal-btns">
-      <div class="cancel-btn" @click="$emit('close')">Hủy</div>
-      <div class="agree-btn">Tạo</div>
     </div>
   </div>
 </template>
 
 <script>
-import MemberItem from "../teams/team/teamChat/MemberItem.vue";
+import MemberAssignee from "../tasks/MemberAssignee.vue"
 //you need to import the CSS manually
 import "vue2-daterange-picker/dist/vue2-daterange-picker.css";
 
 import { mapGetters } from "vuex";
 
 export default {
-  components: { MemberItem },
+  name: 'AddPersonel',
+  components: { MemberAssignee },
   data() {
     return {
       hoverClose: false,
@@ -66,6 +66,11 @@ export default {
       return this.members.filter((member) => member.id !== this.user.userId);
     },
   },
+  methods: {
+    assignThis(member) {
+      this.$emit('close', member);
+    }
+  }
 };
 </script>
 
@@ -154,7 +159,7 @@ export default {
 
   .list-members {
     flex-grow: 1;
-    padding: 0 1.7rem 4rem 0.7rem;
+    padding: 0 1.7rem 0 0.7rem;
     overflow-y: auto;
 
     .self-member {

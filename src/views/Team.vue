@@ -13,8 +13,22 @@
       <div class="list">
         <h3 class="list-title">Việc cần làm</h3>
 
-        <ul class="list-items to-do">
-          <li v-for="(task, index) in toDoTasks" :task="task" :key="index">{{task.name}}</li>
+        <ul
+          class="list-items to-do"
+          @drop="onDropToDo($event, tasks)"
+          @dragover.prevent
+          @dragenter.prevent
+        >
+          <li
+            v-for="(task, index) in toDoTasks"
+            :task="task"
+            :key="index"
+            @click="selectTask(task)"
+            draggable
+            @dragstart="startDrag($event, task)"
+          >
+            {{ task.name }}
+          </li>
         </ul>
 
         <button class="add-card-btn btn" @click="createNewTask">
@@ -25,16 +39,44 @@
       <div class="list">
         <h3 class="list-title">Việc đang làm</h3>
 
-        <ul class="list-items pending">
-          <li v-for="(task, index) in pendingTasks" :task="task" :key="index">{{task.name}}</li>
+        <ul
+          class="list-items pending"
+          @drop="onDropPending($event, tasks)"
+          @dragover.prevent
+          @dragenter.prevent
+        >
+          <li
+            v-for="(task, index) in pendingTasks"
+            :task="task"
+            :key="index"
+            @click="selectTask(task)"
+            draggable
+            @dragstart="startDrag($event, task)"
+          >
+            {{ task.name }}
+          </li>
         </ul>
       </div>
 
       <div class="list">
         <h3 class="list-title">Việc đã hoàn thành</h3>
 
-        <ul class="list-items finished">
-          <li v-for="(task, index) in finishedTasks" :task="task" :key="index">{{task.name}}</li>
+        <ul
+          class="list-items finished"
+          @drop="onDropFinished($event, tasks)"
+          @dragover.prevent
+          @dragenter.prevent
+        >
+          <li
+            v-for="(task, index) in finishedTasks"
+            :task="task"
+            :key="index"
+            @click="selectTask(task)"
+            draggable
+            @dragstart="startDrag($event, task)"
+          >
+            {{ task.name }}
+          </li>
         </ul>
       </div>
     </section>
@@ -63,27 +105,17 @@ export default {
   computed: {
     ...mapGetters({
       team: "team",
+      tasks: "taskList",
     }),
   },
 
   data() {
     return {
       type: "team-tasks",
-      toDoTasks: [
-        {
-          name: "Nhiệm vụ thứ nhất",
-        },
-        {
-          name: "Nhiệm vụ thứ hai",
-        },
-      ],
-      pendingTasks: [
-      ],
-      finishedTasks: [
-        {
-          name: "Nhiệm vụ thứ ba",
-        },
-      ],
+      toDoTasks: [],
+      pendingTasks: [],
+      finishedTasks: [],
+      taskRcv: Object,
     };
   },
 
@@ -98,6 +130,8 @@ export default {
       getTeam: "getTeam",
       getMembersInfo: "getMembersInfo",
       playTeamMessageSound: "playTeamMessageSound",
+      getTaskList: "getTaskList",
+      updateTismTaskType: "updateTismTaskType",
     }),
 
     async refreshTeamPage() {
@@ -113,10 +147,12 @@ export default {
     },
 
     createNewTask() {
+      this.taskRcv = new Object();
       this.$modal.show(
         AddTask,
         {
           isUpdate: false,
+          taskRcv: this.taskRcv,
         },
         {
           draggable: true,
@@ -124,18 +160,74 @@ export default {
           adaptive: true,
           width: 800,
           height: "auto",
+        },
+        {
+          "before-close": this.getTaskByTypes,
         }
       );
     },
+
+    selectTask(task) {
+      this.taskRcv = task;
+      this.$modal.show(
+        AddTask,
+        {
+          isUpdate: true,
+          taskRcv: this.taskRcv,
+        },
+        {
+          draggable: true,
+          // resizable: true,
+          adaptive: true,
+          width: 800,
+          height: "auto",
+        },
+        {
+          "before-close": this.getTaskByTypes,
+        }
+      );
+    },
+
+    getTaskByTypes() {
+      this.toDoTasks = this.tasks.filter((x) => x.type == 1);
+      this.pendingTasks = this.tasks.filter((x) => x.type == 2);
+      this.finishedTasks = this.tasks.filter((x) => x.type == 3);
+    },
+
+    startDrag(evt, task) {
+      evt.dataTransfer.dropEffect = "move";
+      evt.dataTransfer.effectAllowed = "move";
+      evt.dataTransfer.setData("taskId", task._id);
+    },
+
+    async onDropToDo(evt) {
+      let taskId = evt.dataTransfer.getData("taskId");
+      await this.updateTismTaskType({teamId: this.$route.params.teamId, taskId: taskId, taskType: 1});
+      this.getTaskByTypes();
+    },
+
+    async onDropPending(evt) {
+      let taskId = evt.dataTransfer.getData("taskId");
+      await this.updateTismTaskType({teamId: this.$route.params.teamId, taskId: taskId, taskType: 2});
+      this.getTaskByTypes();
+    },
+
+    async onDropFinished(evt) {
+      let taskId = evt.dataTransfer.getData("taskId");
+      await this.updateTismTaskType({teamId: this.$route.params.teamId, taskId: taskId, taskType: 3});
+      this.getTaskByTypes();
+    },
   },
 
-  created() {
+  async created() {
     this.refreshTeamPage();
     socket.on("new-team-message", (newMessage) => {
       if (newMessage.team === this.$route.params.teamId) {
         this.playTeamMessageSound();
       }
     });
+    await this.getTaskList(this.$route.params.teamId);
+    this.getTaskByTypes();
   },
 
   destroyed() {
