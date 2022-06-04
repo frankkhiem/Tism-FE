@@ -1,7 +1,7 @@
 <template>
   <div class="app-main">
     <Header 
-      @logout="logout" 
+      @logout="logout"
       :userAvatar="userProfile.avatar"
       :userFirstName="userProfile.firstName"
       :userFirstNameLetter="userProfile.firstNameLetter"
@@ -66,7 +66,8 @@ export default {
     ...mapActions({
       getListFriends: 'getListFriends',
       getListConversations: 'getListConversations',
-      playMessageSound: 'playMessageSound'
+      playMessageSound: 'playMessageSound',
+      playNotificationSound: 'playNotificationSound',
     }),
 
     async logout() {
@@ -187,6 +188,18 @@ export default {
       this.showIncomingCallModal(callInfo)
       this.videoCallInfo = callInfo
     })
+
+    socket.on('new-friend', () => {
+      this.playNotificationSound()
+    })
+
+    socket.on('new-invitation-friend', () => {
+      this.playNotificationSound()
+    })
+
+    socket.on('new-invitation-team', () => {
+      this.playNotificationSound()
+    })
   },
 
   mounted() {
@@ -200,6 +213,9 @@ export default {
     socket.off('friend-online')
     socket.off('friend-offline')
     socket.off('incoming-video-call')
+    socket.off('new-friend')
+    socket.off('new-invitation-friend')
+    socket.off('new-invitation-team')
     socket.disconnect()
   },
 };

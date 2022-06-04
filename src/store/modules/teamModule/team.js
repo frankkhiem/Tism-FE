@@ -143,6 +143,67 @@ const actions = {
     }
   },
 
+
+  createTeamMeeting: async ({ commit }, { teamId, meetingName }) => {
+    const accessToken = localStorage.getItem('accessToken')
+
+    try {
+      const response = await axios.post(`${process.env.VUE_APP_API_HOST}/team/${teamId}/meeting`, 
+      {
+        meetingName
+      },
+      { 
+        headers: {"Authorization" : `Bearer ${accessToken}`}
+      })
+
+      if( response.data.success ) {
+        commit('nothingTeamAction')
+        return response.data.message
+      }
+    } catch(error) {
+      console.log(error.response.data);
+    }
+  },
+
+  getMeetingPermissionAccess: async ({ commit }, meetingId) => {
+    const accessToken = localStorage.getItem('accessToken')
+
+    try {
+      const response = await axios.get(`${process.env.VUE_APP_API_HOST}/team/meeting/${meetingId}/permission`, { 
+        headers: {"Authorization" : `Bearer ${accessToken}`}
+      })
+
+      if( response.data.success ) {
+        commit('nothingTeamAction')
+        return response.data
+      }
+    } catch(error) {
+      console.log(error.response.data)
+      throw error
+    }
+  },
+
+  endTeamMeeting: async ({ commit }, { meetingId, duringTimes }) => {
+    const accessToken = localStorage.getItem('accessToken')
+
+    try {
+      const response = await axios.patch(`${process.env.VUE_APP_API_HOST}/team/meeting/${meetingId}/end`, 
+      {
+        duringTimes
+      },
+      { 
+        headers: {"Authorization" : `Bearer ${accessToken}`}
+      })
+
+      if( response.data.success ) {
+        commit('nothingTeamAction')
+        return response.data.message
+      }
+    } catch(error) {
+      console.log(error.response.data);
+    }
+  },
+
   deleteTeamMessage: async ({ commit }, { teamId, messageId }) => {
     const accessToken = localStorage.getItem('accessToken')
 

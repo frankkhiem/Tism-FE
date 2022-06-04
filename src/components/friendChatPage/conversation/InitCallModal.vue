@@ -36,7 +36,7 @@ export default {
 
 	data() {
 		return {
-			remainingTime: 20,
+			remainingTime: 30,
 			callInfo: null
 		}
 	},

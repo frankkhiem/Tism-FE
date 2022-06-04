@@ -63,40 +63,23 @@
         :class="{ self: message.from === userId }"
       >
         <div class="video-call__title">
-          <i 
-            v-if="message.description === 'success' || message.description === 'accept'" 
-            class="fa-solid fa-phone-flip"
-          ></i>
-          <i v-else class="fa-solid fa-phone-slash"></i>
-          Cuộc gọi Video
+          <i class="fa-solid fa-video"></i>
+          {{ message.description === 'happening' ? message.content : 'Cuộc họp nhóm' }}
         </div>
         <div class="video-call__status">
-          <div v-if="message.description === 'success' && message.from === userId">
-            Cuộc gọi đi, trong {{ message.content }}
+          <div v-if="message.description === 'happening'">
+            Đang diễn ra 🟢
           </div>
-          <div 
-            v-if="((message.description === 'cancel' 
-            || message.description === 'reject')
-            && message.from === userId)
-            || message.description === 'initial'"
-          >
-            Không thành công
-          </div>
-          <div v-if="message.description === 'success' && message.to === userId">
-            Cuộc gọi đến, trong {{ message.content }}
-          </div>
-          <div v-if="message.description === 'cancel' && message.to === userId">
-            Cuộc gọi nhỡ
-          </div>
-          <div v-if="message.description === 'reject' && message.to === userId">
-            Đã từ chối
-          </div>
-          <div v-if="message.description === 'accept'">
-            Thành công
+          <div v-if="message.description === 'finished'">
+            Đã kết thúc, trong {{ message.content }}
           </div>
         </div>
-        <div class="video-call__btn" @click="initVideoCall">
-          Gọi lại
+        <div 
+          v-if="message.description === 'happening' && message.from !== userId" 
+          class="video-call__btn" 
+          @click="joinTeamMeeting"
+        >
+          Tham gia
         </div>
       </div>
     </div>
@@ -142,11 +125,49 @@ export default {
 
   methods: {
     ...mapActions({
-      deleteTeamMessage: 'deleteTeamMessage'
+      deleteTeamMessage: 'deleteTeamMessage',
+      getUserStatus: 'getUserStatus'
     }),
 
-    initVideoCall() {
-      this.$emit('init-video-call')
+    async joinTeamMeeting() {
+      const userStatus = await this.getUserStatus()
+      if( 
+        userStatus !== 'online' || 
+        this.message.type !== 'meeting' || 
+        this.message.description !== 'happening' 
+      ) {
+        this.$confirm(
+          {
+            title: `Tham gia cuộc họp thất bại`,
+            message: `Hiện tại bạn không thể tham gia cuộc họp, vui lòng thử lại sau!`,
+            button: {
+              no: 'Đã hiểu',
+            }
+          }
+        )
+        return
+      }
+      
+      const meetingRoute = this.$router.resolve({
+        name: 'TeamMeeting',
+        params: {
+          meetingId: this.message._id
+        }
+      })
+      const meetingWidth = window.outerWidth * 0.8
+      const meetingHeight = window.outerHeight * 0.8
+      const meetingLeft = window.outerWidth * 0.1
+      const meetingTop = window.outerHeight * 0.08
+      window.open(
+        meetingRoute.href, 
+        'Metting', 
+        `
+          width=${meetingWidth}px,
+          height=${meetingHeight}px,
+          left=${meetingLeft},
+          top=${meetingTop}
+        `
+      )
     },
 
     showImageModal() {
@@ -338,10 +359,16 @@ export default {
     &.self {
       color: #fff;
       background-color: #0084ff;
+      background-color: rgb(163,3,236);
+      background: linear-gradient(146deg, rgba(163,3,236,1) 0%, rgba(200,73,144,1) 76%, rgba(203,79,136,1) 85%, rgba(207,86,126,1) 92%, rgba(249,156,32,1) 100%);
     }
 
     &.image {
       padding: 0;
+
+      &.self {
+        background: #ebe6eb;
+      }
 
       img {
         max-width: 300px;
@@ -398,8 +425,9 @@ export default {
       .video-call__status {
         font-size: 12px;
         font-weight: 700;
-        padding-left: 44px;
+        padding-left: 42px;
         padding-right: .5rem;
+        margin-bottom: 2px;
       }
 
       .video-call__btn {

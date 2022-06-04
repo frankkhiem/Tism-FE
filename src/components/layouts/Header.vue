@@ -16,24 +16,6 @@
           <sui-icon
             bordered
             fitted
-            name="th"
-            inverted
-            color="blue"
-            :style="{
-              borderRadius: '2px',
-              margin: '2px',
-              height: '42px',
-              width: '42px',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }"
-          ></sui-icon>
-        </router-link>
-        <router-link to="/" class="top-nav-links">
-          <sui-icon
-            bordered
-            fitted
             name="home"
             inverted
             color="blue"
@@ -52,8 +34,25 @@
           <sui-icon
             bordered
             fitted
-            name="trello"
-            content="Trello boards"
+            name="address book"
+            inverted
+            color="blue"
+            :style="{
+              borderRadius: '2px',
+              margin: '2px',
+              height: '42px',
+              width: '42px',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }"
+          ></sui-icon>
+        </router-link>
+        <router-link to="/teams" class="top-nav-links">
+          <sui-icon
+            bordered
+            fitted
+            name="columns"
             inverted
             color="blue"
             :style="{
@@ -86,7 +85,11 @@
           height: '42px'
         }"
       >
-        <router-link to="/chat" class="top-nav-links">
+        <router-link 
+          to="/chat"
+          class="top-nav-links chat-btn"
+          @click.native="hasNewMessages = false"
+        >
           <sui-icon
             bordered
             fitted
@@ -103,8 +106,14 @@
               marginLeft: '4px',
             }"
           ></sui-icon>
+          <div v-show="hasNewMessages" class="badge-icon"></div>
         </router-link>
-        <router-link to="/" class="top-nav-links">
+        <router-link 
+          to="/" 
+          class="top-nav-links notification-btn" 
+          is="span"
+          @click="handleShowNotificationsMenu"
+        >
           <sui-icon
             bordered
             fitted
@@ -121,8 +130,32 @@
               marginLeft: '4px',
             }"
           ></sui-icon>
+          <div v-show="hasNewNotifications" class="badge-icon"></div>
+          <div 
+            v-if="showNotificationsMenu" 
+            class="notification-menu"
+            v-click-outside-element="handleHideNotificationsMenu"
+          >
+            <div class="menu-title">
+              Thông báo
+            </div>
+            <div class="notification-list">
+              <NotificationItem
+                v-for="(notification, index) in notifications"
+                :type="notification.type"
+                :image="notification.image"
+                :title="notification.title"
+                :description="notification.description"
+                :topHighlight="notification.topHighlight"
+                :bottomHighlight="notification.bottomHighlight"
+                :seen="notification.seen"
+                :key="index"
+                @click.native.stop="seenNotification(index)"
+              ></NotificationItem>
+            </div>
+          </div>
         </router-link>
-        <router-link to="/" class="top-nav-links">
+        <router-link to="/about" class="top-nav-links">
           <sui-icon
             bordered
             fitted
@@ -184,7 +217,14 @@
 </template>
 
 <script>
+import socket from '@/helpers/socketClient'
+import NotificationItem from './notificationsMenu/NotificationItem'
+
 export default {
+  components: {
+    NotificationItem
+  },
+
   data() {
     return {
       show_dropdown_menu: false,
@@ -203,6 +243,31 @@ export default {
           value: "sign-out",
         },
       ],
+      hasNewMessages: false,
+      hasNewNotifications: false,
+      showNotificationsMenu: false,
+      notifications: [
+        {
+          type: 'team',
+          image: null,
+          title: 'Làm việc cùng Tism',
+          description: 'Tạo nhóm của bạn hoặc tham gia vào nhóm làm việc.',
+          topHighlight: null,
+          bottomHighlight: null,
+          seen: true,
+          redirectTo: '/teams'
+        },
+        {
+          type: 'info',
+          image: null,
+          title: 'Welcome to Tism',
+          description: 'Chào mừng bạn đến với Tism. Chúng tôi hy vọng bạn sẽ có những trải nghiệm tuyệt vời cùng ứng dụng này!',
+          topHighlight: null,
+          bottomHighlight: null,
+          seen: true,
+          redirectTo: '/about'
+        },
+      ]
     };
   },
 
@@ -232,7 +297,82 @@ export default {
     toProfile() {
       this.show_dropdown_menu = false
       if( this.$route.name !== 'Profile' ) this.$router.push({ name: 'Profile' })
+    },
+
+    handleShowNotificationsMenu() {
+      this.hasNewNotifications = false
+      setTimeout(() => {
+        this.showNotificationsMenu= true
+      }, 0)
+    },
+
+    handleHideNotificationsMenu() {
+      setTimeout(() => {
+        this.showNotificationsMenu = false
+      }, 1)
+    },
+
+    seenNotification(index) {
+      if( !this.notifications[index].seen ) {
+        this.notifications[index].seen = true
+      }
+      this.showNotificationsMenu = false
+      if( this.$route.path === this.notifications[index].redirectTo ) {
+        this.$emit('rerender')
+      } else {
+        this.$router.push(this.notifications[index].redirectTo)
+      }
     }
+  },
+
+  created() {
+    socket.on('new-message', () => {
+      if( !(/\/chat.*/).test(this.$route.path) ) {
+        this.hasNewMessages = true
+      }
+    })
+    socket.on('new-friend', (data) => {
+      this.hasNewNotifications = true
+      const newNoti = {
+        type: 'friend',
+        image: data.newFriendAvatar,
+        title: 'Bạn mới',
+        description: 'đã chấp nhận lời mời kết bạn của bạn.',
+        topHighlight: data.newFriend,
+        bottomHighlight: null,
+        seen: false,
+        redirectTo: '/friends'
+      }
+      this.notifications.unshift(newNoti)
+    })
+    socket.on('new-invitation-friend', (data) => {
+      this.hasNewNotifications = true
+      const newNoti = {
+        type: 'friend',
+        image: data.inviterAvatar,
+        title: 'Lời mời kết bạn',
+        description: 'đã gửi lời mời kết bạn cho bạn.',
+        topHighlight: data.inviter,
+        bottomHighlight: null,
+        seen: false,
+        redirectTo: '/friends/invitations'
+      }
+      this.notifications.unshift(newNoti)
+    })
+    socket.on('new-invitation-team', (data) => {
+      this.hasNewNotifications = true
+      const newNoti = {
+        type: 'team',
+        image: null,
+        title: 'Lời mời vào nhóm',
+        description: 'đã mời bạn vào nhóm',
+        topHighlight: data.inviter,
+        bottomHighlight: data.teamName,
+        seen: false,
+        redirectTo: '/teams'
+      }
+      this.notifications.unshift(newNoti)
+    })
   },
 
   watch: {
@@ -249,6 +389,12 @@ export default {
   justify-content: flex-start;
   flex-grow: 1;
 }
+.top-nav-links:hover {
+  text-decoration: none;
+}
+.top-nav-links i:hover {
+  filter: brightness(120%);
+}
 .top-nav-left .top-nav-links {
   margin-right: 4px;
 }
@@ -263,6 +409,62 @@ export default {
 }
 .top-nav-right .top-nav-links {
   margin-right: 4px;
+}
+.top-nav-links.chat-btn {
+  position: relative;
+}
+.top-nav-links.notification-btn {
+  position: relative;
+  cursor: pointer;
+}
+.top-nav-links .badge-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 10px;
+  height: 10px;
+  background: #fe2e1c;
+  border-radius: 50%;
+}
+.notification-btn .notification-menu {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 350px;
+  height: 350px;
+  transform: translate(-60%, 2rem);
+  background-color: #fff;
+  border: 1px solid rgba(34, 36, 38, 0.15);
+  border-radius: 4px;
+  box-shadow: 0 1px 3px 1px rgb(34 36 38 / 15%);
+  z-index: 2;
+  cursor: default;
+}
+.notification-btn .notification-menu::before {
+  position: absolute;
+  top: 0;
+  left: 60%;
+  transform: translate(-50%, calc(-50% - 1px)) rotate(45deg);
+  content: "";
+  width: 20px;
+  height: 20px;
+  background: #fff;
+  border-top: 1px solid rgba(34, 36, 38, 0.15);
+  border-left: 1px solid rgba(34, 36, 38, 0.15);
+}
+.notification-btn .notification-menu .menu-title {
+  width: fit-content;
+  margin: .5rem 1rem 1rem;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.notification-btn .notification-menu .menu-title:hover {
+  color: #2185d0;
+}
+.notification-menu .notification-list {
+  height: calc(100% - 60px);
+  overflow-y: auto;
 }
 .top-nav-right p {
   align-items: center;
@@ -345,8 +547,8 @@ export default {
 
 .menu-options::after {
   top: -0.25em;
-  left: auto !important;
-  right: 1em !important;
+  left: 1.3rem !important;
+  right: auto !important;
   margin: 0;
   transform: rotate(45deg);
   display: block;
