@@ -7,21 +7,18 @@
       :eventSettings="eventSettings"
     >
       <e-views>
-        <e-view option="Day"></e-view>
-        <e-view option="Week" startHour="07:00" endHour="15:00"></e-view>
-        <e-view option="WorkWeek" startHour="10:00" endHour="18:00"></e-view>
+        <e-view option="Week" startHour="08:00" endHour="18:00"></e-view>
         <e-view option="Month" showWeekend="false"></e-view>
-        <e-view option="Agenda"></e-view>
       </e-views>
       <e-resources>
         <e-resource
-          field="OwnerId"
-          title="Owner"
-          name="Owners"
-          :dataSource="ownerDataSource"
-          textField="OwnerText"
+          field="TypeId"
+          title="Type"
+          name="Types"
+          :dataSource="typeDataSource"
+          textField="TypeText"
           idField="Id"
-          colorField="OwnerColor"
+          colorField="TypeColor"
         >
         </e-resource>
       </e-resources>
@@ -43,8 +40,14 @@ import {
   ResourcesDirective,
   ResourceDirective,
 } from "@syncfusion/ej2-vue-schedule";
+import { mapGetters } from 'vuex'
 
 export default {
+  computed: {
+    ...mapGetters({
+      taskList: "taskList",
+    }),
+  },
   components: {
     "ejs-schedule": ScheduleComponent,
     "e-views": ViewsDirective,
@@ -55,45 +58,48 @@ export default {
   // Bound properties declaration
   data() {
     return {
-      selectedDate: new Date(2021, 7, 12),
+      selectedDate: new Date(),
       allowMultiple: true,
-      ownerDataSource: [
-        { OwnerText: "Nancy", Id: 1, OwnerColor: "#ffaa00" },
-        { OwnerText: "Steven", Id: 2, OwnerColor: "#f8a398" },
-        { OwnerText: "Michael", Id: 3, OwnerColor: "#7499e1" },
+      typeDataSource: [
+        { TypeText: "To do", Id: 1, TypeColor: "#f8a398" },
+        { TypeText: "Doing", Id: 2, TypeColor: "#ffaa00" },
+        { TypeText: "Done", Id: 3, TypeColor: "#63de69" },
       ],
       eventSettings: {
-        dataSource: [
-          {
-            Id: 1,
-            Subject: "Nhiệm vụ thứ nhất",
-            EventType: "Confirmed",
-            StartTime: new Date(2021, 7, 10, 9, 0),
-            EndTime: new Date(2021, 7, 10, 10, 0),
-            OwnerId: 2,
-          },
-          {
-            Id: 2,
-            Subject: "Nhiệm vụ thứ hai",
-            EventType: "Confirmed",
-            StartTime: new Date(2021, 7, 11, 10, 0),
-            EndTime: new Date(2021, 7, 11, 11, 30),
-            OwnerId: 3,
-          },
-          {
-            Id: 3,
-            Subject: "Nhiệm vụ thứ ba",
-            EventType: "Requested",
-            StartTime: new Date(2021, 7, 12, 11, 30),
-            EndTime: new Date(2021, 7, 12, 12, 30),
-            OwnerId: 1,
-          },
-        ],
+        dataSource: [],
       },
+      data: []
     };
   },
   provide: {
     schedule: [Day, Week, WorkWeek, Month, Agenda, DragAndDrop, Resize],
+  },
+  methods: {
+    prepareDataForCalendar() {
+      this.data = [];
+      this.taskList.forEach(task => {
+        const taskType = task.type
+        let taskData = {}
+        taskData.Id = task._id
+        taskData.Subject = task.name
+        taskData.StartTime = (task.start_time.slice(0, 10)) + ' 08:00'
+        taskData.EndTime = (task.end_time.slice(0, 10)) + ' 17:30'
+        if (taskType == 1) {
+          taskData.TypeId = 1
+        }
+        if (taskType == 2) {
+           taskData.TypeId = 2
+        }
+        if (taskType == 3) {
+           taskData.TypeId = 3
+        }
+        this.data.push(taskData)
+      });
+      this.eventSettings.dataSource = this.data
+    }
+  },
+  created() {
+    this.prepareDataForCalendar()
   },
 };
 </script>

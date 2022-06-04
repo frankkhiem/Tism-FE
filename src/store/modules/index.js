@@ -5,6 +5,7 @@ import Chat from './chatModule'
 import Notification from './notificationModule'
 import Team from './teamModule'
 import Invite from './inviteModule'
+import Task from './taskModule'
 
 export const modules = {
   User,
@@ -13,5 +14,6 @@ export const modules = {
   Chat,
   Notification,
   Team,
-  Invite
+  Invite,
+  Task
 }

@@ -115,7 +115,8 @@ export default {
     ...mapActions({
       getTeam: 'getTeam',
       getMembersInfo: 'getMembersInfo',
-      playTeamMessageSound: 'playTeamMessageSound'
+      playTeamMessageSound: 'playTeamMessageSound',
+      getTaskList: 'getTaskList'
     }),
 
     async refreshTeamPage() {
@@ -125,6 +126,7 @@ export default {
           this.$router.push({ name: 'Not Found' })
         }
         this.getMembersInfo(this.$route.params.teamId)
+        this.getTaskList(this.$route.params.teamId)
       } catch (error) {
         console.log(error)
       }
@@ -490,5 +492,8 @@ Remove or comment-out the code block below to see how the browser will fall-back
   // .calendar-container {
   //   overflow-y: hidden;
   // }
+  #js-licensing {
+    display: none;
+  }
 }
 </style>
