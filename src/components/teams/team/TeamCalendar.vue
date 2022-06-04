@@ -62,8 +62,8 @@ export default {
       allowMultiple: true,
       calendarHeight: 300,
       typeDataSource: [
-        { TypeText: "To do", Id: 1, TypeColor: "#f8a398" },
-        { TypeText: "Doing", Id: 2, TypeColor: "#ffaa00" },
+        { TypeText: "To do", Id: 1, TypeColor: "#f1d45e" },
+        { TypeText: "Doing", Id: 2, TypeColor: "#4da9e2" },
         { TypeText: "Done", Id: 3, TypeColor: "#63de69" },
       ],
       eventSettings: {
