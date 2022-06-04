@@ -45,7 +45,15 @@
           name="email"
           placeholder="example@gmail.com"
           v-model="email"
+          @click="hintMembers = true"
+          autocomplete="new-password"
         />
+        <div class="dropdown" v-if="hintMembers">
+         <!-- <button class="dropbtn">Dropdown</button> -->
+          <div class="dropdown-content" v-if="tempAllUsers.length != 0 ">
+            <a v-for="(user, index) in tempAllUsers.slice(0,5)" :key="index" @click="handleInviteMail(user)">{{user}}</a>
+          </div>
+        </div>
       </div>
     </div>
     <div class="modal-btns">
@@ -65,6 +73,10 @@ export default {
   props: {
     isUpdate: Boolean,
   },
+  async created() {
+    await this.getAllUsers()
+    //this.tempAllUsers = this.allUsers
+  },
 
   data() {
     return {
@@ -73,7 +85,10 @@ export default {
       msgResult: "",
       loading: false,
       sendResultUiSuccess: false,
-      sendResultUiFail: false
+      sendResultUiFail: false,
+      hintMembers: false,
+      allUsers:[],
+      tempAllUsers:[],
     };
   },
 
@@ -114,8 +129,56 @@ export default {
     continueInvite() {
       this.sendResultUiSuccess = false
       this.sendResultUiFail = false
+      this.email = ''
+    },
+
+    async getAllUsers() {
+      const accessToken = localStorage.getItem("accessToken");
+      axios.get(`${process.env.VUE_APP_API_HOST}/user/allUser`,{
+            headers: { Authorization: `Bearer ${accessToken}` },
+          })
+      .then(response => {
+          this.allUsers = response.data
+          //this.tempAllUsers = this.allUsers.email.slice(0,5)
+          console.log(this.allUsers);
+      })
+      .catch(function(err){
+        console.log(err);
+      });  
+    },
+
+    hintUser(text){
+      if(this.email.includes('.com')) return
+      let re = new RegExp(text);
+      let temp = new Array()
+      //console.log()
+      //console.log(re)
+      this.allUsers.map(user => {
+        //console.log(user.email)
+        if(user.email != null){
+          if(user.email.match(re)) temp.push(user.email)
+        }
+      })
+      // for(let i = 0; i< this.allUsers.length; i++)
+      // {
+      //   console.log(this.allUsers[i].email.includes(text))
+      //   if(this.allUsers[i].email.includes(text)) temp.push(this.allUsers[i].email)
+      // }
+      this.tempAllUsers = temp;
+    },
+
+    handleInviteMail(email){
+      this.email = email;
+      this.tempAllUsers = [];
     }
   },
+
+  watch: {
+    email(){
+      //console.log(this.email)
+      this.hintUser(this.email)
+    }
+  }
 };
 </script>
 
@@ -233,5 +296,49 @@ export default {
     color: rgb(211, 99, 99);
     font-weight: 600;
   }
+}
+
+
+//////////////////
+
+.dropbtn {
+  background-color: #4CAF50;
+  color: white;
+  padding: 16px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: inline;
+  position: fixed;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  min-width: 200px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {background-color: #f1f1f1}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.dropdown:hover .dropbtn {
+  background-color: #3e8e41;
 }
 </style>
