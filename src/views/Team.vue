@@ -140,7 +140,8 @@ export default {
         if ("success" in this.team) {
           this.$router.push({ name: "Not Found" });
         }
-        this.getMembersInfo(this.$route.params.teamId);
+        this.getMembersInfo(this.$route.params.teamId)
+        this.getTaskList(this.$route.params.teamId)
       } catch (error) {
         console.log(error);
       }
@@ -584,5 +585,8 @@ Remove or comment-out the code block below to see how the browser will fall-back
   // .calendar-container {
   //   overflow-y: hidden;
   // }
+  #js-licensing {
+    display: none;
+  }
 }
 </style>
