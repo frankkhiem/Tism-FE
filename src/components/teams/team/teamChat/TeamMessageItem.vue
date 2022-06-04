@@ -147,7 +147,7 @@ export default {
         )
         return
       }
-      console.log('vao phong hop')
+      
       const meetingRoute = this.$router.resolve({
         name: 'TeamMeeting',
         params: {
