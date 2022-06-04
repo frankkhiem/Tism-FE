@@ -19,16 +19,16 @@ export default {
           icon: 'fa-solid fa-address-book'
         },
         {
-          href: { path: '/teams' },
-          title: 'Nhóm',
-          icon: 'fa-solid fa-people-group'
-        },
-        {
           href: { path: '/friends' },
           title: 'Bạn bè',
           icon: 'fa-solid fa-user-group'
         },
-         {
+        {
+          href: { path: '/teams' },
+          title: 'Nhóm',
+          icon: 'fa-solid fa-table-columns'
+        },
+        {
           href: { path: '/about' },
           title: 'Giới thiệu',
           icon: 'fa-solid fa-circle-info'

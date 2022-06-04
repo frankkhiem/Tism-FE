@@ -51,6 +51,8 @@
 }
 .footer {
   margin-top: 0rem;
+  position: relative;
+  z-index: 10;
 }
 .top-footer {
   height: 20px;
