@@ -333,7 +333,7 @@ export default {
     border-radius: 20px;
     text-align: left;
     color: inherit;
-    background-color: #ebe6eb;
+    background-color: #f5ffc4;
 
     &.self {
       color: #fff;

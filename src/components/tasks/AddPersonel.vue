@@ -1,5 +1,5 @@
 <template>
-  <div id="add-calendar-modal">
+  <div id="add-personel-modal">
     <div
       class="modal-close"
       @click="$emit('close')"
@@ -21,24 +21,17 @@
       ></b-icon>
     </div>
     <div class="modal-title">
-      <div>Đặt lịch</div>
+      <div>Chỉ định thành viên</div>
     </div>
     <div class="modal-main">
-      <div class="add-calendar-container">
-        <date-range-picker
-          ref="picker"
-          :opens="'center'"
-          :locale-data="{ firstDay: 1, format: 'dd-mm-yyyy HH:mm:ss' }"
-          :showDropdowns="true"
-					:singleDatePicker="'range'"
-          :autoApply="true"	
-          v-model="dateRange"
-          @finish-selection="logEvent('event: finishSelection', $event)"
-        >
-          <template v-slot:input="picker" style="min-width: 350px">
-            {{ picker.startDate }} - {{ picker.endDate }}
-          </template>
-        </date-range-picker>
+      <div class="add-personel-container">
+        <div class="list-members">
+          <MemberItem
+            v-for="(member, index) in membersNotMe"
+            :member="member"
+            :key="index"
+          ></MemberItem>
+        </div>
       </div>
     </div>
     <div class="modal-btns">
@@ -49,26 +42,35 @@
 </template>
 
 <script>
-import DateRangePicker from "vue2-daterange-picker";
+import MemberItem from "../teams/team/teamChat/MemberItem.vue";
 //you need to import the CSS manually
 import "vue2-daterange-picker/dist/vue2-daterange-picker.css";
 
+import { mapGetters } from "vuex";
+
 export default {
-  components: { DateRangePicker },
+  components: { MemberItem },
   data() {
     return {
       hoverClose: false,
-			dateRange: {
-				startDate: null,
-				endDate: null
-			}
+      teamMembers: [],
     };
+  },
+  computed: {
+    ...mapGetters({
+      user: "profile",
+      members: "members",
+    }),
+
+    membersNotMe() {
+      return this.members.filter((member) => member.id !== this.user.userId);
+    },
   },
 };
 </script>
 
 <style lang="scss" scoped>
-#add-calendar-modal {
+#add-personel-modal {
   position: relative;
   font-family: "Source Sans Pro", "Fira Sans", Arial, sans-serif;
 
@@ -91,7 +93,7 @@ export default {
     margin-top: 1rem;
     padding: 0 1rem;
 
-    .add-calendar-container {
+    .add-personel-container {
       margin: 0;
       display: flex;
       justify-content: space-between;
@@ -147,6 +149,16 @@ export default {
     .agree-btn[disabled="disabled"] {
       pointer-events: none;
       opacity: 0.4;
+    }
+  }
+
+  .list-members {
+    flex-grow: 1;
+    padding: 0 1.7rem 4rem 0.7rem;
+    overflow-y: auto;
+
+    .self-member {
+      margin-bottom: 5px;
     }
   }
 }

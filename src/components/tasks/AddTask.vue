@@ -59,7 +59,7 @@
 
         <div class="content right-content">
           <div>Thêm vào thẻ</div>
-          <div class="add-tag">
+          <div class="add-tag" @click="openPersonelAssign">
             <i class="fa-solid fa-user-plus" style="margin-right: 6px"></i>Chỉ
             định
           </div>
@@ -78,7 +78,7 @@
 </template>
 
 <script>
-// import AddDate from '../../components/tasks/AddDate.vue'
+import AddPersonel from '../../components/tasks/AddPersonel.vue'
 
 import DateRangePicker from "vue2-daterange-picker";
 //you need to import the CSS manually
@@ -108,6 +108,22 @@ export default {
       setTimeout(() => {
         this.$refs.picker.togglePicker("boolean", this.isShowCalendar);
       }, 200);
+    },
+
+    openPersonelAssign() {
+      this.$modal.show(
+        AddPersonel,
+        {
+          isUpdate: false,
+        },
+        {
+          draggable: true,
+          // resizable: true,
+          adaptive: true,
+          width: 350,
+          height: "auto",
+        }
+      );
     },
   },
 };

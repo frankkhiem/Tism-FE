@@ -1,7 +1,7 @@
 <template>
   <div id="team-calendar">
     <ejs-schedule
-      height="550px"
+      :height="calendarHeight"
       width="100%"
       :selectedDate="selectedDate"
       :eventSettings="eventSettings"
@@ -57,6 +57,7 @@ export default {
     return {
       selectedDate: new Date(2021, 7, 12),
       allowMultiple: true,
+      calendarHeight: 300,
       ownerDataSource: [
         { OwnerText: "Nancy", Id: 1, OwnerColor: "#ffaa00" },
         { OwnerText: "Steven", Id: 2, OwnerColor: "#f8a398" },
@@ -68,24 +69,24 @@ export default {
             Id: 1,
             Subject: "Nhiệm vụ thứ nhất",
             EventType: "Confirmed",
-            StartTime: new Date(2021, 7, 10, 9, 0),
-            EndTime: new Date(2021, 7, 10, 10, 0),
+            StartTime: new Date(2021, 5, 10, 9, 0),
+            EndTime: new Date(2021, 5, 10, 10, 0),
             OwnerId: 2,
           },
           {
             Id: 2,
             Subject: "Nhiệm vụ thứ hai",
             EventType: "Confirmed",
-            StartTime: new Date(2021, 7, 11, 10, 0),
-            EndTime: new Date(2021, 7, 11, 11, 30),
+            StartTime: new Date(2021, 5, 4, 9, 0),
+            EndTime: new Date(2021, 5, 25, 10, 30),
             OwnerId: 3,
           },
           {
             Id: 3,
             Subject: "Nhiệm vụ thứ ba",
             EventType: "Requested",
-            StartTime: new Date(2021, 7, 12, 11, 30),
-            EndTime: new Date(2021, 7, 12, 12, 30),
+            StartTime: new Date(2021, 5, 9, 9, 30),
+            EndTime: new Date(2021, 5, 19, 10, 30),
             OwnerId: 1,
           },
         ],
@@ -95,7 +96,12 @@ export default {
   provide: {
     schedule: [Day, Week, WorkWeek, Month, Agenda, DragAndDrop, Resize],
   },
+  created() {
+    this.calendarHeight = window.innerHeight - 58 - 168;
+  }
 };
 </script>
 
-<style></style>
+<style lang="scss" scoped>
+
+</style>
