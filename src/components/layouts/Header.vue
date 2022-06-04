@@ -363,9 +363,9 @@ export default {
       this.hasNewNotifications = true
       const newNoti = {
         type: 'team',
-        image: null,
+        image: data.inviterAvatar,
         title: 'Lời mời vào nhóm',
-        description: 'đã mời bạn vào nhóm',
+        description: 'đã gửi cho bạn lời mời vào nhóm',
         topHighlight: data.inviter,
         bottomHighlight: data.teamName,
         seen: false,

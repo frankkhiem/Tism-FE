@@ -530,7 +530,7 @@ export default {
       border: none;
       font-size: 22px;
       color: #026aa7;
-      background-color: #fff;
+      background-color: #e9edd5;
       margin-left: 1.5rem;
       margin-bottom: .5rem;
 

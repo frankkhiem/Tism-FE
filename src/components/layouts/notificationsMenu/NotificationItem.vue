@@ -110,6 +110,10 @@ export default {
 			color: #2185d0;
 			font-size: 14px;
 			font-weight: 700;
+
+			&:last-child {
+				color: #46b04a;
+			}
 		}
 	}
 }

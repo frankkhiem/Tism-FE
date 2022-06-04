@@ -290,7 +290,7 @@ export default {
       cursor: pointer;
 
       &:hover {
-        background-color: #eee;
+        background-color: #f2f2f2;
       }
     }
 
