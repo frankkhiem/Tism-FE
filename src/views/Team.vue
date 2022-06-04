@@ -95,14 +95,9 @@ import socket from '@/helpers/socketClient'
 export default {
   computed: {
     ...mapGetters({
-<<<<<<< HEAD
       user: 'profile',
       team: 'team'
     })
-=======
-      team: "team",
-    }),
->>>>>>> branch-demo-1
   },
 
   data() {
