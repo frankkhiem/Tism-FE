@@ -16,14 +16,17 @@
           </span>
           <!-- admin first name first letter -->
           <span class="admin-name-icon text" v-else>{{
-            team.adminName.slice(0, 1).toUpperCase()
+            typeof team.adminName === 'string' ? team.adminName.split(" ").pop().slice(0, 1).toUpperCase() : 'A'
           }}</span>
         </p>
         <!-- admin first name -->
-        <span class="admin-name">{{ team.adminName.split(" ").pop() }}</span>
+        <span class="admin-name">{{ typeof team.adminName === 'string' ? team.adminName.split(" ").pop() : 'Admin' }}</span>
       </div>
-      <div class="invite-member" @click="inviteMemberModal">
+      <div class="invite-member" v-if="team.admin === userProfile.userId" @click="inviteMemberModal">
         <i class="fa-solid fa-user-plus"></i>Mời
+      </div>
+      <div class="delete-team" v-if="team.admin === userProfile.userId" @click="deleteTeam">
+        <i class="fa-solid fa-trash-can"></i>Xóa nhóm
       </div>
     </div>
     <div class="page-nav">
@@ -53,6 +56,7 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex'
 import InviteMemberModal from './InviteMemberModal.vue'
 export default {
   // data() {
@@ -60,6 +64,11 @@ export default {
   // 		type: 'team-tasks',
   // 	}
   // },
+  computed: {
+    ...mapGetters({
+      userProfile: "profile",
+    }),
+  },
   props: {
     type: String,
     team: Object,
@@ -67,6 +76,10 @@ export default {
     // userFirstNameLetter: String
   },
   methods: {
+    ...mapActions({
+      deleteTismTeam: 'deleteTismTeam'
+    }),
+
     inviteMemberModal() {
       this.$modal.show(
         InviteMemberModal,
@@ -77,11 +90,30 @@ export default {
           draggable: true,
           // resizable: true,
           adaptive: true,
-          width: 600,
+          width: 700,
           height: 'auto'
         }
       );
     },
+
+    deleteTeam() {
+      this.$confirm(
+        {
+          title: `Xóa nhóm '${this.team.teamName}'`,
+          message: `Bạn có chắc muốn xóa nhóm hiện tại?`,
+          button: {
+            no: 'Hủy',
+            yes: 'Xóa'
+          },
+          callback: async confirm => {
+            if (confirm) {
+              await this.deleteTismTeam(this.team.teamId)
+              this.$router.push({ name: 'Teams' })
+            }
+          }
+        }
+      )
+    }
   },
 };
 </script>
@@ -180,6 +212,27 @@ export default {
           width: 40px;
           height: 40px;
         }
+      }
+    }
+
+    .delete-team {
+      padding: 5px 2rem;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      box-shadow: 0px 1px 3px 1px rgba(9, 30, 66, 0.25);
+      cursor: pointer;
+      transition: all 0.1s linear;
+      user-select: none;
+      color: #fff;
+      background-color: #d33921;
+      &:hover {
+        color: black;
+        background-color: #d06e65;
+      }
+
+      i {
+        margin-right: 2px;
       }
     }
   }

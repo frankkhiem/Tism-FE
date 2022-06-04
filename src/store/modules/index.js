@@ -4,6 +4,7 @@ import Friend from './friendModule'
 import Chat from './chatModule'
 import Notification from './notificationModule'
 import Team from './teamModule'
+import Invite from './inviteModule'
 
 export const modules = {
   User,
@@ -11,5 +12,6 @@ export const modules = {
   Friend,
   Chat,
   Notification,
-  Team
+  Team,
+  Invite
 }

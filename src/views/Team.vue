@@ -1,11 +1,11 @@
 <template>
   <div class="team-page">
-    <TeamPageHeaderVue 
-    @team-tasks="type='team-tasks'"
-    @team-chat="type='team-chat'"
-    @calendar="type='calendar'"
-    :type = "type"
-    :team = "team"
+    <TeamPageHeaderVue
+      @team-tasks="type = 'team-tasks'"
+      @team-chat="type = 'team-chat'"
+      @calendar="type = 'calendar'"
+      :type="type"
+      :team="team"
     >
     </TeamPageHeaderVue>
     <!-- Lists container -->
@@ -30,7 +30,9 @@
           <li>Listen to new CodePen Radio episode</li>
         </ul>
 
-        <button class="add-card-btn btn" @click="createNewTask">Add a card</button>
+        <button class="add-card-btn btn" @click="createNewTask">
+          Add a card
+        </button>
       </div>
 
       <div class="list">
@@ -53,7 +55,9 @@
           <li>Listen to new CodePen Radio episode</li>
         </ul>
 
-        <button class="add-card-btn btn" @click="createNewTask">Add a card</button>
+        <button class="add-card-btn btn" @click="createNewTask">
+          Add a card
+        </button>
       </div>
 
       <div class="list">
@@ -65,13 +69,17 @@
           <li>Begin work on mock-up for client website</li>
         </ul>
 
-        <button class="add-card-btn btn" @click="createNewTask">Add a card</button>
+        <button class="add-card-btn btn" @click="createNewTask">
+          Add a card
+        </button>
       </div>
     </section>
     <section v-if="type == 'team-chat'" class="lists-container">
       <TeamChat></TeamChat>
     </section>
-    <section v-if="type == 'calendar'" class="lists-container">Tính năng theo dõi lịch đang được phát triển</section>
+    <section v-if="type == 'calendar'" class="lists-container calendar-container">
+      <TeamCalendar></TeamCalendar>
+    </section>
   </div>
 </template>
 
@@ -80,25 +88,32 @@ import { mapGetters, mapActions } from 'vuex'
 import TeamPageHeaderVue from '../components/teams/team/TeamPageHeader';
 import AddTask from '../components/tasks/AddTask.vue';
 import TeamChat from '../components/teams/team/teamChat/TeamChat';
+import TeamCalendar from "../components/teams/team/TeamCalendar";
 
 import socket from '@/helpers/socketClient'
 
 export default {
   computed: {
     ...mapGetters({
+<<<<<<< HEAD
       user: 'profile',
       team: 'team'
     })
+=======
+      team: "team",
+    }),
+>>>>>>> branch-demo-1
   },
 
   data() {
     return {
-      type: 'team-tasks',
-    }
+      type: "team-tasks",
+    };
   },
 
   components: {
     TeamPageHeaderVue,
+    TeamCalendar,
     TeamChat
   },
 
@@ -111,27 +126,30 @@ export default {
 
     async refreshTeamPage() {
       try {
-        this.getTeam(this.$route.params.teamId)
+        await this.getTeam(this.$route.params.teamId);
+        if ('success' in this.team) {
+          this.$router.push({ name: 'Not Found' })
+        }
         this.getMembersInfo(this.$route.params.teamId)
       } catch (error) {
         console.log(error)
       }
     },
 
-    createNewTask () {
+    createNewTask() {
       this.$modal.show(
         AddTask,
         {
-          isUpdate: false
+          isUpdate: false,
         },
         {
           draggable: true,
           // resizable: true,
           adaptive: true,
           width: 800,
-          height: 'auto'
+          height: "auto",
         }
-      )
+      );
     },
   },
 
@@ -481,5 +499,9 @@ Remove or comment-out the code block below to see how the browser will fall-back
   .user-settings-btn {
     margin: 0;
   }
+
+  // .calendar-container {
+  //   overflow-y: hidden;
+  // }
 }
 </style>

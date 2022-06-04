@@ -16,12 +16,18 @@
           fitted="true"
           icon="blue search circular fitted inverted link icon"
         ></sui-input>
+        <div class="invite-join-team" v-if="invites.length">
+          <span>Bạn có {{ invites.length }} lời mời tham gia nhóm. </span>
+          <span class="show-invites-modal" @click="showInvitesModal">Bấm vào đây để xem</span>
+        </div>
       </div>
     </div>
+    <div class="row text-no-team" v-if="Object.keys(teamList).length === 0">
+      <span>Không tìm thấy nhóm nào phù hợp với kết quả tìm kiếm</span>
+    </div>
     <div v-for="(groupTeambyStatus, status, index) in teamList" :key="index">
-      <h2 v-if="status === 'public'">Team công khai</h2>
-      <h2 v-if="status === 'private'">Team riêng tư</h2>
-      <div class="row" v-if="groupTeambyStatus.length">
+      <h2>{{ status }}</h2>
+      <div class="row">
         <div class="col-12 col-lg-6 team" v-for="(team, index) in groupTeambyStatus" :key="index">
           <div class="team-container">
             <img :src="require(`./../assets/img/${team.avatar}`)" alt="Avatar" class="image" style="width:100%">
@@ -33,15 +39,12 @@
           </div>
         </div>
       </div>
-      <div class="row text-no-team" v-else>
-        <span v-if="status === 'public'">Chưa có team công khai</span>
-        <span v-if="status === 'private'">Chưa có team riêng tư</span>
-      </div>
     </div>
   </div>
 </template>
 
 <script>
+import InvitesModal from '../components/teams/InvitesModal.vue';
 import AddTeam from '../components/teams/AddTeam.vue'
 import { mapGetters, mapActions } from 'vuex'
 
@@ -50,18 +53,21 @@ export default {
     return {
       keyword: '',
       teamList: {},
+      teamTypeList: [],
     };
   },
 
   computed: {
     ...mapGetters({
       teams: 'teamList',
+      invites: 'inviteList'
     })
   },
 
   methods: {
     ...mapActions({
       getTeamList: 'getTeamList',
+      getInviteList: 'getInviteList'
     }),
 
     getTeamAvatar(teamAvatar) {
@@ -76,7 +82,8 @@ export default {
       this.$modal.show(
         AddTeam,
         {
-          isUpdate: false
+          isUpdate: false,
+          typeList: this.teamTypeList
         },
         {
           draggable: true,
@@ -93,7 +100,8 @@ export default {
         AddTeam,
         {
           targetTeam: team,
-          isUpdate: true
+          isUpdate: true,
+          typeList: this.teamTypeList
         },
         {
           draggable: true,
@@ -107,13 +115,23 @@ export default {
 
     prepareTeamList (teams) {
       this.teamList = {}
-      this.teamList['public'] = []
-      this.teamList['private'] = []
       teams.forEach((team) => {
-        if( team.type === 'public' ) {
-          this.teamList['public'].push(team)
+        const teamType = team.type
+        if( this.teamList[teamType] ) {
+          this.teamList[teamType].push(team)
         } else {
-          this.teamList['private'].push(team)
+          this.teamList[teamType] = []
+          this.teamList[teamType].push(team)
+        }
+      })
+    },
+
+    getTypeList (teams) {
+      this.teamTypeList = []
+      teams.forEach((team) => {
+        const teamType = team.type
+        if( !this.teamTypeList.includes(teamType) ) {
+          this.teamTypeList.push(teamType)
         }
       })
     },
@@ -128,12 +146,29 @@ export default {
       })
 
       this.prepareTeamList(teams)
-    }
+    },
+
+    showInvitesModal () { 
+      this.$modal.show(
+        InvitesModal,
+        {
+          isUpdate: true
+        },
+        {
+          draggable: true,
+          // resizable: true,
+          adaptive: true,
+          width: 600,
+          height: 600,
+        }
+      )
+    },
   },
 
   async created() {
     await this.getTeamList()
-    this.prepareTeamList(this.teams)
+    await this.getInviteList()
+    this.getTypeList(this.teams)
   },
 
   watch: {
@@ -143,6 +178,11 @@ export default {
 
     teams(newTeams) {
       this.prepareTeamList(newTeams)
+      this.getTypeList(newTeams)
+    },
+
+    invites() {
+      this.getTeamList()
     }
   }
 }
@@ -262,7 +302,7 @@ export default {
   
   .team-search {
     display: flex;
-    justify-content: flex-end;
+    flex-flow: column;
 
     .team-search-input {
       border: 1px solid #ccc;
@@ -276,6 +316,20 @@ export default {
     justify-content: center;
     align-items: center;
     margin: 4rem auto;
+  }
+
+  .invite-join-team {
+    margin-top: 30px;
+    font-weight: bold;
+
+    .show-invites-modal {
+      color: #026aa7;
+
+      &:hover {
+        color: blue;
+        cursor: pointer;
+      }
+    }
   }
 }
 </style>

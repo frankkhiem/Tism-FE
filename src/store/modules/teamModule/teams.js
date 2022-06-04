@@ -67,6 +67,22 @@ const actions = {
       console.log(error.response.data);
     }
   },
+
+  deleteTismTeam: async ({ dispatch }, teamId) => {
+    console.log('khanh')
+    const accessToken = localStorage.getItem('accessToken')
+
+    try {
+      await axios.delete(`${process.env.VUE_APP_API_HOST}/team/${teamId}/removeteam`, {
+        headers: {"Authorization" : `Bearer ${accessToken}`},
+      })
+
+      await dispatch('getTeamList')
+    } catch(error) {
+      // statements
+      console.log(error.response.data);
+    }
+  },
 }
 
 export default {
