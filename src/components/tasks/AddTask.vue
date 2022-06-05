@@ -28,12 +28,29 @@
         <div class="content left-content">
           <div class="input-wrapper">
             <div class="input-title">Tên công việc</div>
-            <input type="text" id="taskName_ipt" />
+            <input type="text" id="taskName_ipt" v-model="taskObj.taskName" />
           </div>
           <div class="input-wrapper" v-if="isAssigned">
             <div class="input-title">Thông tin chỉ định</div>
             <div class="assign-wrapper">
-              <div class="user-ava" v-tooltip="'You have new messages.'">{{ userFormatedName }}</div>
+              <div
+                class="user-ava"
+                v-tooltip="'You have new messages.'"
+                :class="{
+                  'first-color':
+                    'A' <= userFormatedName && userFormatedName < 'F',
+                  'second-color':
+                    'F' <= userFormatedName && userFormatedName < 'M',
+                  'third-color':
+                    'M' <= userFormatedName && userFormatedName < 'S',
+                  'forth-color':
+                    'S' <= userFormatedName && userFormatedName < 'Y',
+                  'fifth-color':
+                    'Y' <= userFormatedName && userFormatedName <= 'Z',
+                }"
+              >
+                {{ userFormatedName }}
+              </div>
               <date-range-picker
                 ref="picker"
                 :opens="'right'"
@@ -53,7 +70,13 @@
           </div>
           <div class="input-wrapper">
             <div class="input-title">Miêu tả</div>
-            <textarea name="" id="taskDes_ipt" cols="30" rows="8"></textarea>
+            <textarea
+              name=""
+              id="taskDes_ipt"
+              cols="30"
+              rows="8"
+              v-model="taskObj.description"
+            ></textarea>
           </div>
         </div>
 
@@ -72,37 +95,86 @@
     </div>
     <div class="modal-btns">
       <div class="cancel-btn" @click="$emit('close')">Hủy</div>
-      <div class="agree-btn">Tạo</div>
+      <div class="agree-btn" @click="createTask" v-if="!isUpdate">Tạo</div>
+      <div class="agree-btn" @click="updateTask" v-else>Sửa</div>
     </div>
   </div>
 </template>
 
 <script>
-import AddPersonel from '../../components/tasks/AddPersonel.vue'
+import AddPersonel from "../../components/tasks/AddPersonel.vue";
 
 import DateRangePicker from "vue2-daterange-picker";
 //you need to import the CSS manually
 import "vue2-daterange-picker/dist/vue2-daterange-picker.css";
 
+import { mapActions } from "vuex";
+import { mapGetters } from "vuex";
+
 export default {
   components: { DateRangePicker },
   props: {
     isUpdate: Boolean,
+    taskRcv: {},
   },
   data() {
     return {
       hoverClose: false,
       isAssigned: true,
+      today: new Date(),
       dateRange: {
-        startDate: null,
-        endDate: null,
+        startDate: new Date(),
+        endDate: new Date(),
       },
       isShowCalendar: false,
       userFormatedName: "?",
-			executorName: "",
+      executorName: "",
+      taskObj: Object,
+    };
+  },
+  created() {
+    // Gán giá trị
+    this.taskObj = {
+      taskId: this.taskRcv._id,
+      taskName: this.taskRcv.name,
+      taskType: this.taskRcv.type,
+      executor: this.taskRcv.executor,
+      description: this.taskRcv.description,
+    };
+
+    this.dateRange = {
+      startDate: this.taskRcv.start_time,
+      endDate: this.taskRcv.end_time
+    }
+
+    if (this.taskObj.executor) {
+      let memberId = this.taskObj.executor[0];
+      this.taskObj.member = this.currentMember(memberId)[0];
+      this.userFormatedName = this.taskObj.member.firstNameLetter;
+    }
+
+    if (!this.taskObj.startTime) {
+      this.taskObj.startTime = this.today;
+      let tomorrow = new Date(this.today);
+      this.taskObj.endTime = tomorrow.setDate(tomorrow.getDate() + 1);
+    }
+
+    if (!this.taskObj.taskType) {
+      this.taskObj.taskType = 1;
+    }
+
+    // Gán giá trị cho lịch
+    this.dateRange = {
+      startDate: this.taskObj.startTime,
+      endDate: this.taskObj.endTime,
     };
   },
   methods: {
+    ...mapActions({
+      createTismTask: "createTismTask",
+      updateTismTask: "updateTismTask",
+    }),
+
     openCalendar() {
       this.isShowCalendar = !this.isShowCalendar;
       setTimeout(() => {
@@ -122,9 +194,74 @@ export default {
           adaptive: true,
           width: 350,
           height: "auto",
+        },
+        {
+          "before-close": this.addPersonel,
         }
       );
     },
+
+    addPersonel(event) {
+      if (event.params) {
+        this.taskObj.member = event.params;
+        this.taskObj.executor = [event.params.id];
+        this.userFormatedName = this.taskObj.member.firstNameLetter;
+      }
+    },
+
+    currentMember(userId) {
+      return this.members.filter((member) => member.id == userId);
+    },
+
+    async createTask() {
+      try {
+        const response = await this.createTismTask({
+          teamId: this.$route.params.teamId,
+          taskName: this.taskObj.taskName,
+          taskType: this.taskObj.taskType,
+          startTime: this.dateRange.startDate,
+          endTime: this.dateRange.endDate,
+          description: this.taskObj.description,
+          executor: this.taskObj.executor,
+        });
+        if (response._id) {
+          this.$emit("close");
+        } else {
+          // console.log(response)
+          return;
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    async updateTask() {
+      try {
+        const response = await this.updateTismTask({
+          teamId: this.$route.params.teamId,
+          taskId: this.taskObj.taskId,
+          taskName: this.taskObj.taskName,
+          taskType: this.taskObj.taskType,
+          startTime: this.dateRange.startDate,
+          endTime: this.dateRange.endDate,
+          description: this.taskObj.description,
+          executor: this.taskObj.executor,
+        })
+        if( response.success ) {
+          this.$emit('close')
+        } else {
+          // console.log(response)
+          return
+        }
+      } catch(error) {
+        console.log(error);
+      }
+    },
+  },
+  computed: {
+    ...mapGetters({
+      members: "members",
+    }),
   },
 };
 </script>
@@ -147,6 +284,26 @@ export default {
     font-weight: 600;
     padding: 10px 1.5rem;
     border-bottom: 1px solid #ddd;
+  }
+
+  .first-color {
+    background-color: #f87408 !important;
+  }
+
+  .second-color {
+    background-color: #c4f808 !important;
+  }
+
+  .third-color {
+    background-color: #08f850 !important;
+  }
+
+  .forth-color {
+    background-color: #088cf8 !important;
+  }
+
+  .fifth-color {
+    background-color: #c008f8 !important;
   }
 
   .modal-main {
@@ -174,7 +331,7 @@ export default {
             text-align: center;
             line-height: 34px;
             font-size: 28px;
-						cursor: pointer;
+            cursor: pointer;
           }
         }
       }

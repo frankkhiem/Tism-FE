@@ -150,7 +150,6 @@ export default {
     searchTeam(keyword) {
       const teams = this.teams.filter((team) => {
         if (team.teamName.toLowerCase().includes(keyword.toLowerCase())) {
-          console.log("true");
           return true;
         }
         return false;
@@ -317,13 +316,14 @@ export default {
   // }
 
   .row-header {
+    margin-bottom: 25px;
     display: flex;
     justify-content: space-between;
   }
 
   .create-new-team {
     width: 300px;
-    padding: 5px 2rem;
+    padding: 6px 2rem;
     border-radius: 8px;
     font-size: 20px;
     font-weight: 600;
