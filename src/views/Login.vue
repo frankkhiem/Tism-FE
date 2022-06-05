@@ -7,7 +7,7 @@
     </div>
     <div class="form-login">
       <form @submit.prevent='login'>
-        <div class="form-control">
+        <div class="form__control">
           <label for="email">Email*</label>
           <div class="login-input-wrap">
             <input id="email" v-model='email' class="input-field" placeholder="Nhập email của bạn ..." required>
@@ -18,7 +18,7 @@
             <i class="fa-solid fa-circle-exclamation"></i>
           </div>
         </div>
-        <div class="form-control">
+        <div class="form__control">
           <label for="password">Mật khẩu*</label>
           <div class="login-input-wrap">
             <input v-if="showPassword" id="password" type="text" v-model='password' class="input-field password" placeholder="Nhập mật khẩu của bạn ..." required>
@@ -174,12 +174,12 @@ export default {
   display: flex;
   flex-direction: column;
 }
-.form-control {
+.form__control {
   display: flex;
   flex-direction: column;
   margin: 12px 0;
 }
-.form-control label {
+.form__control label {
   font-size: 14px;
   padding: 12px 0;
   color: #333;

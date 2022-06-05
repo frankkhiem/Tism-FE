@@ -8,7 +8,7 @@ export default {
 	created() {
 		// console.log(this.$route.query);
 		this.$router.replace({ 
-			name: 'Contacts', 
+			name: 'OutlookContacts', 
 			query: { 
 				type: 'linkingOutlook',
 				data: this.$route.query

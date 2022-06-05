@@ -1,0 +1,182 @@
+<template>
+  <div class="friend-item">
+    <div v-if="friend.avatar" class="avatar avatar--img" @click="toProfile">
+      <img :src="friend.avatar" alt="">
+    </div>
+    <div v-else class="avatar avatar--text" @click="toProfile">
+      {{ friend.firstNameLetter }}
+    </div>
+    <div class="info">
+      <div class="name" @click="toProfile">{{ friend.name }}</div>
+      <div class="mutual" @click="toMutualFriends">
+        {{ friend.mutualFriends }} bạn chung
+      </div>
+      <div class="history">
+        Trở thành bạn từ: {{ friend.history }}
+      </div>
+    </div>
+    <div class="btns">
+      <div class="chat-btn" @click="toChat">
+        <b-icon icon="chat-quote-fill"></b-icon>
+        Nhắn tin
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import { mapActions } from 'vuex'
+
+export default {
+  props: {
+    friend: Object
+  },
+
+  computed: {
+    
+  },
+
+  data() {
+    return {
+      
+    }
+  },
+
+  methods: {
+    ...mapActions({    
+      // sendInvitationFriend: 'sendInvitationFriend',
+      // cancelInvitationFriend: 'cancelInvitationFriend',
+      // declineInvitationFriend: 'declineInvitationFriend',
+      // acceptInvitationFriend: 'acceptInvitationFriend'
+    }),
+
+    toChat() {
+      this.$router.push(`/chat/${this.friend.chatRoomId}`)
+    },
+
+    toProfile() {
+      this.$router.push(`/person/${this.friend.id}/info`)
+    },
+
+    toMutualFriends() {
+      this.$router.push(`/person/${this.friend.id}/mutual-friends`)
+    }
+  },
+}
+</script>
+
+<style lang="scss" scoped>
+.friend-item {
+  display: flex;
+  align-items: center;
+  height: 120px;
+  width: 65%;
+  margin: 0 auto 20px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  box-shadow: 0px 1px 2px 0px rgba(9, 30, 66, .2);
+  padding: 0 1rem;
+
+  .avatar {
+    width: 85px;
+    height: 85px;
+    border-radius: 6px;
+    cursor: pointer;
+
+    &:hover {
+      filter: brightness(90%) contrast(100%) saturate(100%) blur(0px) hue-rotate(0deg);
+    }
+
+    &.avatar--text {
+      display: grid;
+      place-items: center;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #fff;
+      background-color: #ccc;
+      user-select: none;
+    }
+
+    &.avatar--img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+  }
+
+  .info {
+    flex-grow: 1;
+    margin-left: 1rem;
+
+    .name {
+      position: relative;
+      font-size: 22px;
+      font-weight: 600;
+      line-height: 1.2;
+      color: #050505;
+      cursor: pointer;
+      width: fit-content;
+
+      &:hover::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        border-bottom: 1px solid #2c3e50;
+      }
+    }
+
+    .mutual {
+      position: relative;
+      font-size: 14px;
+      line-height: 1;
+      margin-top: 2px;
+      cursor: pointer;
+      width: fit-content;
+
+      &:hover::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -1px;
+        width: 100%;
+        border-bottom: 1px solid #2c3e50;
+      }
+    }
+
+    .history {
+      margin-top: 10px;
+      cursor: default;
+    }
+  }
+
+  .btns {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: 1rem;
+
+    > div {
+      padding: 4px 12px;
+      border-radius: 6px;
+      margin-left: .6rem;
+      cursor: pointer;
+    }
+
+    .chat-btn {
+      background-color: #e4e6eb;
+
+      &:hover {
+        background-color: #dbdbeb;
+      }
+    }
+  }
+}
+
+@media (max-width: 1220px) {
+  .friend-item {
+    width: 85%;
+  }
+}
+</style>

@@ -5,7 +5,9 @@ const state = {
 }
 
 const getters = {
-  
+  googleContacts: (state) => {
+    return state.googleContacts
+  }
 }
 
 const mutations = {
@@ -40,12 +42,46 @@ const actions = {
         accessToken
       })
 
-      if( response.data.success ) dispatch('getGoogleContacts')
+      if( response.data.success ) await dispatch('getGoogleContacts')
     } catch(error) {
       // statements
       console.log(error.response.data)
     }
   },
+
+  syncReverseGoogleContacts: async ({ dispatch }) => {
+    const accessToken = localStorage.getItem('accessToken')
+
+    try {
+      const response = await axios.get(`${process.env.VUE_APP_ZATO_ESB_MODULE_HOST}/google/sync-reverse`, {
+        params: {
+          accessToken
+        }
+      })
+
+      if( response.data.success ) await dispatch('getGoogleContacts')
+    } catch(error) {
+      // statements
+      console.log(error.response.data)
+    }
+  },
+
+  googleUnlink: async ({ dispatch }) => {
+    const accessToken = localStorage.getItem('accessToken')
+
+    try {
+      const response = await axios.get(`${process.env.VUE_APP_ZATO_ESB_MODULE_HOST}/google/unlink`, {
+        params: {
+          accessToken
+        }
+      })
+
+      if( response.data.success ) await dispatch('getGoogleContacts')
+    } catch(error) {
+      // statements
+      console.log(error.response.data);
+    }
+  }
 }
 
 export default {

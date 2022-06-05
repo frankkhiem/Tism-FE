@@ -30,19 +30,104 @@ const routes = [
       },
       {
         path: 'contacts',
-        name: 'Contacts',
-        component: () => import(/* webpackChunkName: "about" */ '../views/Contacts.vue')
+        component: () => import(/* webpackChunkName: "about" */ '../views/Contacts.vue'),
+        children: [
+          {
+            path: '',
+            name: 'Contacts',
+            component: () => import('../components/contactsPage/tismContacts/TismContacts'),
+          },
+          {
+            path: 'google-contacts',
+            name: 'GoogleContacts',
+            component: () => import('../components/contactsPage/googleContacts/GoogleContacts'),
+          },
+          {
+            path: 'outlook-contacts',
+            name: 'OutlookContacts',
+            component: () => import('../components/contactsPage/outlookContacts/OutlookContacts'),
+          },
+        ]
       },
-      // {
-      //   path: 'profile',
-      //   name: 'Profile',
-      //   component: () => import('../views/Profile')
-      // },
+      {
+        path: 'profile',
+        component: () => import('../views/Profile'),
+        children: [
+          {
+            path: '',
+            name: 'Profile',
+            component: () => import('../components/profilePage/UserInfo'),
+          },
+          {
+            path: 'edit',
+            name: 'EditProfile',
+            component: () => import('../components/profilePage/EditProfile'),
+          },
+        ]
+      },
+      {
+        path: 'friends',
+        component: () => import('../views/Friends'),
+        children: [
+          {
+            path: '',
+            name: 'ListFriends',
+            component: () => import('../components/friendsPage/listFriends/ListFriends'),
+          },
+          {
+            path: 'invitations',
+            name: 'InvitationsFriends',
+            component: () => import('../components/friendsPage/invitationsFriends/InvitationsFriends'),
+          },
+          {
+            path: 'find',
+            name: 'FindFriends',
+            component: () => import('../components/friendsPage/findFriends/FindFriends'),
+          },
+        ]
+      },
+      {
+        path: 'person',
+        component: () => import('../views/PersonProfile'),
+        children: [
+          {
+            path: ':personId/info',
+            name: 'PersonInfo',
+            component: () => import('../components/personPage/PersonInfo'),
+          },
+          {
+            path: ':personId/mutual-friends',
+            name: 'MutualFriends',
+            component: () => import('../components/personPage/MutualFriends'),
+          },
+        ]
+      },
+      {
+        path: 'chat',
+        name: 'FriendChatDefault',
+        component: () => import('../views/FriendChat')
+      },
+      {
+        path: 'chat/:chatRoomId',
+        name: 'FriendChat',
+        component: () => import('../views/FriendChat')
+      },
       // {
       //   path: 'home-test',
       //   name: 'HomeTest',
       //   component: () => import('../views/HomeTest')
       // }
+      {
+        path: '/team/:teamId',
+        name: 'Team',
+        props: true,
+        component: () => import('../views/Team')
+      },
+      {
+        path: 'teams',
+        name: 'Teams',
+        component: () => import('../views/Teams')
+      },
     ]
   },
   {
@@ -55,16 +140,21 @@ const routes = [
     name: 'Google Code',
     component: () => import('../views/GoogleCode')
   },
+  {
+    path: '/meeting/:meetingId',
+    name: 'TeamMeeting',
+    component: () => import('../views/Meeting')
+  },
   // {
   //   path: '/zalo/get-auth-code',
   //   name: 'Zalo Code',
   //   component: () => import('../views/ZaloCode')
   // },
-  // {
-  //   path: '/*',
-  //   name: 'Not Found',
-  //   component: () => import('../views/NotFoundPage')
-  // },
+  {
+    path: '/*',
+    name: 'Not Found',
+    component: () => import('../views/NotFound')
+  },
 ]
 
 const router = new VueRouter({

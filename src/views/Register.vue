@@ -6,7 +6,7 @@
       </div>
       <div class="form-register">
       <form @submit.prevent='register'>
-        <div class="form-control">
+        <div class="form__control">
           <label for="username">Họ tên*</label>
           <div class="register-input-wrap">
             <input id="username" type="text" v-model='fullName' class="input-field" placeholder="Nhập họ tên của bạn ..." >
@@ -17,7 +17,7 @@
             <i class="fa-solid fa-circle-exclamation"></i>
           </div>
         </div>
-        <div class="form-control">
+        <div class="form__control">
           <label for="email">Email*</label>
           <div class="register-input-wrap">
             <input id="email" v-model='email' type="" class="input-field" placeholder="Nhập email của bạn ..." >
@@ -28,7 +28,7 @@
             <i class="fa-solid fa-circle-exclamation"></i>
           </div>
         </div>
-        <div class="form-control">
+        <div class="form__control">
           <label for="password">Mật khẩu*</label>
           <div class="register-input-wrap">
             <input v-if="showPassword" id="password" type="text" v-model='password' class="input-field password" placeholder="Nhập mật khẩu của bạn ..." >
@@ -44,7 +44,7 @@
             <i class="fa-solid fa-circle-exclamation"></i>
           </div>
         </div>
-        <div class="form-control">
+        <div class="form__control">
           <label for="password-confirm">Nhập lại mật khẩu*</label>
           <div class="register-input-wrap">
             <input v-if="showPasswordConfirm" id="password-confirm" type="text" v-model='passwordConfirm' class="input-field password" placeholder="Nhập lại mật khẩu của bạn ..." >
@@ -171,6 +171,9 @@ export default {
   },
 
   watch: {
+    fullName: function(){
+      this.errorFullName = '';
+    }, 
     email: function(){
       this.errorEmail = '';
     }, 
@@ -219,12 +222,12 @@ export default {
   display: flex;
   flex-direction: column;
 }
-.form-control {
+.form__control {
   display: flex;
   flex-direction: column;
-  margin: 15px 0 0 0;
+  margin: 2px 0 0 0;
 }
-.form-control label {
+.form__control label {
   font-size: 14px;
   padding: 12px 0;
   color: #333;
@@ -291,6 +294,9 @@ export default {
   text-align: center;
   position: absolute;
   bottom: 0;
+}
+.login-button p {
+  margin: 0 0 10px;
 }
 .login-button a {
   display: inline-block;
