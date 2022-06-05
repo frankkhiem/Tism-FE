@@ -36,6 +36,7 @@
               <div
                 class="user-ava"
                 v-tooltip="'You have new messages.'"
+                v-b-tooltip.hover.bottom :title="userFullName"
                 :class="{
                   'first-color':
                     'A' <= userFormatedName && userFormatedName < 'F',
@@ -69,7 +70,7 @@
             </div>
           </div>
           <div class="input-wrapper">
-            <div class="input-title">Miêu tả</div>
+            <div class="input-title">Mô tả</div>
             <textarea
               name=""
               id="taskDes_ipt"
@@ -128,6 +129,7 @@ export default {
       },
       isShowCalendar: false,
       userFormatedName: "?",
+      userFullName: "?",
       executorName: "",
       taskObj: Object,
     };
@@ -151,6 +153,7 @@ export default {
       let memberId = this.taskObj.executor[0];
       this.taskObj.member = this.currentMember(memberId)[0];
       this.userFormatedName = this.taskObj.member.firstNameLetter;
+      this.userFullName = this.taskObj.member.name;
     }
 
     if (!this.taskObj.startTime) {
@@ -206,6 +209,7 @@ export default {
         this.taskObj.member = event.params;
         this.taskObj.executor = [event.params.id];
         this.userFormatedName = this.taskObj.member.firstNameLetter;
+        this.userFullName = this.taskObj.member.name;
       }
     },
 
