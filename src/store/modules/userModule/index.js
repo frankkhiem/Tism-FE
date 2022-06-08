@@ -92,6 +92,27 @@ const actions = {
     }
   },
 
+  updateUserFullname: async ({ dispatch }, fullname) => {
+    const accessToken = localStorage.getItem('accessToken')
+
+    try {
+      await axios.patch(`${process.env.VUE_APP_API_HOST}/user/fullname`, 
+        {
+          fullname
+        }, 
+        {
+          headers: {
+            "Authorization": `Bearer ${accessToken}`
+          }
+        }
+      )
+
+      dispatch('fetchUserProfile')
+    } catch(error) {
+      console.log(error.response.data);
+    }
+  },
+
   uploadUserAvatar: async ({ commit }, formData) => {
     const accessToken = localStorage.getItem('accessToken')
 

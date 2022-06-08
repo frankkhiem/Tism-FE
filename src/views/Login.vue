@@ -5,7 +5,10 @@
       <span>Đăng nhập</span>
       <!-- <i class="fa-solid fa-arrow-right-to-bracket login-icon"></i> -->
     </div>
-    <div class="form-login">
+    <div v-show="loading" class="loading-login">
+      <img src="@/assets/img/Dual Ring-1s-200px.gif" alt="">
+    </div>
+    <div v-show="!loading" class="form-login">
       <form @submit.prevent='login'>
         <div class="form__control">
           <label for="email">Email*</label>
@@ -58,7 +61,8 @@ export default {
       password: '',
       errorEmail: '',
       errorPassword: '',
-      showPassword: false
+      showPassword: false,
+      loading: false
     }
   },
 
@@ -82,7 +86,8 @@ export default {
       fetchUserProfile: 'fetchUserProfile',
     }),
 
-    async login() {      
+    async login() {
+      this.loading = true     
       this.errorEmail = ''
       this.errorPassword = ''
 
@@ -124,6 +129,8 @@ export default {
             this.errorEmail = 'Không thể đăng nhập tài khoản'
             break
         }
+      } finally {
+        this.loading = false
       }
     },
   },
@@ -166,6 +173,17 @@ export default {
 }
 .login-title span {
   font-weight: 500;
+}
+.loading-login {
+  width:  100%;
+  height:  440px;
+  display: flex;
+  justify-content: center;
+  align-items:  center;
+}
+.loading-login img {
+  width: 80px;
+  height: 80px;
 }
 .form-login {
   width: 100%;

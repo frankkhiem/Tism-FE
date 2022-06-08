@@ -229,16 +229,16 @@ export default {
     return {
       show_dropdown_menu: false,
       options: [
-        { key: "user", text: "Account", icon: "user", value: "user" },
+        { key: "user", text: "Tài khoản", icon: "user", value: "user" },
         {
           key: "settings",
-          text: "Settings",
+          text: "Cài đặt",
           icon: "settings",
           value: "settings",
         },
         {
           key: "sign-out",
-          text: "Sign Out",
+          text: "Đăng xuất",
           icon: "sign out",
           value: "sign-out",
         },
@@ -542,7 +542,7 @@ export default {
   transition: opacity 0.1s ease;
   z-index: 11;
   will-change: transform, opacity;
-  width: 120px
+  width: 130px;
 }
 
 .menu-options::after {

@@ -4,7 +4,10 @@
       <div class="register-title">
         <span>Đăng ký</span>
       </div>
-      <div class="form-register">
+      <div v-show="loading" class="loading-register">
+        <img src="@/assets/img/Dual Ring-1s-200px.gif" alt="">
+      </div>
+      <div v-show="!loading" class="form-register">
       <form @submit.prevent='register'>
         <div class="form__control">
           <label for="username">Họ tên*</label>
@@ -88,7 +91,8 @@ export default {
       errorEmail: '',
       errorPasswordConfirm: '',
       showPassword: false,
-      showPasswordConfirm: false
+      showPasswordConfirm: false,
+      loading: false
     }
   },
 
@@ -122,6 +126,7 @@ export default {
         this.errorPasswordConfirm = 'Mật khẩu nhập lại không đúng'
         return
       }
+      this.loading = true
 
       try {
         const response = await axios.post(process.env.VUE_APP_API_HOST + '/register', {
@@ -166,6 +171,8 @@ export default {
             this.errorEmail = 'Không thể đăng ký tài khoản'
             break
         }
+      } finally {
+        this.loading = false
       }
     },
   },
@@ -214,6 +221,17 @@ export default {
 }
 .register-title span {
   font-weight: 500;
+}
+.loading-register {
+  width:  100%;
+  min-height: 560px;
+  display: flex;
+  justify-content: center;
+  align-items:  center;
+}
+.loading-register img {
+  width: 80px;
+  height: 80px;
 }
 .form-register {
   width: 100%;
