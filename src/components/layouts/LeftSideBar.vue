@@ -80,4 +80,12 @@ export default {
 .v-sidebar-menu .vsm--link_mobile-item .vsm--title {
   color: #f2f4f7;
 }
+
+.v-sidebar-menu .vsm--link_level-1:hover .vsm--icon {
+  color: #fff;
+}
+
+.v-sidebar-menu .vsm--link_level-1:hover .vsm--title {
+  color: #fff;
+}
 </style>
