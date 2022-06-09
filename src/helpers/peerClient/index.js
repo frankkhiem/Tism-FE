@@ -41,6 +41,7 @@ const createPeer = (id) => {
     host: process.env.VUE_APP_PEER_SERVER_HOST || HOST,
     port: process.env.VUE_APP_PEER_SERVER_PORT || PORT,
     path: process.env.VUE_APP_PEER_SERVER_PATH || '/',
+    secure: true,
     config: _config
   })
   // const peer = new Peer(id)
