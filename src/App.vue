@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <vue-confirm-dialog></vue-confirm-dialog>
-    <router-view/>
+    <router-view v-if="!loadingUser"/>
   </div>
 </template>
 
@@ -12,7 +12,7 @@ export default {
   name: 'App',
   data() {
     return {
-
+      loadingUser: false
     }
   },
 
@@ -24,8 +24,10 @@ export default {
   },
 
   async created() {
+    this.loadingUser = true
     await this.fetchUserProfile()
     // await this.getListFriends()
+    this.loadingUser = false
   },
 }
 </script>

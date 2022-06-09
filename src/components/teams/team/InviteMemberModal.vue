@@ -115,7 +115,7 @@ export default {
           this.msgResult = "Người dùng này đã được gửi lời mời vào nhóm hiện tại. Vui lòng nhập email khác"
           this.loading = false
           this.sendResultUiFail = true
-          console.log(response.data)
+          // console.log(response.data)
         }
       } catch (error) {
         this.msgResult = "Gửi lời mời không thành công. Vui lòng kiểm tra và nhập lại email chính xác"
@@ -140,7 +140,7 @@ export default {
       .then(response => {
           this.allUsers = response.data
           //this.tempAllUsers = this.allUsers.email.slice(0,5)
-          console.log(this.allUsers);
+          // console.log(this.allUsers);
       })
       .catch(function(err){
         console.log(err);
