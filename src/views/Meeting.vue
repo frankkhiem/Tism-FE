@@ -442,7 +442,6 @@ export default {
     setInterval(() => {
       this.duringTimes++
     }, 1000)
-    this.loadingSelfStream = true
 
     await new Promise(resolve => setTimeout(resolve, 1000))
     // connect to socket server
@@ -588,6 +587,7 @@ export default {
   },
 
   async mounted() {
+    this.loadingSelfStream = true
     await this.createMediaStream()
     this.$refs.selfCamera.srcObject = this.selfStream
     this.loadingSelfStream = false
