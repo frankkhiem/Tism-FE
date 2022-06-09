@@ -62,7 +62,7 @@ export default {
 			try {
 				this.loading = true;
 				await this.getListFriends()
-				await new Promise(resolve => setTimeout(resolve, 300))
+				// await new Promise(resolve => setTimeout(resolve, 300))
 				this.loading = false;
 			} catch(error) {
 				console.log(error);

@@ -201,7 +201,7 @@ export default {
 
   async created() {
     this.loading = true
-    await new Promise(resolve => setTimeout(resolve, 200))
+    // await new Promise(resolve => setTimeout(resolve, 200))
     await this.fetchUserProfile()
     this.loading = false
   }

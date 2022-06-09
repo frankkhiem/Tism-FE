@@ -134,7 +134,7 @@ export default {
         this.loading = true
         await this.getPersonInfo(this.$route.params.personId)
         await this.getMutualFriends(this.$route.params.personId)
-        await new Promise(resolve => setTimeout(resolve, 300))
+        // await new Promise(resolve => setTimeout(resolve, 300))
         this.loading = false
       } catch(error) {
         console.log(error);

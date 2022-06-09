@@ -68,7 +68,7 @@ export default {
 			this.$refs.searchInput.blur()
 			try {
 				this.loading = true
-				await new Promise(resolve => setTimeout(resolve, 500));
+				// await new Promise(resolve => setTimeout(resolve, 500));
 				await this.searchFindFriends(keyword)
 				this.loading = false
 			} catch(error) {

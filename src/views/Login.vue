@@ -77,7 +77,7 @@ export default {
       setTimeout( () => {
         if( vm.isAuth ) next({ name: 'Home' })
         else next()
-      }, 200)      
+      }, 50)      
     })
   },
 

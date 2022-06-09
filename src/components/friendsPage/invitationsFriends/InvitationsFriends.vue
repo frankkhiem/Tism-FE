@@ -95,7 +95,7 @@ export default {
 		async refreshInvitaions() {
 			try {
 				this.loading = true;
-				await new Promise(resolve => setTimeout(resolve, 500));
+				// await new Promise(resolve => setTimeout(resolve, 500));
 				await this.getInvitationsReceived()
 				await this.getInvitationsSended()
 				await this.getListFriends()
