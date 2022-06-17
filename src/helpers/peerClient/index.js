@@ -4,18 +4,18 @@ let _config
 _config = {
   iceServers: [
     {
-      urls: [ "stun:ss-turn1.xirsys.com" ]
+      urls: [ "stun:hk-turn1.xirsys.com" ]
     }, 
     {
-      username: "Rf_-BjfmYsAJ497FoGqboMdzolglNSjUfFLMaw3LZqs9yLxl9lT32yfo-Q533svnAAAAAGKRAeVmcmFua2toaWVt",
-      credential: "7352bcba-dddd-11ec-961a-0242ac140004",
+      username: "M8W0eOl_QCusvixntDpw-G0TtAutEtXMFS4AzaPuYLpomaoh5J567WOxVZZJluPnAAAAAGKr9iJraGllbW5nZw==",
+      credential: "50495bb8-edee-11ec-8a22-0242ac120004",
       urls: [
-        "turn:ss-turn1.xirsys.com:80?transport=udp",
-        "turn:ss-turn1.xirsys.com:3478?transport=udp",
-        "turn:ss-turn1.xirsys.com:80?transport=tcp",
-        "turn:ss-turn1.xirsys.com:3478?transport=tcp",
-        "turns:ss-turn1.xirsys.com:443?transport=tcp",
-        "turns:ss-turn1.xirsys.com:5349?transport=tcp"
+        "turn:hk-turn1.xirsys.com:80?transport=udp",
+        "turn:hk-turn1.xirsys.com:3478?transport=udp",
+        "turn:hk-turn1.xirsys.com:80?transport=tcp",
+        "turn:hk-turn1.xirsys.com:3478?transport=tcp",
+        "turns:hk-turn1.xirsys.com:443?transport=tcp",
+        "turns:hk-turn1.xirsys.com:5349?transport=tcp"
       ]
     } 
   ]
