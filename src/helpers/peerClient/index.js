@@ -4,18 +4,16 @@ let _config
 _config = {
   iceServers: [
     {
-      urls: [ "stun:hk-turn1.xirsys.com" ]
+      urls: [ "stun:openrelay.metered.ca:80" ]
     }, 
     {
-      username: "M8W0eOl_QCusvixntDpw-G0TtAutEtXMFS4AzaPuYLpomaoh5J567WOxVZZJluPnAAAAAGKr9iJraGllbW5nZw==",
-      credential: "50495bb8-edee-11ec-8a22-0242ac120004",
+      username: "openrelayproject",
+      credential: "openrelayproject",
       urls: [
-        "turn:hk-turn1.xirsys.com:80?transport=udp",
-        "turn:hk-turn1.xirsys.com:3478?transport=udp",
-        "turn:hk-turn1.xirsys.com:80?transport=tcp",
-        "turn:hk-turn1.xirsys.com:3478?transport=tcp",
-        "turns:hk-turn1.xirsys.com:443?transport=tcp",
-        "turns:hk-turn1.xirsys.com:5349?transport=tcp"
+        "turn:openrelay.metered.ca:80",
+        "turn:openrelay.metered.ca:443",
+        "turn:openrelay.metered.ca:80?transport=tcp",
+        "turn:openrelay.metered.ca:443?transport=tcp"
       ]
     } 
   ]
